@@ -15,3 +15,8 @@ image.png
 kgml_cache/
 kegg_cache/
 docs
+
+!inst/extdata/hsa04010.xml
+!inst/extdata/test01.xml
+
+Users:.fileloc
