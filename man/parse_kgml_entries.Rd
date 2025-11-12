@@ -2,7 +2,7 @@
 % Please edit documentation in R/kgml_interface.R
 \name{parse_kgml_entries}
 \alias{parse_kgml_entries}
-\title{Parse KEGG KGML files to extract nodes and edges data frames.}
+\title{Parse KEGG KGML files to extract nodes data frame.}
 \usage{
 parse_kgml_entries(file)
 }
@@ -10,8 +10,10 @@ parse_kgml_entries(file)
 \item{file}{Path to the KGML XML file.}
 }
 \value{
-A tibble with columns: id, name, type, link, reaction, graphics_name, fgcolor, bgcolor, graphics_type, x, y, width, height.
+A tibble with columns: id, kegg_name, type, link, reaction,
+  graphics_name, label, fgcolor, bgcolor, graphics_type, x, y,
+  width, height, value, source, color, text, components.
 }
 \description{
-Parse KEGG KGML files to extract nodes and edges data frames.
+Parse KEGG KGML files to extract nodes data frame.
 }

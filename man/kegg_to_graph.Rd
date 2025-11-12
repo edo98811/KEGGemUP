@@ -9,7 +9,7 @@ kegg_to_graph(
   organism = "mmu",
   de_results = NULL,
   return_type = "igraph",
-  scaling_factor = 2.5
+  scaling_factor = 1.5
 )
 }
 \arguments{
