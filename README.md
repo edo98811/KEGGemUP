@@ -6,7 +6,7 @@ A package to map you differential expression results on KEGG pathways
 
 ```R
 install.packages("devtools")     
-devtools::install_github("edoardofilippi/KEGGemUP")
+devtools::install_github("edo98811/KEGGemUP")
 ```
 ## Usage
 
