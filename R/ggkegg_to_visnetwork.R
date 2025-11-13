@@ -339,11 +339,15 @@ add_group_relations <- function(nodes_df) {
 
     # Skip groups with only 1 member
     # Concatenation with empty tibble will not add NA or empty rows
-    if (n < 2) return(tibble::tibble(from = character(0), 
-                                     to = character(0), 
-                                     type = character(0), 
-                                     subtype = character(0), 
-                                     rel_value = character(0)))
+    if (n < 2) {
+      return(tibble::tibble(
+        from = character(0),
+        to = character(0),
+        type = character(0),
+        subtype = character(0),
+        rel_value = character(0)
+      ))
+    }
 
     # Generate all pairwise combinations
     # docs: https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/combn
