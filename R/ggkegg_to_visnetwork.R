@@ -205,24 +205,42 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' @details The tooltip includes a button to the specific KEGG entry page. If multiple KEGG IDs are present, they are concatenated with '+' in the URL. It also adds information about the node name, source of differential expression data, and value.
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
-
+  #  base_link, gsub(" ", "+", nodes_df$kegg_name)
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
+    # paste0(
+    #   '<a href="', nodes_df$link,
+    #   '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
+    #   '<button type="button">KEGG entry</button></a><br>'
+    # )
     paste0(
-      '<a href="', base_link, gsub(" ", "+", nodes_df$kegg_name),
+      '<div style="text-align:center; margin-top:5px;">',
+      '<a href="', nodes_df$link,
       '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
-      '<button type="button">KEGG entry</button></a><br>'
+      '<button type="button" style="',
+      "background-color:#4CAF50;",
+      "color:white;",
+      "border:none;",
+      "padding:5px 12px;",
+      "border-radius:5px;",
+      "cursor:pointer;",
+      'font-size:12px;">',
+      "KEGG entry</button></a></div>"
     )
   )
 
   # Ensure no "NA" strings in tooltip
   safe <- function(x) ifelse(is.na(x), "", as.character(x))
-  nodes_df$title <- paste0(
-    "Name: ", safe(nodes_df$kegg_name), "<br>",
-    "Source: ", safe(nodes_df$source), "<br>",
-    "Value: ", safe(nodes_df$value), "<br>",
-    button_html
+  nodes_df$title <- ifelse(
+    safe(nodes_df$kegg_name) == "undefined",
+    "Group Node Placeholder<br>",
+    paste0(
+      "Name: ", safe(nodes_df$kegg_name), "<br>",
+      "Source: ", safe(nodes_df$source), "<br>",
+      "Value: ", safe(format(round(as.numeric(nodes_df$value), 3), nsmall = 3)), "<br>",
+      button_html
+    )
   )
   return(nodes_df)
 }
