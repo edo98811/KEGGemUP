@@ -1,10 +1,33 @@
 #' Parse KEGG KGML files to extract relations and edges data frames.
 #'
 #' @param file Path to the KGML XML file.
-#' @return A tibble with columns: from, to, type, name, value.
+#'
+#' @return A tibble with the following columns:
+#' \describe{
+#'   \item{from}{The ID of the source entry (node) in the pathway, corresponding to the `entry1` attribute in the KGML `<relation>` tag.}
+#'   \item{to}{The ID of the target entry (node) in the pathway, corresponding to the `entry2` attribute in the KGML `<relation>` tag.}
+#'   \item{type}{The general type of relationship between the two entries (e.g., `"ECrel"`, `"PPrel"`, `"GErel"`, `"PCrel"`, `"maplink"`). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.}
+#'   \item{subtype}{A more specific subtype of the relation, derived from the `<subtype>` child elements of the `<relation>` node (e.g., `"activation"`, `"inhibition"`, `"expression"`, `"compound"`). If no subtype is defined, this will be `NA`.}
+#'   \item{rel_value}{A categorical value associated with the subtype, which encodes the apearence of the arrow (from the `value` attribute of `<subtype>`). If not present, this will be `NA`.}
+#' }
+#'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
 #' @importFrom tibble tibble
 #' @importFrom purrr map_dfr
+#'
+#' @details
+#' The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
+#' information as XML, and extracts all `<relation>` elements that describe the 
+#' interactions or relationships between entities in the pathway. Each `<relation>` may
+#' contain one or more `<subtype>` elements that provide additional details about
+#' the interaction. The result is a tidy tibble suitable for network analysis or
+#' visualization, where each row represents one relation–subtype pair.
+#' @examples
+#' \dontrun{
+#' relations_df <- parse_kgml_relations("pathway.xml")
+#' head(relations_df)
+#' }
+#' @export
 parse_kgml_relations <- function(file) {
   doc <- read_xml(file)
 
@@ -40,12 +63,52 @@ parse_kgml_relations <- function(file) {
 #' Parse KEGG KGML files to extract nodes data frame.
 #'
 #' @param file Path to the KGML XML file.
-#' @return A tibble with columns: id, kegg_name, type, link, reaction,
-#'   graphics_name, label, fgcolor, bgcolor, graphics_type, x, y,
-#'   width, height, value, source, color, text, components.
+#'
+#' @return A tibble with the following columns:
+#' \describe{
+#'   \item{id}{Unique identifier of the entry within the KGML pathway (from the `id` attribute).}
+#'   \item{kegg_name}{The KEGG-specific name or identifier of the entity (from the `name` attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
+#'   \item{type}{Type of the node (from the `type` attribute), indicating the biological entity class such as `"gene"`, `"enzyme"`, `"compound"`, `"map"`, `"ortholog"`, or `"group"`.}
+#'   \item{link}{URL linking to the KEGG resource for this entry, if available (from the `link` attribute).}
+#'   \item{reaction}{Associated reaction ID(s), if any (from the `reaction` attribute). Typically present for enzyme entries.}
+#'   \item{graphics_name}{Display name for the entry, taken from the `name` attribute of the `<graphics>` node.}
+#'   \item{label}{Text label for visualization purposes.}
+#'   \item{fgcolor}{Foreground color of the graphical element (from the `fgcolor` attribute of `<graphics>`).}
+#'   \item{bgcolor}{Background color of the graphical element (from the `bgcolor` attribute of `<graphics>`).}
+#'   \item{graphics_type}{Shape or representation type of the graphical element (from the `type` attribute of `<graphics>`), such as `"rectangle"`, `"circle"`, or `"line"`.}
+#'   \item{x}{X-coordinate of the node’s position in the pathway diagram (from the `x` attribute of `<graphics>`).}
+#'   \item{y}{Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `<graphics>`).}
+#'   \item{width}{Width of the graphical element (from the `width` attribute of `<graphics>`).}
+#'   \item{height}{Height of the graphical element (from the `height` attribute of `<graphics>`).}
+#'   \item{value}{Will be filled up later with numerical values mapped to the node (initialized as `NA`).}
+#'   \item{source}{Will be filled up later with text indicating the source of the numerical values mapped to the node (initialized as `NA`).}
+#'   \item{color}{Convenience column duplicating `bgcolor`, used for visualization with `visNetwork` or `igraph`.}
+#'   \item{text}{text field (initialized as empty string) for additional infos on mapping.}
+#'   \item{components}{Semicolon-separated list of component IDs for entries of type `"group"`, extracted from nested `<component>` nodes.}
+#'   \item{group}{Reserved column for grouping information (initialized as NA).}
+#' }
+#'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
 #' @importFrom tibble tibble
 #' @importFrom purrr map_dfr
+#'
+#' @details
+#' The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
+#' `<entry>` elements, each representing a biological entity in a KEGG pathway diagram.
+#' Each node may contain nested `<graphics>` elements defining visual properties 
+#' (such as position, size, and colors) and `<component>` elements that define group
+#' membership for composite entities.
+#'
+#' The resulting tibble provides a tidy, one-row-per-entry representation suitable
+#' for integration with relational data models or network visualization frameworks
+#' (e.g., `igraph`or `visNetwork`).
+#'
+#' @examples
+#' \dontrun{
+#' nodes_df <- parse_kgml_entries("pathway.xml")
+#' head(nodes_df)
+#' }
+#' @export
 parse_kgml_entries <- function(file) {
   # Read the KGML file
   doc <- xml2::read_xml(file)
@@ -109,7 +172,6 @@ parse_kgml_entries <- function(file) {
     node_row
   })
 }
-
 
 # #' Parse KEGG KGML files to extract nodes and edges data frames.
 # #'

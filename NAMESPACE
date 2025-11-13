@@ -2,6 +2,8 @@
 
 export(kegg_to_graph)
 export(map_results_to_nodes)
+export(parse_kgml_entries)
+export(parse_kgml_relations)
 importFrom(BiocFileCache,BiocFileCache)
 importFrom(BiocFileCache,bfcnew)
 importFrom(BiocFileCache,bfcpath)
