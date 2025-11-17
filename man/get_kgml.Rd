@@ -7,9 +7,7 @@
 get_kgml(url)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., "hsa04110" or "04110").}
-
-\item{bfc}{A BiocFileCache object for caching.}
+\item{url}{URL to download the KGML file from.}
 }
 \value{
 Content of the respose as text, or NULL if download failed.

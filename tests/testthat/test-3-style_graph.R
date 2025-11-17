@@ -7,7 +7,7 @@
 #   # Run function
 #   mapped_nodes <- add_results_nodes(nodes_df, results_combined)
 #   expect_true(is.data.frame(mapped_nodes))
-#   browser()
+#  
 #   # Check structure
 #   expect_true(is.data.frame(mapped_nodes))
 #   expect_true(all(c("value", "color", "source", "text") %in% colnames(mapped_nodes)))
@@ -218,8 +218,9 @@ test_that("adds visual styling columns correctly", {
 test_that("tooltip is formatted correctly", {
   nodes <- data.frame(
     label = "TP53",
-    KEGG = "hsa04115",
+    KEGG = "04115",
     type = "simple",
+    kegg_name = "hsa04115",
     height = 30,
     width = 30,
     x = 100,

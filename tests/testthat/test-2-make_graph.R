@@ -63,7 +63,7 @@ test_that("parse_kgml_entries load nodes correctly", {
 
 test_that("combine_results_in_dataframe correctly merges DE results across all test lists", {
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-    message(glue::glue("🧩 Testing combine_results_in_dataframe() for scenario: {test_name}"))
+    # message(glue::glue("🧩 Testing combine_results_in_dataframe() for scenario: {test_name}"))
 
     # Run the function for this test list
     result <- combine_results_in_dataframe(de_list)
@@ -96,7 +96,7 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
 test_that("download_kgml caches and returns file path", {
 
   # Locate real KGML file in package
-  xml_file <- system.file("extdata", "hsa04010.xml", package = "MOVIDA")
+  xml_file <- system.file("extdata", "hsa04010.xml", package = "KEGGemUP")
 
   expect_true(file.exists(xml_file)) # sanity check
 
@@ -131,7 +131,7 @@ test_that("add_compound_names caches and assigns compound names", {
   nodes_df <- data.frame(
     id = c("n1", "n2", "n3"),
     type = c("gene", "compound", "compound"),
-    graphics_name = c(NA, "C00031", "C99999"),  # C99999 not in mapping
+    graphics_name = c(NA, "C00006", "C99999"), 
     label = c("", "", ""),
     stringsAsFactors = FALSE
   )
@@ -139,7 +139,7 @@ test_that("add_compound_names caches and assigns compound names", {
   # Locate packaged compound mapping
   compounds_file <- system.file(
     "extdata", "compounds.rds",
-    package = "MOVIDA"
+    package = "KEGGemUP"
   )
 
   expect_true(file.exists(compounds_file))
@@ -157,7 +157,6 @@ test_that("add_compound_names caches and assigns compound names", {
       res <- add_compound_names(nodes_df, bfc)
     }
   )
-
   # ---- assertions ----
 
   # get_compounds must be called exactly once
@@ -167,7 +166,7 @@ test_that("add_compound_names caches and assigns compound names", {
   expect_equal(res$label[1], "")
 
   # known compound gets correct label
-  expect_equal(res$label[2], gsub(";.*", "", as.character(real_compounds[["C00031"]])))
+  expect_equal(res$label[2], gsub(";.*", "", as.character(real_compounds[["C00006"]])))
 
   # unknown compound keeps original ID
   expect_equal(res$label[3], "C99999")

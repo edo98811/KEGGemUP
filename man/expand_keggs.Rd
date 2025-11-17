@@ -7,7 +7,7 @@
 expand_keggs(kegg_df)
 }
 \arguments{
-\item{kegg_string}{Character string of KEGG IDs separated by ";"}
+\item{kegg_df}{Data frame with at least two columns: 'name' and 'KEGG'}
 }
 \value{
 Data frame with a single column 'KEGG' containing individual KEGG IDs

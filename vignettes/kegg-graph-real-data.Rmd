@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-library("MOVIDA")
+library("KEGGemUP")
 ```
 
 ```{r load-fake-results}
@@ -134,16 +134,18 @@ de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)[res_macropha
 pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
 ```
 
+```{r kgml-parsing}
+
+```
+
 ```{r use-package}
-devtools::load_all()
-graph <- kegg_to_graph(pathway, scaling_factor = 2.5)
+graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_list)
 graph
 ```
 
 ```{r use-package-2}
-devtools::load_all()
-graph <- kegg_to_graph(pathway, scaling_factor = 2.5)
+graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_limma)
 graph
 ```

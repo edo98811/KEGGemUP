@@ -17,7 +17,7 @@ remove_kegg_prefix <- function(kegg_ids) {
 
 
 #' Handle multiple KEGG IDs in a single string separated by ";"
-#' @param kegg_string Character string of KEGG IDs separated by ";"
+#' @param kegg_df Data frame with at least two columns: 'name' and 'KEGG'
 #' @return Data frame with a single column 'KEGG' containing individual KEGG IDs
 expand_keggs <- function(kegg_df) {
   # Initialize empty vectors to store results

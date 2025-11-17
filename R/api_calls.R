@@ -1,8 +1,6 @@
 #' Convert KEGG pathway ID to readable pathway name
 #'
-#' @param pathway_id A KEGG pathway ID (e.g., "hsa04110", "mmu04110", "04110")
-#' @param organism Optional organism code (e.g., "hsa", "mmu"). If not provided,
-#'   it will be extracted from the pathway_id if present.
+#' @param id KEGG pathway ID (e.g., "hsa04110")
 #' @return A character string with the readable pathway name
 get_pathway_name <- function(id) {
   tryCatch(
@@ -19,8 +17,7 @@ get_pathway_name <- function(id) {
 
 #' Download KEGG KGML file for a given pathway ID, with caching.
 #'
-#' @param pathway_id KEGG pathway ID (e.g., "hsa04110" or "04110").
-#' @param bfc A BiocFileCache object for caching.
+#' @param url URL to download the KGML file from.
 #' @return Content of the respose as text, or NULL if download failed.
 #' @importFrom httr GET http_error content status_code
 get_kgml <- function(url) {
@@ -67,4 +64,34 @@ get_kegg_compounds <- function(bfc) {
   saveRDS(kegg_compounds, file = path)
 
   return(kegg_compounds)
+}
+
+#' Get KEGG glycans with caching.
+#'
+#' @param bfc A BiocFileCache object for caching.
+#' @return A data frame with KEGG glycan IDs and names.
+#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
+#' @importFrom KEGGREST keggList
+get_kegg_glycans <- function(bfc) {
+
+  cache_name <- "kegg_glycans.rds"
+
+  # Check if cache exists
+  qr <- BiocFileCache::bfcquery(bfc, cache_name, field = "rname")
+
+  if (nrow(qr) > 0) {
+    message("Loading KEGG glycans from cache...")
+    glycans <- readRDS(BiocFileCache::bfcpath(bfc, qr$rid[1]))
+    return(glycans)
+  }
+
+  # Otherwise download from KEGG
+  message("Downloading KEGG glycans...")
+  kegg_glycans <- KEGGREST::keggList("glycan")
+
+  # Save to cache
+  path <- BiocFileCache::bfcnew(bfc, rname = cache_name, ext = ".rds")
+  saveRDS(kegg_glycans, file = path)
+
+  return(kegg_glycans)
 }

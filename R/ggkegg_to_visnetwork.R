@@ -120,24 +120,25 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
   # --- 2. Color and style nodes and edges ---
   nodes_df <- add_tooltip(nodes_df)
 
-  if (nrow(edges_df) == 0) {
-    fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
-    g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
-    g <- igraph::delete_edges(g, igraph::E(g))
-    warning("No edges in the kgml graph.")
-    # remove the fake edge
-    # g <- make_empty_graph(n = 0, directed = FALSE)
-    # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
-  } else {
-    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
-  }
 
-  g <- igraph::permute(g, order(igraph::V(g)$label))
-  igraph::graph_attr(g, "title") <- pathway_name
-  
   # --- 5. Build ---
   result <- switch(return_type,
     igraph = {
+      if (nrow(edges_df) == 0) {
+        fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
+        g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
+        g <- igraph::delete_edges(g, igraph::E(g))
+        warning("No edges in the kgml graph.")
+        # remove the fake edge
+        # g <- make_empty_graph(n = 0, directed = FALSE)
+        # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
+      } else {
+        g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
+      }
+
+      g <- igraph::permute(g, order(igraph::V(g)$label))
+      igraph::graph_attr(g, "title") <- pathway_name
+
       g
     },
     visNetwork = {
@@ -153,7 +154,12 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
         # visNetwork::visLegend(main = pathway_name, zoom = FALSE) %>%
         # visNetwork::visNodes(shape = nodes_df$shape_vis) %>%
         # visNetwork::visLegend(main = pathway_name, position = "left", zoom = FALSE) %>%
-        visNetwork::visOptions(highlightNearest = list(enabled = T, degree = 2, hover = T), nodesIdSelection = TRUE, selectedBy = "group")
+        visNetwork::visOptions(
+          highlightNearest = list(enabled = T, degree = 2, hover = T),
+          selectedBy = "group",
+          nodesIdSelection = TRUE
+        ) %>%
+        visNetwork::visInteraction(dragNodes = TRUE)
       # visNetwork::visSetTitle(main = pathway_name)
     },
     stop("Invalid return_type. Must be 'igraph' or 'visNetwork'.")
@@ -206,6 +212,7 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
   #  base_link, gsub(" ", "+", nodes_df$kegg_name)
+
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
@@ -216,7 +223,7 @@ add_tooltip <- function(nodes_df) {
     # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
-      '<a href="', nodes_df$link,
+      '<a href="', ifelse(is.na(nodes_df$link), nodes_df$link , NA_character_),
       '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
       '<button type="button" style="',
       "background-color:#4CAF50;",
@@ -234,7 +241,7 @@ add_tooltip <- function(nodes_df) {
   safe <- function(x) ifelse(is.na(x), "", as.character(x))
   nodes_df$title <- ifelse(
     safe(nodes_df$kegg_name) == "undefined",
-    "Group Node Placeholder<br>",
+    paste0("Group Node Placeholder: ", nodes_df$group, "<br>"),
     paste0(
       "Name: ", safe(nodes_df$kegg_name), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
@@ -324,6 +331,7 @@ style_edges <- function(edges_df) {
 #'
 #' @param nodes_df A tibble of nodes, must contain columns `name` and `group`.
 #' @return A tibble of edges representing pairwise relations between members of the same group.
+#' @importFrom utils combn
 #' @importFrom tibble tibble
 #' @importFrom purrr map_dfr
 add_group_relations <- function(nodes_df) {
@@ -442,6 +450,8 @@ combine_results_in_dataframe <- function(results_list) {
 #' @param nodes_df Data frame of nodes with 'value' and 'source' columns.
 #' @return nodes_df with colored nodes based on their values.
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom stats na.omit
+#' @importFrom grDevices colorRampPalette
 add_colors_to_nodes <- function(nodes_df) {
   palettes <- c(
     "RdBu",
@@ -493,7 +503,7 @@ add_colors_to_nodes <- function(nodes_df) {
 
 #' Download and cache KEGG KGML files.
 #' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
-#' @param cache_dir Directory to store cached KGML files (default: "kgml_cache").
+#' @param bfc BiocFileCache object for caching KEGG KGML files.
 #' @return Path to the cached KGML file.
 #'
 #' @importFrom xml2 read_xml
@@ -536,9 +546,9 @@ download_kgml <- function(pathway_id, bfc) {
 }
 
 
-#' Parse KEGG KGML files to extract relations (edges) data frame.
-#' @param file Path to the KGML XML file.
-#' @return A tibble
+#' Add gene names to gene nodes in the nodes data frame.
+#' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
+#' @return Updated nodes data frame with gene names added to gene nodes.
 add_gene_names <- function(nodes_df) {
   # find rows that are genes (logical index)
   idx <- which(!is.na(nodes_df$type) & nodes_df$type == "gene")
@@ -557,7 +567,8 @@ add_gene_names <- function(nodes_df) {
 }
 
 #' Add compound names to compound nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type
+#' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
+#' @param bfc BiocFileCache object for caching KEGG compound mappings.
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
 add_compound_names <- function(nodes_df, bfc) {
@@ -572,13 +583,19 @@ add_compound_names <- function(nodes_df, bfc) {
   compounds_in_graph <- compounds_in_graph[idx]
 
   compounds <- get_kegg_compounds(bfc) # expect named vector mapping KEGG id -> name
+  # glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
 
   # safe lookup: if not found, use original id or empty string
   labels <- vapply(compounds_in_graph, function(id) {
     if (is.null(id) || id == "") {
       return("")
     }
-    val <- compounds[id]
+    # if (grepl("^C", id)) {
+      # Compound IDs start with 'C'
+      val <- compounds[id]
+    # } else {
+    #   val <- glycan[id]
+    # }
     if (is.null(val) || is.na(val)) {
       return(id)
     }

@@ -119,13 +119,13 @@ all_de_test_lists <- list(
 throw_warning <- names(all_de_test_lists)[c(2,3,4)]
 expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 
-kgml_path <- system.file("extdata", "test01.xml", package = "MOVIDA")
+kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")
 
-# edges_df <- parse_kgml_relations(kgml_path)
-# write.table(edges_df, system.file("extdata", "test01.xml_edges.csv", package = "MOVIDA"),  sep = ";", row.names = FALSE)
+edges_df <- parse_kgml_relations(kgml_path)
+write.table(edges_df, system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
 
-# nodes_df <- parse_kgml_entries(kgml_path)
-# write.table(nodes_df, system.file("extdata", "test01.xml_nodes.csv", package = "MOVIDA"),  sep = ";", row.names = FALSE)
+nodes_df <- parse_kgml_entries(kgml_path)
+write.table(nodes_df, system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
 
-nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "MOVIDA")
-edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "MOVIDA")
+nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP")
+edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP")

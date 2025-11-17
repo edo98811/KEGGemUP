@@ -9,7 +9,7 @@ download_kgml(pathway_id, bfc)
 \arguments{
 \item{pathway_id}{KEGG pathway ID (e.g., "hsa04110").}
 
-\item{cache_dir}{Directory to store cached KGML files (default: "kgml_cache").}
+\item{bfc}{BiocFileCache object for caching KEGG KGML files.}
 }
 \value{
 Path to the cached KGML file.

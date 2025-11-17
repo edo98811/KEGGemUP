@@ -7,10 +7,7 @@
 get_pathway_name(id)
 }
 \arguments{
-\item{pathway_id}{A KEGG pathway ID (e.g., "hsa04110", "mmu04110", "04110")}
-
-\item{organism}{Optional organism code (e.g., "hsa", "mmu"). If not provided,
-it will be extracted from the pathway_id if present.}
+\item{id}{KEGG pathway ID (e.g., "hsa04110")}
 }
 \value{
 A character string with the readable pathway name

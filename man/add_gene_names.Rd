@@ -2,16 +2,16 @@
 % Please edit documentation in R/ggkegg_to_visnetwork.R
 \name{add_gene_names}
 \alias{add_gene_names}
-\title{Parse KEGG KGML files to extract relations (edges) data frame.}
+\title{Add gene names to gene nodes in the nodes data frame.}
 \usage{
 add_gene_names(nodes_df)
 }
 \arguments{
-\item{file}{Path to the KGML XML file.}
+\item{nodes_df}{Data frame of nodes with a column 'type' indicating node type.}
 }
 \value{
-A tibble
+Updated nodes data frame with gene names added to gene nodes.
 }
 \description{
-Parse KEGG KGML files to extract relations (edges) data frame.
+Add gene names to gene nodes in the nodes data frame.
 }
