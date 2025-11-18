@@ -1,7 +1,7 @@
-"name";"id";"kegg_name";"type";"link";"reaction";"graphics_name";"label";"fgcolor";"bgcolor";"graphics_type";"x";"y";"width";"height";"value";"source";"color";"text";"components";"group"
-"1";"1";"tst:1111";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:1111";NA;"GENE1, aliasA";"GENE1, aliasA";"#000000";"#BFFFBF";"rectangle";"100";"100";"46";"17";NA;NA;"#BFFFBF";"";NA;NA
-"2";"2";"tst:2222 tst:3333";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:2222+tst:3333";NA;"GENE2, GENE3";"GENE2, GENE3";"#000000";"#BFFFBF";"rectangle";"200";"100";"46";"17";NA;NA;"#BFFFBF";"";NA;NA
-"3";"3";"ko:K00001";"ortholog";"https://www.kegg.jp/dbget-bin/www_bget?K00001";NA;"K00001";"K00001";"#000000";"#FFFFFF";"rectangle";"300";"100";"46";"17";NA;NA;"#FFFFFF";"";NA;NA
-"4";"4";"path:tst00002";"map";"https://www.kegg.jp/dbget-bin/www_bget?tst00002";NA;"TITLE:Test map";"TITLE:Test map";"#000000";"#FFFFFF";"roundrectangle";"400";"100";"100";"25";NA;NA;"#FFFFFF";"";NA;NA
-"5";"5";"undefined";"group";NA;NA;NA;NA;"#000000";"#FFFFFF";"rectangle";"150";"200";"80";"17";NA;NA;"#FFFFFF";"";"1;2";NA
-"6";"6";"tst:1111";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:1111";NA;"GENE1_DUPLICATE";"GENE1_DUPLICATE";"#000000";"#BFFFBF";"rectangle";"100";"300";"46";"17";NA;NA;"#BFFFBF";"";NA;NA
+"name";"id";"kegg_name";"type";"link";"reaction";"graphics_name";"label";"fgcolor";"bgcolor";"graphics_type";"x";"y";"width";"height";"components"
+"1";"1";"tst:1111";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:1111";NA;"GENE1, aliasA";"GENE1, aliasA";"#000000";"#BFFFBF";"rectangle";"100";"100";"46";"17";NA
+"2";"2";"tst:2222 tst:3333";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:2222+tst:3333";NA;"GENE2, GENE3";"GENE2, GENE3";"#000000";"#BFFFBF";"rectangle";"200";"100";"46";"17";NA
+"3";"3";"ko:K00001";"ortholog";"https://www.kegg.jp/dbget-bin/www_bget?K00001";NA;"K00001";"K00001";"#000000";"#FFFFFF";"rectangle";"300";"100";"46";"17";NA
+"4";"4";"path:tst00002";"map";"https://www.kegg.jp/dbget-bin/www_bget?tst00002";NA;"TITLE:Test map";"TITLE:Test map";"#000000";"#FFFFFF";"roundrectangle";"400";"100";"100";"25";NA
+"5";"5";"undefined";"group";NA;NA;NA;NA;"#000000";"#FFFFFF";"rectangle";"150";"200";"80";"17";"1;2"
+"6";"6";"tst:1111";"gene";"https://www.kegg.jp/dbget-bin/www_bget?tst:1111";NA;"GENE1_DUPLICATE";"GENE1_DUPLICATE";"#000000";"#BFFFBF";"rectangle";"100";"300";"46";"17";NA

@@ -31,7 +31,6 @@ test_that("parse_kgml_entries load nodes correctly", {
   nodes_df <- parse_kgml_entries(kgml_path)
 
   nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-  nodes_df_expected$value <- as.numeric(nodes_df_expected$value)
 
   expect_equal(nodes_df, nodes_df_expected)
 })

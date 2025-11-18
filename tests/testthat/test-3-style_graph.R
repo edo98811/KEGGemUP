@@ -25,6 +25,7 @@
 test_that("add_results_nodes correctly maps DE results onto nodes_df across all test lists", {
   # Load node reference table
   nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+  nodes_df <- add_columns_nodes_df(nodes_df)
   nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
   # Iterate through each DE test list
@@ -91,6 +92,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
 test_that("add_colors_to_nodes assigns colors based on values across all test lists", {
   # Load the node reference table once
   base_nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+  base_nodes_df <- add_columns_nodes_df(base_nodes_df)
   base_nodes_df$KEGG <- vapply(base_nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
@@ -253,6 +255,7 @@ test_that("make igraph works", {
 
 test_that("make visnetwork graph works", {
     nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
     edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
     title = "Test Pathway"
