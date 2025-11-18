@@ -34,6 +34,7 @@ kegg_to_graph <- function(path_id,
   # --- 2. Parse nodes and edges ---
   nodes_df <- parse_kgml_entries(kgml_file)
   edges_df <- parse_kgml_relations(kgml_file)
+  nodes_df <- add_columns_nodes_df(nodes_df)
 
   # Extract KEGG IDs
   nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, character(1))
@@ -276,17 +277,12 @@ add_tooltip <- function(nodes_df) {
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
   # Base visual settings
 
-  nodes_df$fixed <- TRUE
-
   # nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "rectangle")
   nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "box")
 
   # Set size constraints for non-compound nodes (compute numeric vectors first)
   widths_num <- as.numeric(nodes_df$width) * node_size_multiplier
   heights_num <- as.numeric(nodes_df$height) * node_size_multiplier
-  nodes_df$widthConstraint <- NA_real_
-  nodes_df$heightConstraint <- NA_real_
-  nodes_df$size <- NA_real_
   non_comp_idx <- which(!is.na(nodes_df$type) & nodes_df$type != "compound")
 
   if (length(non_comp_idx) > 0) {

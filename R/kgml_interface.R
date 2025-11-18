@@ -17,7 +17,7 @@
 #'
 #' @details
 #' The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
-#' information as XML, and extracts all `<relation>` elements that describe the 
+#' information as XML, and extracts all `<relation>` elements that describe the
 #' interactions or relationships between entities in the pathway. Each `<relation>` may
 #' contain one or more `<subtype>` elements that provide additional details about
 #' the interaction. The result is a tidy tibble suitable for network analysis or
@@ -80,12 +80,6 @@ parse_kgml_relations <- function(file) {
 #'   \item{y}{Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `<graphics>`).}
 #'   \item{width}{Width of the graphical element (from the `width` attribute of `<graphics>`).}
 #'   \item{height}{Height of the graphical element (from the `height` attribute of `<graphics>`).}
-#'   \item{value}{Will be filled up later with numerical values mapped to the node (initialized as `NA`).}
-#'   \item{source}{Will be filled up later with text indicating the source of the numerical values mapped to the node (initialized as `NA`).}
-#'   \item{color}{Convenience column duplicating `bgcolor`, used for visualization with `visNetwork` or `igraph`.}
-#'   \item{text}{text field (initialized as empty string) for additional infos on mapping.}
-#'   \item{components}{Semicolon-separated list of component IDs for entries of type `"group"`, extracted from nested `<component>` nodes.}
-#'   \item{group}{Reserved column for grouping information (initialized as NA).}
 #' }
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
@@ -95,7 +89,7 @@ parse_kgml_relations <- function(file) {
 #' @details
 #' The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
 #' `<entry>` elements, each representing a biological entity in a KEGG pathway diagram.
-#' Each node may contain nested `<graphics>` elements defining visual properties 
+#' Each node may contain nested `<graphics>` elements defining visual properties
 #' (such as position, size, and colors) and `<component>` elements that define group
 #' membership for composite entities.
 #'
@@ -138,12 +132,7 @@ parse_kgml_entries <- function(file) {
       y = NA_character_,
       width = NA_character_,
       height = NA_character_,
-      value = NA_real_,
-      source = NA_character_,
-      color = NA_character_,
-      text = "",
-      components = NA_character_,
-      group = NA_character_
+      components = NA_character_
     )
 
     # Extract graphics attributes (only first graphics node is used)
@@ -161,7 +150,6 @@ parse_kgml_entries <- function(file) {
       node_row$y <- xml2::xml_attr(g, "y")
       node_row$width <- xml2::xml_attr(g, "width")
       node_row$height <- xml2::xml_attr(g, "height")
-      node_row$color <- xml2::xml_attr(g, "bgcolor")
     }
 
     # Extract group components
@@ -171,6 +159,23 @@ parse_kgml_entries <- function(file) {
 
     node_row
   })
+}
+
+#' Add columns to nodes_df with default values
+#' @param nodes_df Data frame of nodes parsed from KGML
+#' @return Data frame with additional columns for styling and DE results
+add_columns_nodes_df <- function(nodes_df) {
+  nodes_df$value <- NA_real_
+  nodes_df$source <- NA_character_
+  nodes_df$color <- nodes_df$bgcolor
+  nodes_df$text <- ""
+  nodes_df$group <- NA_character_
+  nodes_df$fixed <- FALSE
+  nodes_df$widthConstraint <- NA_real_
+  nodes_df$heightConstraint <- NA_real_
+  nodes_df$size <- NA_real_
+
+  return(nodes_df)
 }
 
 # #' Parse KEGG KGML files to extract nodes and edges data frames.
