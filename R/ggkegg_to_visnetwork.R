@@ -100,14 +100,15 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
     # Keep only valid entries
     de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
   }
+  # --- 1. Extract nodes and edges from igraph ---
+  nodes_df <- igraph::as_data_frame(g, what = "vertices")
+  edges_df <- igraph::as_data_frame(g, what = "edges")
+  pathway_name <- igraph::graph_attr(g, "title")
 
   # If no valid results, return original graph with a warning
   if (is.null(de_results) || length(de_results) == 0) {
     warning("No valid differential expression results provided. Returning original graph.")
   } else {
-    # --- 1. Extract nodes and edges from igraph ---
-    nodes_df <- igraph::as_data_frame(g, what = "vertices")
-    edges_df <- igraph::as_data_frame(g, what = "edges")
     pathway_name <- igraph::graph_attr(g, "title")
 
     # --- 2. Map DE results to nodes ---
@@ -140,7 +141,8 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
 #' @return A visNetwork object representing the graph.
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   # Different handling if no edges
-  if (nrow(edges_df) == 0) {
+  if (nrow(edges_df) == 0 || is.null(edges_df)) {
+    warning("No edges in graph.")
     v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
   } else {
     v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has no edges
@@ -166,11 +168,11 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return An igraph object representing the graph.
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
-  if (nrow(edges_df) == 0) {
+  if (nrow(edges_df) == 0 || is.null(edges_df)) {
+    warning("No edges in graph.")
     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
     g <- igraph::delete_edges(g, igraph::E(g))
-    warning("No edges in the kgml graph.")
     # remove the fake edge
     # g <- make_empty_graph(n = 0, directed = FALSE)
     # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
