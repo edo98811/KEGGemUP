@@ -53,20 +53,18 @@ kegg_to_graph <- function(path_id,
   # --- 5. Build pathway name ---
   pathway_name <- paste0("(", path_id, ") ", get_pathway_name(path_id))
 
-  if (nrow(edges_df) == 0) {
-    fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
-    g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
-    g <- igraph::delete_edges(g, igraph::E(g)) # remove the fake edge
-    warning("No edges in the kgml graph.")
-    # g <- make_empty_graph(n = 0, directed = FALSE)
-    # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
-  } else {
-    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
-  }
-  g <- igraph::permute(g, order(igraph::V(g)$label))
-  igraph::graph_attr(g, "title") <- pathway_name
+  # --- 5. Build ---
+  result <- switch(return_type,
+    igraph = {
+      make_igraph_graph(nodes_df, edges_df, pathway_name)
+    },
+    visNetwork = {
+      make_vis_graph(nodes_df, edges_df, pathway_name)
+    },
+    stop("Invalid return_type. Must be 'igraph' or 'visNetwork'.")
+  )
 
-  return(g)
+  return(result)
 }
 
 #' Map differential expression results to nodes
@@ -103,69 +101,86 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
     de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
   }
 
+  # If no valid results, return original graph with a warning
   if (is.null(de_results) || length(de_results) == 0) {
-    return(g)
     warning("No valid differential expression results provided. Returning original graph.")
+  } else {
+    # --- 1. Extract nodes and edges from igraph ---
+    nodes_df <- igraph::as_data_frame(g, what = "vertices")
+    edges_df <- igraph::as_data_frame(g, what = "edges")
+    pathway_name <- igraph::graph_attr(g, "title")
+
+    # --- 2. Map DE results to nodes ---
+    results_combined <- combine_results_in_dataframe(de_results)
+    nodes_df <- add_results_nodes(nodes_df, results_combined)
+    nodes_df <- add_colors_to_nodes(nodes_df)
+
+    # --- 3. Color and style nodes and edges ---
+    nodes_df <- add_tooltip(nodes_df)
   }
 
-  nodes_df <- igraph::as_data_frame(g, what = "vertices")
-  edges_df <- igraph::as_data_frame(g, what = "edges")
-  pathway_name <- igraph::graph_attr(g, "title")
-
-  # --- 4. Map DE results to nodes ---
-  results_combined <- combine_results_in_dataframe(de_results)
-  nodes_df <- add_results_nodes(nodes_df, results_combined)
-  nodes_df <- add_colors_to_nodes(nodes_df)
-
-  # --- 2. Color and style nodes and edges ---
-  nodes_df <- add_tooltip(nodes_df)
-
-
-  # --- 5. Build ---
+  # --- 4. Build ---
   result <- switch(return_type,
     igraph = {
-      if (nrow(edges_df) == 0) {
-        fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
-        g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
-        g <- igraph::delete_edges(g, igraph::E(g))
-        warning("No edges in the kgml graph.")
-        # remove the fake edge
-        # g <- make_empty_graph(n = 0, directed = FALSE)
-        # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
-      } else {
-        g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
-      }
-
-      g <- igraph::permute(g, order(igraph::V(g)$label))
-      igraph::graph_attr(g, "title") <- pathway_name
-
-      g
+      make_igraph_graph(nodes_df, edges_df, pathway_name)
     },
     visNetwork = {
-      if (nrow(edges_df) == 0) {
-        v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
-      } else {
-        v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has no edges
-        # v <- visNetwork::visIgraph(g, idToLabel = FALSE)
-      }
-
-      v %>%
-        visNetwork::visPhysics(enabled = FALSE) %>%
-        # visNetwork::visLegend(main = pathway_name, zoom = FALSE) %>%
-        # visNetwork::visNodes(shape = nodes_df$shape_vis) %>%
-        # visNetwork::visLegend(main = pathway_name, position = "left", zoom = FALSE) %>%
-        visNetwork::visOptions(
-          highlightNearest = list(enabled = T, degree = 2, hover = T),
-          selectedBy = "group",
-          nodesIdSelection = TRUE
-        ) %>%
-        visNetwork::visInteraction(dragNodes = TRUE)
-      # visNetwork::visSetTitle(main = pathway_name)
+      make_vis_graph(nodes_df, edges_df, pathway_name)
     },
     stop("Invalid return_type. Must be 'igraph' or 'visNetwork'.")
   )
 
   return(result)
+}
+
+#' Create a visNetwork graph from nodes and edges data frames
+#' @param nodes_df Data frame of nodes.
+#' @param edges_df Data frame of edges.
+#' @param pathway_name Name of the pathway for the graph title.
+#' @return A visNetwork object representing the graph.
+make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
+  # Different handling if no edges
+  if (nrow(edges_df) == 0) {
+    v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
+  } else {
+    v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has no edges
+  }
+
+  v <- visNetwork::visPhysics(v, enabled = FALSE)
+
+  v <- visNetwork::visOptions(
+    v,
+    highlightNearest = list(enabled = TRUE, degree = 2, hover = TRUE),
+    selectedBy = "group",
+    nodesIdSelection = TRUE
+  )
+
+  v <- visNetwork::visInteraction(v, dragNodes = TRUE)
+  v
+  return(v)
+}
+
+#' Create an igraph graph from nodes and edges data frames
+#' @param nodes_df Data frame of nodes.
+#' @param edges_df Data frame of edges.
+#' @param pathway_name Name of the pathway for the graph title.
+#' @return An igraph object representing the graph.
+make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
+  if (nrow(edges_df) == 0) {
+    fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
+    g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
+    g <- igraph::delete_edges(g, igraph::E(g))
+    warning("No edges in the kgml graph.")
+    # remove the fake edge
+    # g <- make_empty_graph(n = 0, directed = FALSE)
+    # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
+  } else {
+    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
+  }
+
+  g <- igraph::permute(g, order(igraph::V(g)$label))
+  igraph::graph_attr(g, "title") <- pathway_name
+  return(g)
 }
 
 #' Add group information to nodes based on 'undefined' groups.
@@ -223,7 +238,7 @@ add_tooltip <- function(nodes_df) {
     # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
-      '<a href="', ifelse(is.na(nodes_df$link), nodes_df$link , NA_character_),
+      '<a href="', ifelse(is.na(nodes_df$link), nodes_df$link, NA_character_),
       '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
       '<button type="button" style="',
       "background-color:#4CAF50;",
@@ -591,8 +606,8 @@ add_compound_names <- function(nodes_df, bfc) {
       return("")
     }
     # if (grepl("^C", id)) {
-      # Compound IDs start with 'C'
-      val <- compounds[id]
+    # Compound IDs start with 'C'
+    val <- compounds[id]
     # } else {
     #   val <- glycan[id]
     # }
