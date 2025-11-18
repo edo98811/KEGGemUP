@@ -135,7 +135,10 @@ pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
 ```
 
 ```{r kgml-parsing}
-
+nodes_df <- parse_kgml_entries(system.file("extdata/kgml/hsa04060.xml", package = "KEGGemUP"))
+edges_df <- parse_kgml_relations(system.file("extdata/kgml/hsa04060.xml", package = "KEGGemUP"))
+knitr::kable(head(nodes_df))
+knitr::kable(head(edges_df))
 ```
 
 ```{r use-package}
