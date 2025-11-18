@@ -24,7 +24,7 @@ Parse KEGG KGML files to extract relations and edges data frames.
 }
 \details{
 The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
-information as XML, and extracts all `<relation>` elements that describe the 
+information as XML, and extracts all `<relation>` elements that describe the
 interactions or relationships between entities in the pathway. Each `<relation>` may
 contain one or more `<subtype>` elements that provide additional details about
 the interaction. The result is a tidy tibble suitable for network analysis or

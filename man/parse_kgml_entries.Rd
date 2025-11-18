@@ -26,12 +26,6 @@ A tibble with the following columns:
   \item{y}{Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `<graphics>`).}
   \item{width}{Width of the graphical element (from the `width` attribute of `<graphics>`).}
   \item{height}{Height of the graphical element (from the `height` attribute of `<graphics>`).}
-  \item{value}{Will be filled up later with numerical values mapped to the node (initialized as `NA`).}
-  \item{source}{Will be filled up later with text indicating the source of the numerical values mapped to the node (initialized as `NA`).}
-  \item{color}{Convenience column duplicating `bgcolor`, used for visualization with `visNetwork` or `igraph`.}
-  \item{text}{text field (initialized as empty string) for additional infos on mapping.}
-  \item{components}{Semicolon-separated list of component IDs for entries of type `"group"`, extracted from nested `<component>` nodes.}
-  \item{group}{Reserved column for grouping information (initialized as NA).}
 }
 }
 \description{
@@ -40,7 +34,7 @@ Parse KEGG KGML files to extract nodes data frame.
 \details{
 The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
 `<entry>` elements, each representing a biological entity in a KEGG pathway diagram.
-Each node may contain nested `<graphics>` elements defining visual properties 
+Each node may contain nested `<graphics>` elements defining visual properties
 (such as position, size, and colors) and `<component>` elements that define group
 membership for composite entities.
 
