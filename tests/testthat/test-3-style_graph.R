@@ -230,3 +230,42 @@ test_that("tooltip is formatted correctly", {
   styled <- add_tooltip(nodes)
   expect_true("title" %in% names(styled))
 })
+
+test_that("make igraph works", {
+    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+
+    title = "Test Pathway"
+
+    g_expected <- make_igraph_graph(nodes_df_expected, edges_df_expected, title)
+    expect_true(igraph::is_igraph(g_expected))
+
+    expect_warning(
+      make_igraph_graph(nodes_df_expected, data.frame(from=character(0), to=character(0)), title),
+      "No edges in graph."
+    )
+
+    expect_warning(
+      make_igraph_graph(nodes_df_expected, NULL, title),
+      "No edges in graph."
+    )
+})
+
+test_that("make visnetwork graph works", {
+    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+
+    title = "Test Pathway"
+
+    g_expected <- make_vis_graph(nodes_df_expected, edges_df_expected, title)
+    expect_true(inherits(g_expected, "visNetwork"))
+
+    expect_warning(
+      make_vis_graph(nodes_df_expected, data.frame(from=character(0), to=character(0)), title),
+      "No edges in graph."
+    )
+    expect_warning(
+      make_vis_graph(nodes_df_expected, NULL, title),
+      "No edges in graph."
+    )
+})
