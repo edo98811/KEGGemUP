@@ -86,7 +86,7 @@ de_results_list_3 <- list(
 )
 
 # 🧪 Mixed types and random naming — stress test
-de_results_list_5 <- list(
+de_results_list_4 <- list(
   transcriptomics = list(
     de_table = nodes_A_df,
     value_column = "log2FoldChange",
@@ -113,19 +113,60 @@ all_de_test_lists <- list(
   genes_metabolites     = de_results_list_1, # Basic and consistent
   mixed_omics           = de_results_list_2, # Mixed omics, column name variations
   duplicates_overlap    = de_results_list_3, # Duplicate / overlapping feature IDs
-  full_stress           = de_results_list_5  # Large mixed test case 
+  full_stress           = de_results_list_4 # Large mixed test case
 )
 
-throw_warning <- names(all_de_test_lists)[c(2,3,4)]
+throw_warning <- names(all_de_test_lists)[c(2, 3, 4)]
 expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 
 kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")
+kgml_pah_real_example <- system.file("extdata", "hsa04010.xml", package = "KEGGemUP")
 
-edges_df <- parse_kgml_relations(kgml_path)
-write.table(edges_df, system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
+# edges_df <- parse_kgml_relations(kgml_path)
+# write.table(edges_df, system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
 
-nodes_df <- parse_kgml_entries(kgml_path)
-write.table(nodes_df, system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
+# nodes_df <- parse_kgml_entries(kgml_path)
+# write.table(nodes_df, system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
 
 nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP")
 edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP")
+
+# Expected nodes
+expected_nodes <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+expected_nodes_cols <- add_columns_nodes_df(expected_nodes)
+expected_nodes_cols$KEGG <- vapply(expected_nodes_cols$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
+
+# Expected edges
+expected_edges <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+
+# Empty edges
+empty_edges <- data.frame(
+  from = character(0),
+  to = character(0),
+  type = character(0),
+  subtype = character(0),
+  stringsAsFactors = FALSE
+)
+
+nodes_df_basic <- data.frame(
+  id = c("n1", "n2", "n3", "n4", "n5", "n6"),
+  type = c("gene", "compound", "compound", "compound", "compound", "gene"),
+  KEGG = c(NA, "C00001", "C99999", "G00001", "G99999", "00001"),
+  label = c(NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_),
+  stringsAsFactors = FALSE
+)
+
+compounds_file <- system.file(
+  "extdata", "compounds.rds",
+  package = "KEGGemUP"
+)
+
+glycan_file <- system.file(
+  "extdata", "glycans.rds",
+  package = "KEGGemUP"
+)
+
+# Load mapping and mock get_compounds to return it
+real_compounds <- readRDS(compounds_file)
+
+real_glycans <- readRDS(glycan_file)
