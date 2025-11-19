@@ -1,4 +1,4 @@
-# MOVIDA
+# KEGGemUP
 
 A package to map you differential expression results on KEGG pathways
 
