@@ -11,10 +11,22 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          organism = "mmu",
+                          organism = "hsa",
                           de_results = NULL,
                           return_type = "igraph",
                           scaling_factor = 1.5) {
+  # Check arguments
+  return_type <- match.arg(
+    return_type,
+    choices = c("igraph", "visNetwork"),
+    several.ok = FALSE
+  )
+  organism <- match.arg(
+    organism,
+    choices = c("hsa", "mmu"),
+    several.ok = FALSE
+  )
+
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
   if (!is.character(organism) || length(organism) != 1) stop("organism must be a single character string")
@@ -48,7 +60,6 @@ kegg_to_graph <- function(path_id,
   nodes_df <- add_group(nodes_df)
   nodes_df <- nodes_df[order(nodes_df$label), ]
 
-  edges_df <- rbind(edges_df, add_group_relations(nodes_df)) # add group relations
   if (nrow(edges_df)) edges_df <- style_edges(edges_df)
 
   # --- 5. Build pathway name ---
@@ -77,10 +88,19 @@ kegg_to_graph <- function(path_id,
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @export
-map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
+map_results_to_nodes <- function(g,
+                                 de_results,
+                                 return_type = "visNetwork") {
+  # Check arguments
+  return_type <- match.arg(
+    return_type,
+    choices = c("igraph", "visNetwork"),
+    several.ok = FALSE
+  )
+
   message("Mapping differential expression results to nodes...")
 
-  # Validate each entry in de_results
+  # --- 0. Validate each entry in de_results ---
   if (!is.null(de_results)) {
     # If input is a data.frame, convert to default named list
     if (inherits(de_results, "data.frame")) {
@@ -101,6 +121,7 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
     # Keep only valid entries
     de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
   }
+
   # --- 1. Extract nodes and edges from igraph ---
   nodes_df <- igraph::as_data_frame(g, what = "vertices")
   edges_df <- igraph::as_data_frame(g, what = "edges")
@@ -241,7 +262,7 @@ add_tooltip <- function(nodes_df) {
     # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
-      '<a href="', ifelse(is.na(nodes_df$link), nodes_df$link, NA_character_),
+      '<a href="', ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_),
       '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
       '<button type="button" style="',
       "background-color:#4CAF50;",
@@ -338,51 +359,6 @@ style_edges <- function(edges_df) {
   edges_df$label <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$label, character(1))
 
   return(edges_df)
-}
-
-#' Add edges representing group relationships between nodes
-#'
-#' @param nodes_df A tibble of nodes, must contain columns `name` and `group`.
-#' @return A tibble of edges representing pairwise relations between members of the same group.
-#' @importFrom utils combn
-#' @importFrom tibble tibble
-#' @importFrom purrr map_dfr
-add_group_relations <- function(nodes_df) {
-  # Select nodes that belong to a group
-  group_nodes <- nodes_df[!is.na(nodes_df$group), , drop = FALSE]
-  unique_groups <- unique(group_nodes$group)
-
-  # Generate edges for each group
-  edges_df_group_relations <- purrr::map_dfr(unique_groups, function(g) {
-    # Node IDs for this group
-    group_members_node_id <- group_nodes$name[group_nodes$group == g] # name and id are the same
-    n <- length(group_members_node_id)
-
-    # Skip groups with only 1 member
-    # Concatenation with empty tibble will not add NA or empty rows
-    if (n < 2) {
-      return(tibble::tibble(
-        from = character(0),
-        to = character(0),
-        type = character(0),
-        subtype = character(0),
-        rel_value = character(0)
-      ))
-    }
-
-    # Generate all pairwise combinations
-    # docs: https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/combn
-    pairs <- t(combn(group_members_node_id, 2))
-    tibble::tibble(
-      from = pairs[, 1],
-      to = pairs[, 2],
-      type = "group_relation",
-      subtype = "group_relation",
-      rel_value = NA_character_
-    )
-  })
-
-  edges_df_group_relations
 }
 
 
@@ -591,27 +567,25 @@ add_compound_names <- function(nodes_df, bfc) {
     return(nodes_df)
   }
 
-  compounds_in_graph <- as.character(nodes_df$graphics_name)
+  compounds_in_graph <- as.character(nodes_df$KEGG)
   compounds_in_graph[is.na(compounds_in_graph)] <- ""
   compounds_in_graph <- compounds_in_graph[idx]
 
   compounds <- get_kegg_compounds(bfc) # expect named vector mapping KEGG id -> name
-  # glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
+  glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
 
   # safe lookup: if not found, use original id or empty string
   labels <- vapply(compounds_in_graph, function(id) {
-    if (is.null(id) || id == "") {
-      return("")
+    val <- NA_character_
+    if (grepl("^C", id)) {
+      val <- compounds[id]
+    } else if (grepl("^G", id)) {
+      val <- glycan[id]
     }
-    # if (grepl("^C", id)) {
-    # Compound IDs start with 'C'
-    val <- compounds[id]
-    # } else {
-    #   val <- glycan[id]
-    # }
     if (is.null(val) || is.na(val)) {
       return(id)
     }
+
     val <- gsub(";.*", "", val) # take first name before ';'
     return(as.character(val))
   }, character(1))

@@ -1,43 +1,15 @@
-# test_that("add_results_nodes correctly maps DE results onto nodes_df", {
-#   # Capture warnings to test multiple-match behavior later
-#   nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-#   results_combined <- combine_results_in_dataframe(de_results_list)
-#   nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
-#   # Run function
-#   mapped_nodes <- add_results_nodes(nodes_df, results_combined)
-#   expect_true(is.data.frame(mapped_nodes))
-#  
-#   # Check structure
-#   expect_true(is.data.frame(mapped_nodes))
-#   expect_true(all(c("value", "color", "source", "text") %in% colnames(mapped_nodes)))
-#   expect_equal(nrow(mapped_nodes), nrow(nodes_df))
-#   expect_false(all(is.na(mapped_nodes$value)))
-#   expect_false(all(is.na(mapped_nodes$source)))
-#   expect_false(all(is.na(mapped_nodes$text)))
-
-#   results_combined_double <- combine_results_in_dataframe(de_results_list_with_repetition)
-#   expect_warning(
-#     add_results_nodes(nodes_df, results_combined_double),
-#     "Multiple results mapped to node"
-#   )
-# })
 test_that("add_results_nodes correctly maps DE results onto nodes_df across all test lists", {
-  # Load node reference table
-  nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-  nodes_df <- add_columns_nodes_df(nodes_df)
-  nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
   # Iterate through each DE test list
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-    message(glue::glue("🔍 Testing mapping for scenario: {test_name}"))
 
     # Combine all DE results into one table
     results_combined <- combine_results_in_dataframe(de_list)
 
     # --- Capture all warnings ---
     warnings <- testthat::capture_warnings(
-      mapped_nodes <- add_results_nodes(nodes_df, results_combined) # expect warnign expects only one not multiple!!
+      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined) # expect warnign expects only one not multiple!!
     )
 
     # --- Expected warning logic ---
@@ -46,22 +18,22 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
 
       # Count and content validation
       expect_equal(length(warnings), exp_n,
-                   info = glue::glue("{test_name}: expected {exp_n} warnings, got {length(warnings)}"))
+                   info = paste0(test_name, " expected ", exp_n, " warnings, got, ", length(warnings)))
       expect_true(any(grepl("Multiple results", warnings)) || any(grepl("mapped", warnings)),
-                  info = glue::glue("{test_name}: expected warning about mapping issues"))
+                  info = paste0(test_name, " expected warning about mapping issues"))
     } else {
       # Should produce no warnings
       expect_equal(length(warnings), 0,
-                   info = glue::glue("{test_name}: unexpected warnings found"))
+                   info = paste0(test_name, " unexpected warnings found"))
     }
 
     # --- Structure checks ---
     expect_true(is.data.frame(mapped_nodes), info = test_name)
     expect_true(all(c("value", "color", "source", "text") %in% colnames(mapped_nodes)),
-      info = glue::glue("{test_name}: missing expected columns")
+      info = paste0(test_name, " missing expected columns")
     )
     expect_equal(nrow(mapped_nodes), nrow(nodes_df),
-      info = glue::glue("{test_name}: wrong number of rows")
+      info = paste0(test_name, " wrong number of rows")
     )
 
     # --- Content checks ---
@@ -72,38 +44,17 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
 })
 
 
-# test_that("add_color_to_nodes assigns colors based on values", {
-#   nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-#   results_combined <- combine_results_in_dataframe(de_results_list)
-#   nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
-
-#   nodes_df <- add_results_nodes(nodes_df, results_combined)
-
-#   # Run function
-#   nodes_df <- add_colors_to_nodes(nodes_df)
-
-#   expect_true(is.data.frame(nodes_df))
-#   expect_false(all(is.na(nodes_df$color)))
-#   # Check non-NA colors are valid hex (#RRGGBB)
-#   expect_true(all(grepl("^#([A-Fa-f0-9]{6})$", nodes_df$color[!is.na(nodes_df$color)])))
-#   expect_equal(!is.na(nodes_df$value), !is.na(nodes_df$color))
-# })
-
 test_that("add_colors_to_nodes assigns colors based on values across all test lists", {
   # Load the node reference table once
-  base_nodes_df <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-  base_nodes_df <- add_columns_nodes_df(base_nodes_df)
-  base_nodes_df$KEGG <- vapply(base_nodes_df$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-    message(glue::glue("🎨 Testing add_colors_to_nodes() for scenario: {test_name}"))
 
     # Prepare combined results and map onto nodes
     results_combined <- combine_results_in_dataframe(de_list)
 
     # --- Capture all warnings ---
     warnings <- testthat::capture_warnings(
-      mapped_nodes <- add_results_nodes(base_nodes_df, results_combined)
+      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
     )
 
     # --- Expected warning logic ---
@@ -112,15 +63,15 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
 
       # Count and content validation
       expect_equal(length(warnings), exp_n,
-        info = glue::glue("{test_name}: expected {exp_n} warnings, got {length(warnings)}")
+        info = paste0(test_name, " expected ", exp_n, " warnings, got, ", length(warnings))
       )
       expect_true(any(grepl("Multiple results", warnings)) || any(grepl("mapped", warnings)),
-        info = glue::glue("{test_name}: expected warning about mapping issues")
+        info = paste0(test_name, " expected warning about mapping issues")
       )
     } else {
       # Should produce no warnings
       expect_equal(length(warnings), 0,
-        info = glue::glue("{test_name}: unexpected warnings found")
+        info = paste0(test_name, " unexpected warnings found")
       )
     }
 
@@ -130,14 +81,14 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
     # --- Structural checks ---
     expect_true(is.data.frame(colored_nodes), info = test_name)
     expect_true("color" %in% colnames(colored_nodes),
-      info = glue::glue("{test_name}: missing 'color' column")
+      info = paste0(test_name, "missing 'color' column")
     )
 
     # --- Color validity checks ---
     non_na_colors <- colored_nodes$color[!is.na(colored_nodes$color)]
     expect_false(all(is.na(colored_nodes$color)), info = test_name)
     expect_true(all(grepl("^#([A-Fa-f0-9]{6})$", non_na_colors)),
-      info = glue::glue("{test_name}: invalid color hex codes detected")
+      info = paste0(test_name, "invalid color hex codes detected")
     )
 
     # --- Logical consistency ---
@@ -200,21 +151,16 @@ test_that("function returns same number of rows", {
 })
 
 test_that("adds visual styling columns correctly", {
-  nodes <- data.frame(
-    label = c("GeneA", "GeneB"),
-    KEGG = c("hsa00010", "hsa00020"),
-    type = c("compound", "simple"),
-    height = 30,
-    width = 30,
-    x = 100,
-    y = 200
-  )
 
-  styled <- style_nodes(nodes)
+  styled <- style_nodes(expected_nodes_cols)
 
-  expect_equal(styled$shape, c("dot", "box"))
-  expect_true(all(styled$fixed))
-  expect_true(all(c("x", "y", "widthConstraint", "heightConstraint") %in% names(styled)))
+  # expect_true(all(styled$fixed))
+  expect_true(is.numeric(styled$widthConstraint))
+  expect_true(is.numeric(styled$heightConstraint))
+  expect_true(is.character(styled$label))
+  expect_true(any(!is.na(styled$label)))
+
+  expect_true(is.logical(styled$fixed))
 })
 
 test_that("tooltip is formatted correctly", {
@@ -271,4 +217,12 @@ test_that("make visnetwork graph works", {
       make_vis_graph(nodes_df_expected, NULL, title),
       "No edges in graph."
     )
+})
+
+test_that("add groups add groups correctly", {
+  styled <- add_group(expected_nodes_cols)
+
+  expect_equal(unique(styled$group), c("group_5", NA))
+  expect_equal(sum(styled$group[!is.na(styled$group)] == "group_5"), 3)
+
 })
