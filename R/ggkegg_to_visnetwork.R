@@ -585,33 +585,32 @@ add_gene_names <- function(nodes_df) {
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
 add_compound_names <- function(nodes_df, bfc) {
+
   idx <- which(!is.na(nodes_df$type) & nodes_df$type == "compound")
 
   if (length(idx) == 0) {
     return(nodes_df)
   }
 
-  compounds_in_graph <- as.character(nodes_df$graphics_name)
+  compounds_in_graph <- as.character(nodes_df$KEGG)
   compounds_in_graph[is.na(compounds_in_graph)] <- ""
   compounds_in_graph <- compounds_in_graph[idx]
 
   compounds <- get_kegg_compounds(bfc) # expect named vector mapping KEGG id -> name
-  # glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
+  glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
 
   # safe lookup: if not found, use original id or empty string
   labels <- vapply(compounds_in_graph, function(id) {
-    if (is.null(id) || id == "") {
-      return("")
+    val <- NA_character_
+    if (grepl("^C", id)) {
+      val <- compounds[id]
+    } else if (grepl("^G", id)) {
+      val <- glycan[id]
     }
-    # if (grepl("^C", id)) {
-    # Compound IDs start with 'C'
-    val <- compounds[id]
-    # } else {
-    #   val <- glycan[id]
-    # }
     if (is.null(val) || is.na(val)) {
       return(id)
     }
+    
     val <- gsub(";.*", "", val) # take first name before ';'
     return(as.character(val))
   }, character(1))
