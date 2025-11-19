@@ -11,9 +11,9 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          organism = c("mmu", "hsa"),
+                          organism = "hsa",
                           de_results = NULL,
-                          return_type = c("igraph", "visNetwork"),
+                          return_type = "igraph",
                           scaling_factor = 1.5) {
   # Check arguments
   return_type <- match.arg(
@@ -88,10 +88,9 @@ kegg_to_graph <- function(path_id,
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @export
-map_results_to_nodes <- function(
-    g,
-    de_results,
-    return_type = c("igraph", "visNetwork")) {
+map_results_to_nodes <- function(g,
+                                 de_results,
+                                 return_type = "visNetwork") {
   # Check arguments
   return_type <- match.arg(
     return_type,
