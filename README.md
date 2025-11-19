@@ -14,6 +14,7 @@ To use the Kegg pathway visualization function:
 
 ```R
 library(KEGGemUP)
+
 pathway <- "hsa04110"  # Example pathway ID
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_table)
@@ -23,8 +24,9 @@ graph
 or 
 
 ```R
-pathway <- "hsa04110"  # Example pathway ID
 library(KEGGemUP)
+
+pathway <- "hsa04110"  # Example pathway ID
 de_results_list <-list(
   trans_limma = list(
     de_table = data.frame(res_macrophage_IFNg_vs_naive_limma[]),
@@ -37,4 +39,9 @@ de_results_list <-list(
     feature_column = "ENTREZID"
     )
 )
+
+graph <- kegg_to_graph(pathway)
+graph <- map_results_to_nodes(graph, de_results_list)
+graph
+
 ```
