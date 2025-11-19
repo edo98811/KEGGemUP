@@ -48,7 +48,6 @@ kegg_to_graph <- function(path_id,
   nodes_df <- add_group(nodes_df)
   nodes_df <- nodes_df[order(nodes_df$label), ]
 
-  edges_df <- rbind(edges_df, add_group_relations(nodes_df)) # add group relations
   if (nrow(edges_df)) edges_df <- style_edges(edges_df)
 
   # --- 5. Build pathway name ---
@@ -338,51 +337,6 @@ style_edges <- function(edges_df) {
   edges_df$label <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$label, character(1))
 
   return(edges_df)
-}
-
-#' Add edges representing group relationships between nodes
-#'
-#' @param nodes_df A tibble of nodes, must contain columns `name` and `group`.
-#' @return A tibble of edges representing pairwise relations between members of the same group.
-#' @importFrom utils combn
-#' @importFrom tibble tibble
-#' @importFrom purrr map_dfr
-add_group_relations <- function(nodes_df) {
-  # Select nodes that belong to a group
-  group_nodes <- nodes_df[!is.na(nodes_df$group), , drop = FALSE]
-  unique_groups <- unique(group_nodes$group)
-
-  # Generate edges for each group
-  edges_df_group_relations <- purrr::map_dfr(unique_groups, function(g) {
-    # Node IDs for this group
-    group_members_node_id <- group_nodes$name[group_nodes$group == g] # name and id are the same
-    n <- length(group_members_node_id)
-
-    # Skip groups with only 1 member
-    # Concatenation with empty tibble will not add NA or empty rows
-    if (n < 2) {
-      return(tibble::tibble(
-        from = character(0),
-        to = character(0),
-        type = character(0),
-        subtype = character(0),
-        rel_value = character(0)
-      ))
-    }
-
-    # Generate all pairwise combinations
-    # docs: https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/combn
-    pairs <- t(combn(group_members_node_id, 2))
-    tibble::tibble(
-      from = pairs[, 1],
-      to = pairs[, 2],
-      type = "group_relation",
-      subtype = "group_relation",
-      rel_value = NA_character_
-    )
-  })
-
-  edges_df_group_relations
 }
 
 
