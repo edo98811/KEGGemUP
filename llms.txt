@@ -1,0 +1,115 @@
+# KEGGemUP
+
+A package to map you differential expression results on KEGG pathways
+
+## Installation
+
+``` r
+install.packages("devtools")     
+devtools::install_github("edo98811/KEGGemUP")
+```
+
+## Usage
+
+To use the Kegg pathway visualization function:
+
+To use it with a single differential expression results table: Make sure
+there are the two dfault columns: “KEGG_ids” for the kegg ids and
+“log2FoldChange” for the values to map.
+
+``` r
+library(KEGGemUP)
+
+pathway <- "hsa04110"  # Example pathway ID
+graph <- kegg_to_graph(pathway)
+graph <- map_results_to_nodes(graph, de_results_table)
+graph
+```
+
+or
+
+``` r
+library(KEGGemUP)
+
+pathway <- "hsa04110"  # Example pathway ID
+de_results_list <-list(
+  trans_limma = list(
+    de_table = data.frame(res_macrophage_IFNg_vs_naive_limma[]),
+    value_column = "logFC",
+    feature_column = "ENTREZID"
+  ),
+  trans_deseq = list(
+    de_table = data.frame(res_macrophage_IFNg_vs_naive_dds),
+    value_column = "log2FoldChange",
+    feature_column = "ENTREZID"
+    )
+)
+
+graph <- kegg_to_graph(pathway)
+graph <- map_results_to_nodes(graph, de_results_list)
+graph
+```
+
+# Package index
+
+## All functions
+
+- [`add_colors_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/add_colors_to_nodes.md)
+  : Add color palettes
+- [`add_columns_nodes_df()`](https://edo98811.github.io/KEGGemUP/reference/add_columns_nodes_df.md)
+  : Add columns to nodes_df with default values
+- [`add_compound_names()`](https://edo98811.github.io/KEGGemUP/reference/add_compound_names.md)
+  : Add compound names to compound nodes in the nodes data frame.
+- [`add_gene_names()`](https://edo98811.github.io/KEGGemUP/reference/add_gene_names.md)
+  : Add gene names to gene nodes in the nodes data frame.
+- [`add_group()`](https://edo98811.github.io/KEGGemUP/reference/add_group.md)
+  : Add group information to nodes based on 'undefined' groups.
+- [`add_results_nodes()`](https://edo98811.github.io/KEGGemUP/reference/add_results_nodes.md)
+  : Add results from combined results data frame to nodes data frame
+- [`add_tooltip()`](https://edo98811.github.io/KEGGemUP/reference/add_tooltip.md)
+  : Add tooltips to nodes for visNetwork visualization.
+- [`check_de_entry()`](https://edo98811.github.io/KEGGemUP/reference/check_de_entry.md)
+  : Check the structure and validity of each entry in de_results
+- [`combine_results_in_dataframe()`](https://edo98811.github.io/KEGGemUP/reference/combine_results_in_dataframe.md)
+  : Combine multiple differential expression results into a single data
+  frame
+- [`download_kgml()`](https://edo98811.github.io/KEGGemUP/reference/download_kgml.md)
+  : Download and cache KEGG KGML files.
+- [`expand_keggs()`](https://edo98811.github.io/KEGGemUP/reference/expand_keggs.md)
+  : Handle multiple KEGG IDs in a single string separated by ";"
+- [`get_kegg_compounds()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_compounds.md)
+  : Get KEGG compounds with caching.
+- [`get_kegg_glycans()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_glycans.md)
+  : Get KEGG glycans with caching.
+- [`get_kgml()`](https://edo98811.github.io/KEGGemUP/reference/get_kgml.md)
+  : Download KEGG KGML file for a given pathway ID, with caching.
+- [`get_pathway_name()`](https://edo98811.github.io/KEGGemUP/reference/get_pathway_name.md)
+  : Convert KEGG pathway ID to readable pathway name
+- [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
+  : Transform a ggkegg graph to igraph or visNetwork
+- [`make_igraph_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_igraph_graph.md)
+  : Create an igraph graph from nodes and edges data frames
+- [`make_vis_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_vis_graph.md)
+  : Create a visNetwork graph from nodes and edges data frames
+- [`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md)
+  : Map differential expression results to nodes
+- [`parse_kgml_entries()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_entries.md)
+  : Parse KEGG KGML files to extract nodes data frame.
+- [`parse_kgml_relations()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_relations.md)
+  : Parse KEGG KGML files to extract relations and edges data frames.
+- [`remove_kegg_prefix()`](https://edo98811.github.io/KEGGemUP/reference/remove_kegg_prefix.md)
+  : Convert KEGG IDs with prefixes to IDs without prefixes
+- [`scale_dimensions()`](https://edo98811.github.io/KEGGemUP/reference/scale_dimensions.md)
+  : Scale node dimensions for better visualization.
+- [`style_edges()`](https://edo98811.github.io/KEGGemUP/reference/style_edges.md)
+  : Style edges based on their subtype for visNetwork visualization.
+- [`style_nodes()`](https://edo98811.github.io/KEGGemUP/reference/style_nodes.md)
+  : Style nodes based on their type for visNetwork visualization.
+- [`to_organism_kegg()`](https://edo98811.github.io/KEGGemUP/reference/to_organism_kegg.md)
+  : Convert organism name or abbreviation to KEGG organism code
+
+# Articles
+
+### All vignettes
+
+- [kegg-graph](https://edo98811.github.io/KEGGemUP/articles/kegg-graph-real-data.md):
