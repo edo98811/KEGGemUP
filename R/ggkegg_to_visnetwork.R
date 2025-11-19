@@ -11,10 +11,21 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          organism = "mmu",
+                          organism = c("mmu", "hsa"),
                           de_results = NULL,
-                          return_type = "igraph",
+                          return_type = c("igraph", "visNetwork"),
                           scaling_factor = 1.5) {
+  # Check arguments
+  return_type <- match.arg(
+    return_type,
+    choices = c("igraph", "visNetwork"),
+    several.ok = FALSE
+  )
+  organism <- match.arg(
+    organism,
+    choices = c("hsa", "mmu"),
+    several.ok = FALSE
+  )
 
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
@@ -77,10 +88,20 @@ kegg_to_graph <- function(path_id,
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @export
-map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
+map_results_to_nodes <- function(
+    g,
+    de_results,
+    return_type = c("igraph", "visNetwork")) {
+  # Check arguments
+  return_type <- match.arg(
+    return_type,
+    choices = c("igraph", "visNetwork"),
+    several.ok = FALSE
+  )
+
   message("Mapping differential expression results to nodes...")
 
-  # Validate each entry in de_results
+  # --- 0. Validate each entry in de_results ---
   if (!is.null(de_results)) {
     # If input is a data.frame, convert to default named list
     if (inherits(de_results, "data.frame")) {
@@ -101,6 +122,7 @@ map_results_to_nodes <- function(g, de_results, return_type = "visNetwork") {
     # Keep only valid entries
     de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
   }
+
   # --- 1. Extract nodes and edges from igraph ---
   nodes_df <- igraph::as_data_frame(g, what = "vertices")
   edges_df <- igraph::as_data_frame(g, what = "edges")
@@ -230,7 +252,7 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
   #  base_link, gsub(" ", "+", nodes_df$kegg_name)
-  
+
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
@@ -540,7 +562,6 @@ add_gene_names <- function(nodes_df) {
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
 add_compound_names <- function(nodes_df, bfc) {
-
   idx <- which(!is.na(nodes_df$type) & nodes_df$type == "compound")
 
   if (length(idx) == 0) {
@@ -565,7 +586,7 @@ add_compound_names <- function(nodes_df, bfc) {
     if (is.null(val) || is.na(val)) {
       return(id)
     }
-    
+
     val <- gsub(";.*", "", val) # take first name before ';'
     return(as.character(val))
   }, character(1))
