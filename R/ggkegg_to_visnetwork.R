@@ -15,6 +15,7 @@ kegg_to_graph <- function(path_id,
                           de_results = NULL,
                           return_type = "igraph",
                           scaling_factor = 1.5) {
+
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
   if (!is.character(organism) || length(organism) != 1) stop("organism must be a single character string")
@@ -229,7 +230,7 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
   #  base_link, gsub(" ", "+", nodes_df$kegg_name)
-
+  
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
@@ -240,7 +241,7 @@ add_tooltip <- function(nodes_df) {
     # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
-      '<a href="', ifelse(is.na(nodes_df$link), nodes_df$link, NA_character_),
+      '<a href="', ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_),
       '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
       '<button type="button" style="',
       "background-color:#4CAF50;",
