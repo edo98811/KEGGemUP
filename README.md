@@ -12,6 +12,9 @@ devtools::install_github("edo98811/KEGGemUP")
 
 To use the Kegg pathway visualization function:
 
+To use it with a single differential expression results table: 
+Make sure there are the two dfault columns: "KEGG_ids" for the kegg ids and "log2FoldChange" for the values to map.
+
 ```R
 library(KEGGemUP)
 
