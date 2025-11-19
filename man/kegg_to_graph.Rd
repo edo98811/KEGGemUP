@@ -6,7 +6,7 @@
 \usage{
 kegg_to_graph(
   path_id,
-  organism = "mmu",
+  organism = "hsa",
   de_results = NULL,
   return_type = "igraph",
   scaling_factor = 1.5
