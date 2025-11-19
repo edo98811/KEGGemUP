@@ -352,14 +352,9 @@ graph <- kegg_to_graph(pathway)
 #> Using cached KEGG KGML for hsa00563
 #> Loading KEGG compounds from cache...
 #> Loading KEGG glycans from cache...
-graph <- map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma)
+graph <- map_results_to_nodes(graph, de_results_limma)
 #> Mapping differential expression results to nodes...
-#> Warning in map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma):
-#> Using defaults. For personalisation use a named list of de results.
-#> Warning in check_de_entry(de_results[[name]], name):
-#> de_results[['de_input']]$value_column must be a column name in
-#> de_results[['de_input']]$de_table
-#> Warning in map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma): No
-#> valid differential expression results provided. Returning original graph.
+#> Warning in map_results_to_nodes(graph, de_results_limma): Using defaults. For
+#> personalisation use a named list of de results.
 graph
 ```
