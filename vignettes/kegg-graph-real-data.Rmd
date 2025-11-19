@@ -177,7 +177,7 @@ graph
 
 ```{r use-package-2}
 graph <- kegg_to_graph(pathway)
-graph <- map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma)
+graph <- map_results_to_nodes(graph, de_results_limma)
 graph
 ```
 
