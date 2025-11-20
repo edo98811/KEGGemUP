@@ -51,7 +51,7 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
 
     # Missing value checks
     expect_false(any(is.na(result$KEGG)), info = test_name)
-    expect_false(any(is.na(result$value)), info = test_name)
+    expect_false(any(is.na(result$plot_value)), info = test_name)
 
     # Row count check
     expected_nrows <- sum(vapply(de_list, function(x) nrow(x$de_table), numeric(1)))

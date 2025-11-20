@@ -37,7 +37,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     )
 
     # --- Content checks ---
-    expect_false(all(is.na(mapped_nodes$value)), info = test_name)
+    expect_false(all(is.na(mapped_nodes$plot_value)), info = test_name)
     expect_false(all(is.na(mapped_nodes$source)), info = test_name)
     expect_false(all(is.na(mapped_nodes$text)), info = test_name)
   })
@@ -92,7 +92,7 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
     )
 
     # --- Logical consistency ---
-    expect_equal(!is.na(colored_nodes$value), colored_nodes$color != "#FFFFFF")
+    expect_equal(!is.na(colored_nodes$plot_value), colored_nodes$color != "#FFFFFF")
   })
 })
 

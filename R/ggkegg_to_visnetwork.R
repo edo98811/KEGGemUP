@@ -284,7 +284,7 @@ add_tooltip <- function(nodes_df) {
     paste0(
       "Name: ", safe(nodes_df$kegg_name), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
-      "Value: ", safe(format(round(as.numeric(nodes_df$value), 3), nsmall = 3)), "<br>",
+      "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
       button_html
     )
   )
@@ -382,8 +382,8 @@ add_results_nodes <- function(nodes_df, results_combined) {
 
       if (pattern %in% node_ids) { # KEGG ids match (substring)
         # If no value assigned to the node, assign the one from results_combined
-        if (is.na(nodes_df$value[i])) {
-          nodes_df$value[i] <- results_combined$value[j]
+        if (is.na(nodes_df$plot_value[i])) {
+          nodes_df$plot_value[i] <- results_combined$plot_value[j]
           nodes_df$source[i] <- results_combined$source[j]
           # nodes_df$text[i] <- list()
         } else { # If value warn
@@ -395,7 +395,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
         nodes_df$text[i] <- paste0(
           nodes_df$text[i],
           "Source: ", results_combined$source[j], sep,
-          "Value: ", results_combined$value[j], sep,
+          "Value: ", results_combined$plot_value[j], sep,
           "Id: ", results_combined$KEGG[j], ";"
         )
       }
@@ -425,7 +425,7 @@ combine_results_in_dataframe <- function(results_list) {
 
     data.frame(
       KEGG = de_table[[feature_column]],
-      value = de_table[[value_column]],
+      plot_value = de_table[[value_column]],
       source = rep(de_entry_name, nrow(de_table)),
       stringsAsFactors = FALSE
     )
@@ -463,9 +463,9 @@ add_colors_to_nodes <- function(nodes_df) {
     nodes_to_color <- valid_nodes[valid_nodes$source == sources[source_index], , drop = FALSE]
 
     if (nrow(nodes_to_color) > 1) {
-      range_val <- max(abs(as.numeric(nodes_to_color$value)))
+      range_val <- max(abs(as.numeric(nodes_to_color$plot_value)))
     } else if (nrow(nodes_to_color) == 1) {
-      range_val <- abs(as.numeric(nodes_to_color$value[[1]]))
+      range_val <- abs(as.numeric(nodes_to_color$plot_value[[1]]))
     } else {
       next
     }
@@ -479,7 +479,7 @@ add_colors_to_nodes <- function(nodes_df) {
     # cut: https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut
     # may be useful to add general info in the dataframe: https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
     nodes_to_color$color <- palette_ramp(100)[
-      as.numeric(cut(as.numeric(nodes_to_color$value), breaks = breaks_seq, include.lowest = TRUE))
+      as.numeric(cut(as.numeric(nodes_to_color$plot_value), breaks = breaks_seq, include.lowest = TRUE))
     ]
 
     # Update main data frame

@@ -165,7 +165,7 @@ parse_kgml_entries <- function(file) {
 #' @param nodes_df Data frame of nodes parsed from KGML
 #' @return Data frame with additional columns for styling and DE results
 add_columns_nodes_df <- function(nodes_df) {
-  nodes_df$value <- NA_real_
+  nodes_df$plot_value <- NA_real_
   nodes_df$source <- NA_character_
   nodes_df$color <- nodes_df$bgcolor
   nodes_df$text <- ""
