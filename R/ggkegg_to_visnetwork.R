@@ -433,7 +433,6 @@ combine_results_in_dataframe <- function(results_list) {
 
   return(do.call(rbind, results))
 }
-usethis::use_github_actions(save_as = "R-CMD-check.yaml")
 
 
 #' Add color palettes
