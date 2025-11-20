@@ -7,7 +7,7 @@ Transform a ggkegg graph to igraph or visNetwork
 ``` r
 kegg_to_graph(
   path_id,
-  organism = "mmu",
+  organism = "hsa",
   de_results = NULL,
   return_type = "igraph",
   scaling_factor = 1.5
