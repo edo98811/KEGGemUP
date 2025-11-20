@@ -443,12 +443,12 @@ combine_results_in_dataframe <- function(results_list) {
 #' @importFrom grDevices colorRampPalette
 add_colors_to_nodes <- function(nodes_df) {
   palettes <- c(
-    "RdBu",
-    "PuOr",
-    "RdGy",
-    "PRGn",
-    "PiYG",
-    "BrBG"
+    "RdBu"
+    # "PuOr",
+    # "RdGy",
+    # "PRGn",
+    # "PiYG",
+    # "BrBG"
   )
 
   # Get unique sources
@@ -458,7 +458,7 @@ add_colors_to_nodes <- function(nodes_df) {
   # Apply a color palette to each source
   for (source_index in seq_along(sources)) {
     palette <- palettes[[((source_index - 1) %% length(palettes)) + 1]]
-    palette_colors <- brewer.pal(n = 11, name = palette)
+    palette_colors <- rev(brewer.pal(n = 11, name = palette)) # reverse the palette BuRe
     palette_ramp <- colorRampPalette(palette_colors)
     nodes_to_color <- valid_nodes[valid_nodes$source == sources[source_index], , drop = FALSE]
 
