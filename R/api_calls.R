@@ -33,7 +33,7 @@ get_kgml <- function(url) {
     return(NULL)
   }
 
-  content <- httr::content(resp, as = "text", encoding = "UTF-8")
+  content <- httr::content(resp, as = "text", encoding = ""))
   return(content)
 }
 
