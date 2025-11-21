@@ -77,10 +77,12 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
     return(NULL)
   }
 
-  txt <- rawToChar(kgml_raw)
-  tmp <- tempfile(fileext = ".xml")
+  # Parse XML directly from raw vector
+  kgml_xml <- read_xml(kgml_raw)
 
-  writeLines(txt, con = tmp)
+  # Optionally: write to cache file
+  tmp <- tempfile(fileext = ".xml")
+  write_xml(kgml_xml, tmp) # preserves formatting
 
   # Add to BiocFileCache
   res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "copy")
@@ -153,18 +155,18 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 #     return(NULL)
 #   }
 
-  # # Write raw content to temporary file
-  # con <- rawConnection(kgml_raw)
-  # xml_lines <- readLines(con, encoding = "UTF-8")
-  # close(con)
-  # kgml_text <- rawToChar(kgml_raw)
-  # kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
-  # kgml_clean <- sub('\\0', '', kgml_clean)
-  # kgml_clean_raw <- charToRaw(kgml_clean)
+# # Write raw content to temporary file
+# con <- rawConnection(kgml_raw)
+# xml_lines <- readLines(con, encoding = "UTF-8")
+# close(con)
+# kgml_text <- rawToChar(kgml_raw)
+# kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
+# kgml_clean <- sub('\\0', '', kgml_clean)
+# kgml_clean_raw <- charToRaw(kgml_clean)
 
-  # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
+# xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
 
-  # Write the XML lines directly
+# Write the XML lines directly
 #   txt <- rawToChar(kgml_raw)
 #   end_tag <- "</pathway>"
 #   pos <- regexpr(end_tag, txt, fixed = TRUE)
