@@ -89,7 +89,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # xml_lines <- readLines(con, encoding = "UTF-8")
   # close(con)
   kgml_text <- rawToChar(kgml_raw)
-  kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
+  kgml_clean <- sub("\\n$", "", kgml_clean) # remove trailing newline
   kgml_clean_raw <- charToRaw(kgml_text)
 
   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
