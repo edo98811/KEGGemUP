@@ -46,77 +46,102 @@ get_pathway_name <- function(id) {
 #' @importFrom httr GET http_error content status_code
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd
 get_and_cache_kgml <- function(pathway_id, bfc) {
-  # cache key / name
+  # Cache key / name
   rname <- paste0(pathway_id, ".xml")
-
+  
   # Check cache
   qr <- bfcquery(bfc, rname, field = "rname")
-
   if (nrow(qr) > 0) {
     message("Using cached KEGG KGML for ", pathway_id)
     return(bfcpath(bfc, qr$rid[1]))
   }
-
-  # If not cached, download
-  message("Downloading KGML for ", pathway_id, "...")
-
+  
+  # Download KGML
+  message("Downloading KGML for ", pathway_id, " ...")
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
-
-  # # Function to get KGML content
-  # kgml_content <- get_kgml(url)
-
-  # Make request
-  resp <- httr::GET(url)
-
-  # Check if the request was successful (status 200)
-  if (httr::http_error(resp)) {
-    warning(
-      "Failed to download KGML from URL: ", url,
-      " (HTTP status ", httr::status_code(resp), ")"
-    )
-    return(NULL)
-  }
-
-  # Get content as raw vector and check
-  kgml_raw <- httr::content(resp, as = "raw", encoding = "")
-  if (is.null(kgml_raw)) {
-    warning("Failed to download KGML for ", pathway_id)
-    return(NULL)
-  }
-
-  # # Write raw content to temporary file
-  # con <- rawConnection(kgml_raw)
-  # xml_lines <- readLines(con, encoding = "UTF-8")
-  # close(con)
-  # kgml_text <- rawToChar(kgml_raw)
-  # kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
-  # kgml_clean <- sub('\\0', '', kgml_clean)
-  # kgml_clean_raw <- charToRaw(kgml_clean)
-
-  # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
-
-  # Write the XML lines directly
-  txt <- rawToChar(kgml_raw)
-  end_tag <- "</pathway>"
-  pos <- regexpr(end_tag, txt, fixed = TRUE)
-  if (pos[1] == -1) stop("No </pathway> tag found")
-  truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
-  # truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
-  kgml_clean <- charToRaw(truncated)
-
-  kgml_clean <- kgml_clean[kgml_clean != as.raw(0)]
   tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "wb")
-  writeBin(kgml_clean, con)
-  close(con)
-
-  # Add to cache
-  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  download.file(url, destfile = tmp, mode = "wb", quiet = TRUE)
+  
+  # Add to BiocFileCache
+  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "copy")
   rid <- names(res)
-
+  
   message("Downloaded & cached: ", pathway_id)
   return(bfcpath(bfc, rid))
 }
+
+# get_and_cache_kgml <- function(pathway_id, bfc) {
+#   # cache key / name
+#   rname <- paste0(pathway_id, ".xml")
+
+#   # Check cache
+#   qr <- bfcquery(bfc, rname, field = "rname")
+
+#   if (nrow(qr) > 0) {
+#     message("Using cached KEGG KGML for ", pathway_id)
+#     return(bfcpath(bfc, qr$rid[1]))
+#   }
+
+#   # If not cached, download
+#   message("Downloading KGML for ", pathway_id, "...")
+
+#   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
+
+#   # # Function to get KGML content
+#   # kgml_content <- get_kgml(url)
+
+#   # Make request
+#   resp <- httr::GET(url)
+
+#   # Check if the request was successful (status 200)
+#   if (httr::http_error(resp)) {
+#     warning(
+#       "Failed to download KGML from URL: ", url,
+#       " (HTTP status ", httr::status_code(resp), ")"
+#     )
+#     return(NULL)
+#   }
+
+#   # Get content as raw vector and check
+#   kgml_raw <- httr::content(resp, as = "raw", encoding = "")
+#   if (is.null(kgml_raw)) {
+#     warning("Failed to download KGML for ", pathway_id)
+#     return(NULL)
+#   }
+
+#   # # Write raw content to temporary file
+#   # con <- rawConnection(kgml_raw)
+#   # xml_lines <- readLines(con, encoding = "UTF-8")
+#   # close(con)
+#   # kgml_text <- rawToChar(kgml_raw)
+#   # kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
+#   # kgml_clean <- sub('\\0', '', kgml_clean)
+#   # kgml_clean_raw <- charToRaw(kgml_clean)
+
+#   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
+
+#   # Write the XML lines directly
+#   txt <- rawToChar(kgml_raw)
+#   end_tag <- "</pathway>"
+#   pos <- regexpr(end_tag, txt, fixed = TRUE)
+#   if (pos[1] == -1) stop("No </pathway> tag found")
+#   truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
+#   # truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
+#   kgml_clean <- charToRaw(truncated)
+
+#   kgml_clean <- kgml_clean[kgml_clean != as.raw(0)]
+#   tmp <- tempfile(fileext = ".xml")
+#   con <- file(tmp, "wb")
+#   writeBin(kgml_clean, con)
+#   close(con)
+
+#   # Add to cache
+#   res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+#   rid <- names(res)
+
+#   message("Downloaded & cached: ", pathway_id)
+#   return(bfcpath(bfc, rid))
+# }
 # return(dest)
 
 # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
