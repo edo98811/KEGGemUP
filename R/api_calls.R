@@ -121,7 +121,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # Write to temporary file
   tmp <- tempfile(fileext = ".xml")
   conn <- file("tmp", "wb")
-  writeBin("kgml_clean", conn)
+  writeBin(kgml_clean, conn)
   close(conn)
 
   # Add to cache safely
