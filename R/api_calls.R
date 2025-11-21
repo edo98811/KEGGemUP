@@ -93,6 +93,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 
   # ---- WINDOWS SAFE WAY ----
   # Write to a temp file IN BINARY MODE (Windows-safe)
+  kgml_clean <- charToRaw(kgml_text)
   tmp <- tempfile(fileext = ".xml")
   con <- file(tmp, "wb")
   writeBin(kgml_raw, con)
