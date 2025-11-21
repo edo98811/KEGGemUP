@@ -99,9 +99,9 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   close(con)
 
   # Import into BiocFileCache
-  rid <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
   rid <- names(res)
-  
+
   message("Downloaded & cached: ", pathway_id)
   return(bfcpath(bfc, rid))
 }
