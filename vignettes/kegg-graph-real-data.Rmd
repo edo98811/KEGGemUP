@@ -9,18 +9,18 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r}
+```{r, eval = FALSE}
 library("KEGGemUP")
 ```
 
-```{r load-fake-results}
+```{r load-fake-results, eval = FALSE}
 message("--- Loading packages...")
 
 suppressPackageStartupMessages({
@@ -118,19 +118,19 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 ## Functions to parse KGML files
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so.
-```{r kgml-parsing}
+```{r kgml-parsing, eval = FALSE}
 nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
 edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
 ```
 
 ### The output tibble frame for nodes
-```{r}
+```{r, eval = FALSE}
 knitr::kable(head(nodes_df))
 ```
 
 ### The output tibble frame for edges
 
-```{r}
+```{r, eval = FALSE}
 knitr::kable(head(edges_df))
 ```
 
@@ -143,7 +143,7 @@ To do so, you can provide a list of differentially expressed results tables, eac
 - value_column: the name of the column in de_table containing the values to map to the nodes
 - feature_column: the name of the column in de_table containing the feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the graph (without organism prefix).
 
-```{r}
+```{r, eval = FALSE}
 de_results_list <-list(
   trans_limma = list(
     de_table = data.frame(res_macrophage_IFNg_vs_naive_limma),
@@ -161,21 +161,21 @@ de_results_list <-list(
 You can also provide a single differential expression results table as a data.frame. For that the column names need to respect the default values:
 - "KEGG_ids": the column containing the KEGG feature IDs (without organism prefix)
 - "log2FoldChange": the column containing the values to map to the nodes
-```{r}
+```{r, eval = FALSE}
 de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)[res_macrophage_IFNg_vs_naive_limma$adj.P.Val < 0.05, ]
 de_results_limma$log2FoldChange <- de_results_limma$logFC
 de_results_limma$KEGG_ids <- de_results_limma$ENTREZID
 ```
 
 ### Example of usage
-```{r use-package}
+```{r use-package, eval = FALSE}
 pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_list)
 graph
 ```
 
-```{r use-package-2}
+```{r use-package-2, eval = FALSE}
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_limma)
 graph
