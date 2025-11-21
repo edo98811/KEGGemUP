@@ -96,19 +96,40 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
   kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text, perl = TRUE) # remove anything after the last closing tag
   kgml_clean <- charToRaw(kgml_text) # write back to binary
-  # tmp <- tempfile(fileext = ".xml")
-  # con <- file(tmp, "wb")
-  # writeBin(kgml_raw, con)
-  # close(con)
-  dest <- bfcnew(bfc, rname = rname, ext = ".xml")
-  writeBin(kgml_clean, dest)
-  # # Import into BiocFileCache
-  # res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
-  # rid <- names(res)
+  # # tmp <- tempfile(fileext = ".xml")
+  # # con <- file(tmp, "wb")
+  # # writeBin(kgml_raw, con)
+  # # close(con)
+  # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
+  # writeBin(kgml_clean, dest)
+  # # # Import into BiocFileCache
+  # # res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  # # rid <- names(res)
+
+  # message("Downloaded & cached: ", pathway_id)
+  # # return(bfcpath(bfc, rid))
+  # return(dest)
+  # Find the last </pathway> tag in raw bytes
+  # close_tag <- charToRaw("</pathway>")
+  # pos <- max(gregexpr(close_tag, kgml_raw, fixed = TRUE)[[1]])
+  # if (pos > 0) {
+  #   kgml_clean <- kgml_raw[1:(pos + length(close_tag) - 1)]
+  # } else {
+  #   kgml_clean <- kgml_raw
+  # }
+
+  # Write to temporary file
+  tmp <- tempfile(fileext = ".xml")
+  conn <- file("tmp", "wb")
+  writeBin("kgml_clean", conn)
+  close(conn)
+
+  # Add to cache safely
+  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  rid <- names(res)
 
   message("Downloaded & cached: ", pathway_id)
-  # return(bfcpath(bfc, rid))
-  return(dest)
+  return(bfcpath(bfc, rid))
 }
 
 
