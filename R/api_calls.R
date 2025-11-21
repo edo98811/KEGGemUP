@@ -88,15 +88,16 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # con <- rawConnection(kgml_raw)
   # xml_lines <- readLines(con, encoding = "UTF-8")
   # close(con)
+  kgml_text <- rawToChar(kgml_raw)
+  kgml_clean <- sub("\\n$", "", kgml_text) # remove trailing newline
+  kgml_clean_raw <- charToRaw(kgml_text)
 
   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
-
-  kgml_raw <- kgml_raw[1:(length(kgml_raw)-2)] # remove any trailing null bytes
 
   # Write the XML lines directly
   tmp <- tempfile(fileext = ".xml")
   con <- file(tmp, "wb")
-  writeBin(kgml_raw, con)
+  writeBin(kgml_clean_raw, con)
   close(con)
 
   # Add to cache
