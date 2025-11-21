@@ -108,7 +108,8 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # rid <- names(res)
 
   message("Downloaded & cached: ", pathway_id)
-  return(bfcpath(bfc, rid))
+  # return(bfcpath(bfc, rid))
+  return(dest)
 }
 
 
