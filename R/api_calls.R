@@ -84,18 +84,19 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
     return(NULL)
   }
 
+  # # Write raw content to temporary file
+  # con <- rawConnection(kgml_raw)
+  # xml_lines <- readLines(con, encoding = "UTF-8")
+  # close(con)
 
-  # Write raw content to temporary file
-  con <- rawConnection(kgml_raw)
-  xml_lines <- readLines(con, encoding = "UTF-8")
-  close(con)
+  # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
 
-  xml_lines <- xml_lines <- head(xml_lines, -1)# remove empty last line
+  kgml_raw <- kgml_raw[1:(length(kgml_raw)-2)] # remove any trailing null bytes
 
   # Write the XML lines directly
   tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "w")
-  writeLines(xml_lines, con, useBytes = TRUE)
+  con <- file(tmp, "wb")
+  writeBin(kgml_raw, con)
   close(con)
 
   # Add to cache
@@ -163,7 +164,6 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
 #' @importFrom KEGGREST keggList
 get_kegg_compounds <- function(bfc) {
-
   cache_name <- "kegg_compounds.rds"
 
   # Check if cache exists
