@@ -93,15 +93,19 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 
   # ---- WINDOWS SAFE WAY ----
   # Write to a temp file IN BINARY MODE (Windows-safe)
-  kgml_clean <- charToRaw(kgml_text)
-  tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "wb")
-  writeBin(kgml_raw, con)
-  close(con)
-
-  # Import into BiocFileCache
-  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
-  rid <- names(res)
+  kgml_text <- rawToChar(kgml_raw)
+  Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
+  kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text, perl = TRUE) # remove anything after the last closing tag
+  kgml_clean <- charToRaw(kgml_text) # write back to binary
+  # tmp <- tempfile(fileext = ".xml")
+  # con <- file(tmp, "wb")
+  # writeBin(kgml_raw, con)
+  # close(con)
+  dest <- bfcnew(bfc, rname = rname, ext = ".xml")
+  writeBin(kgml_clean, dest)
+  # # Import into BiocFileCache
+  # res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  # rid <- names(res)
 
   message("Downloaded & cached: ", pathway_id)
   return(bfcpath(bfc, rid))
