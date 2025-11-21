@@ -96,7 +96,18 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
 
   # Write the XML lines directly
-  kgml_clean <- kgml_raw[kgml_raw != as.raw(0)]
+  kgml_text <- rawToChar(kgml_raw)
+
+  # find the last occurrence of </pathway>
+  end_tag <- "</pathway>"
+  pos <- regexpr(end_tag, kgml_text, fixed = TRUE)
+  if (pos[1] == -1) stop("No </pathway> tag found in KGML")
+
+  # truncate everything after the closing tag
+  truncated_text <- substr(kgml_text, 1, pos[1] + attr(pos, "match.length") - 1)
+
+  # convert back to raw bytes
+  kgml_clean <- charToRaw(truncated_text)
 
   tmp <- tempfile(fileext = ".xml")
   con <- file(tmp, "wb")
@@ -109,6 +120,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 
   message("Downloaded & cached: ", pathway_id)
   return(bfcpath(bfc, rid))
+}
   # return(dest)
 
   # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
@@ -159,8 +171,6 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # message("Downloaded & cached: ", pathway_id)
   # return(bfcpath(bfc, rid))
   # return(dest)
-}
-
 
 #' Get KEGG compounds with caching.
 #' @param bfc A BiocFileCache object for caching.
@@ -197,7 +207,6 @@ get_kegg_compounds <- function(bfc) {
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
 #' @importFrom KEGGREST keggList
 get_kegg_glycans <- function(bfc) {
-
   cache_name <- "kegg_glycans.rds"
 
   # Check if cache exists
