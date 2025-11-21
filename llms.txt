@@ -75,16 +75,14 @@ graph
 - [`combine_results_in_dataframe()`](https://edo98811.github.io/KEGGemUP/reference/combine_results_in_dataframe.md)
   : Combine multiple differential expression results into a single data
   frame
-- [`download_kgml()`](https://edo98811.github.io/KEGGemUP/reference/download_kgml.md)
-  : Download and cache KEGG KGML files.
 - [`expand_keggs()`](https://edo98811.github.io/KEGGemUP/reference/expand_keggs.md)
   : Handle multiple KEGG IDs in a single string separated by ";"
+- [`get_and_cache_kgml()`](https://edo98811.github.io/KEGGemUP/reference/get_and_cache_kgml.md)
+  : Download and cache KEGG KGML files.
 - [`get_kegg_compounds()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_compounds.md)
   : Get KEGG compounds with caching.
 - [`get_kegg_glycans()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_glycans.md)
   : Get KEGG glycans with caching.
-- [`get_kgml()`](https://edo98811.github.io/KEGGemUP/reference/get_kgml.md)
-  : Download KEGG KGML file for a given pathway ID, with caching.
 - [`get_pathway_name()`](https://edo98811.github.io/KEGGemUP/reference/get_pathway_name.md)
   : Convert KEGG pathway ID to readable pathway name
 - [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
