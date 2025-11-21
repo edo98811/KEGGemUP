@@ -84,6 +84,19 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
     return(NULL)
   }
 
+
+  con <- rawConnection(kgml_raw)
+  xml_lines <- readLines(con, encoding = "UTF-8")
+  close(con)
+
+  xml_lines <- xml_lines[1:length(lines) - 1] # remove empty last line
+
+  # Create a new cache entry (this gives you the path to write to)
+  dest <- bfcnew(bfc, rname = rname, ext = ".xml")
+
+  # Write the XML lines directly
+  writeLines(xml_lines, dest, useBytes = TRUE)
+
   # # create cache entry
   # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
 
@@ -92,10 +105,10 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 
   # ---- WINDOWS SAFE WAY ----
   # Write to a temp file IN BINARY MODE (Windows-safe)
-  kgml_text <- rawToChar(kgml_raw)
-  Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
-  kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text, perl = TRUE) # remove anything after the last closing tag
-  kgml_clean <- charToRaw(kgml_text) # write back to binary
+  # kgml_text <- rawToChar(kgml_raw)
+  # Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
+  # kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text, perl = TRUE) # remove anything after the last closing tag
+  # kgml_clean <- charToRaw(kgml_text) # write back to binary
   # # tmp <- tempfile(fileext = ".xml")
   # # con <- file(tmp, "wb")
   # # writeBin(kgml_raw, con)
@@ -118,18 +131,19 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   #   kgml_clean <- kgml_raw
   # }
 
-  # Write to temporary file
-  tmp <- tempfile(fileext = ".xml")
-  conn <- file(tmp, "wb")
-  writeBin(kgml_clean, conn)
-  close(conn)
+  # # Write to temporary file
+  # tmp <- tempfile(fileext = ".xml")
+  # conn <- file(tmp, "wb")
+  # writeBin(kgml_clean, conn)
+  # close(conn)
 
   # Add to cache safely
-  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
-  rid <- names(res)
+  # res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  # rid <- names(res)
 
-  message("Downloaded & cached: ", pathway_id)
-  return(bfcpath(bfc, rid))
+  # message("Downloaded & cached: ", pathway_id)
+  # return(bfcpath(bfc, rid))
+  return(dest)
 }
 
 
