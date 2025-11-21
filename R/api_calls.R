@@ -101,7 +101,6 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   pos <- regexpr(end_tag, txt, fixed = TRUE)
   if (pos[1] == -1) stop("No </pathway> tag found")
   truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
-
   # truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
   kgml_clean <- charToRaw(truncated)
 
