@@ -136,9 +136,10 @@ map_results_to_nodes <- function(g,
     # --- 2. Map DE results to nodes ---
     results_combined <- combine_results_in_dataframe(de_results)
     nodes_df <- add_results_nodes(nodes_df, results_combined)
-    nodes_df <- add_colors_to_nodes(nodes_df)
+
 
     # --- 3. Color and style nodes and edges ---
+    nodes_df <- add_colors_to_nodes(nodes_df)
     nodes_df <- add_tooltip(nodes_df)
   }
 
@@ -167,7 +168,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
     warning("No edges in graph.")
     v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
   } else {
-    v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has no edges
+    v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has edges
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
@@ -180,7 +181,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   )
 
   v <- visNetwork::visInteraction(v, dragNodes = TRUE)
-  v
+
   return(v)
 }
 

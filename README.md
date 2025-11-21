@@ -1,7 +1,7 @@
-  <!-- badges: start -->
-  [![R-CMD-check](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml)
-  <!-- badges: end -->
-  
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
   
 # KEGGemUP
 
