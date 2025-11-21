@@ -37,7 +37,7 @@ kegg_to_graph <- function(path_id,
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
 
   # --- 1. Download KGML ---
-  kgml_file <- download_kgml(path_id, bfc_kegg)
+  kgml_file <- get_and_cache_kgml(path_id, bfc_kegg)
   if (is.null(kgml_file)) {
     warning("Failed to download KGML file for pathway ID: ", path_id)
     return(NULL)
