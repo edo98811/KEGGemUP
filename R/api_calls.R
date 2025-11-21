@@ -92,15 +92,16 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # writeBin(kgml_content, dest)
 
   # ---- WINDOWS SAFE WAY ----
-  # write to a temp file IN BINARY MODE (Windows-safe)
+  # Write to a temp file IN BINARY MODE (Windows-safe)
   tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "wb") 
+  con <- file(tmp, "wb")
   writeBin(kgml_raw, con)
   close(con)
 
-  # import into BiocFileCache
-  rid <- bfcadd(bfc, rname = rname, fpath = tmp)
-
+  # Import into BiocFileCache
+  rid <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  rid <- names(res)
+  
   message("Downloaded & cached: ", pathway_id)
   return(bfcpath(bfc, rid))
 }
