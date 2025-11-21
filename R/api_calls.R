@@ -96,18 +96,13 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
 
   # Write the XML lines directly
-  kgml_text <- rawToChar(kgml_raw)
-
-  # find the last occurrence of </pathway>
+  txt <- rawToChar(kgml_raw)
   end_tag <- "</pathway>"
-  pos <- regexpr(end_tag, kgml_text, fixed = TRUE)
-  if (pos[1] == -1) stop("No </pathway> tag found in KGML")
-
-  # truncate everything after the closing tag
-  truncated_text <- substr(kgml_text, 1, pos[1] + attr(pos, "match.length") - 1)
-
-  # convert back to raw bytes
-  kgml_clean <- charToRaw(truncated_text)
+  pos <- regexpr(end_tag, txt, fixed = TRUE)
+  if (pos[1] == -1) stop("No </pathway> tag found")
+  truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
+  truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
+  kgml_clean <- charToRaw(truncated)
 
   tmp <- tempfile(fileext = ".xml")
   con <- file(tmp, "wb")
