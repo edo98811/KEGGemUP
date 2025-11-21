@@ -490,60 +490,6 @@ add_colors_to_nodes <- function(nodes_df) {
   return(nodes_df)
 }
 
-#' Download and cache KEGG KGML files.
-#' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
-#' @param bfc BiocFileCache object for caching KEGG KGML files.
-#' @return Path to the cached KGML file.
-#'
-#' @importFrom xml2 read_xml
-#' @importFrom httr GET http_error content status_code
-#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
-download_kgml <- function(pathway_id, bfc) {
-  # cache key / name
-  rname <- paste0(pathway_id, ".xml")
-
-  # Check cache
-  qr <- bfcquery(bfc, rname, field = "rname")
-
-  if (nrow(qr) > 0) {
-    message("Using cached KEGG KGML for ", pathway_id)
-    return(bfcpath(bfc, qr$rid[1]))
-  }
-
-  # If not cached, download
-  message("Downloading KGML for ", pathway_id, "...")
-
-  url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
-
-  # Function to get KGML content
-  kgml_content <- get_kgml(url)
-
-  if (is.null(kgml_content)) {
-    warning("Failed to download KGML for ", pathway_id)
-    return(NULL)
-  }
-
-  # # create cache entry
-  # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
-
-  # # write content
-  # writeBin(kgml_content, dest)
-
-  # ---- WINDOWS SAFE WAY ----
-  # write to a temp file IN BINARY MODE (Windows-safe)
-  tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "wb") 
-  writeBin(kgml_raw, con)
-  close(con)
-
-  # import into BiocFileCache
-  rid <- bfcadd(bfc, rname = rname, fpath = tmp)
-
-  message("Downloaded & cached: ", pathway_id)
-
-  return(dest)
-}
-
 
 #' Add gene names to gene nodes in the nodes data frame.
 #' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
