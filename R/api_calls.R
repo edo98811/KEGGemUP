@@ -165,27 +165,27 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # xml_lines <- head(xml_lines, -1) # remove empty last line (alaways present)
 
   # Write the XML lines directly
-  txt <- rawToChar(kgml_raw)
-  end_tag <- "</pathway>"
-  pos <- regexpr(end_tag, txt, fixed = TRUE)
-  if (pos[1] == -1) stop("No </pathway> tag found")
-  truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
-  # truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
-  kgml_clean <- charToRaw(truncated)
+#   txt <- rawToChar(kgml_raw)
+#   end_tag <- "</pathway>"
+#   pos <- regexpr(end_tag, txt, fixed = TRUE)
+#   if (pos[1] == -1) stop("No </pathway> tag found")
+#   truncated <- substr(txt, 1, pos[1] + attr(pos, "match.length") - 1)
+#   # truncated <- sub("[\r\n\x00\\s]+$", "", truncated, perl = TRUE)
+#   kgml_clean <- charToRaw(truncated)
 
-  kgml_clean <- kgml_clean[kgml_clean != as.raw(0)]
-  tmp <- tempfile(fileext = ".xml")
-  con <- file(tmp, "wb")
-  writeBin(kgml_clean, con)
-  close(con)
+#   kgml_clean <- kgml_clean[kgml_clean != as.raw(0)]
+#   tmp <- tempfile(fileext = ".xml")
+#   con <- file(tmp, "wb")
+#   writeBin(kgml_clean, con)
+#   close(con)
 
-  # Add to cache
-  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
-  rid <- names(res)
+#   # Add to cache
+#   res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+#   rid <- names(res)
 
-  message("Downloaded & cached: ", pathway_id)
-  return(bfcpath(bfc, rid))
-}
+#   message("Downloaded & cached: ", pathway_id)
+#   return(bfcpath(bfc, rid))
+# }
 # return(dest)
 
 # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
