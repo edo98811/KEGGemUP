@@ -92,16 +92,32 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # writeBin(kgml_content, dest)
 
   # ---- WINDOWS SAFE WAY ----
-  # Write to a temp file IN BINARY MODE (Windows-safe)
-  kgml_text <- rawToChar(kgml_raw)
-  Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
-  kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text, perl = TRUE) # remove anything after the last closing tag
-  kgml_clean <- charToRaw(kgml_text) # write back to binary
-  
-  # Write to temp file and add to cache (Windows-safe)
+  # Write to a temp file in binary mode
+  # kgml_text <- rawToChar(kgml_raw)
+  # Encoding(kgml_text) <- "UTF-8" # read or Set the Declared Encodings for a Character Vector
+  # kgml_text <- sub("(?s)(</pathway>).*", "\\1", kgml_text) # remove anything after the last closing tag
+  # kgml_clean <- charToRaw(kgml_text) # write back to binary
+
+  # # Write to temp file and add to cache (Windows-safe)
+  # tmp <- tempfile(fileext = ".xml")
+  # writeBin(kgml_clean, tmp)
+  # Find the closing tag in raw bytes
+  close_tag <- charToRaw("</pathway>")
+  pos <- max(gregexpr(close_tag, kgml_raw, fixed = TRUE)[[1]])
+
+  # Keep only up to the last </pathway> tag
+  if (pos > 0) {
+    kgml_clean <- kgml_raw[1:(pos + length(close_tag) - 1)]
+  } else {
+    # fallback: keep all
+    kgml_clean <- kgml_raw
+  }
+
+  # Write to temp file directly in binary
   tmp <- tempfile(fileext = ".xml")
   writeBin(kgml_clean, tmp)
 
+  # Add to cache
   res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
   rid <- names(res)
 
