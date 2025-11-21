@@ -85,18 +85,28 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   }
 
 
+  # Write raw content to temporary file
   con <- rawConnection(kgml_raw)
   xml_lines <- readLines(con, encoding = "UTF-8")
   close(con)
 
-  xml_lines <- xml_lines[1:length(lines) - 1] # remove empty last line
-
-  # Create a new cache entry (this gives you the path to write to)
-  dest <- bfcnew(bfc, rname = rname, ext = ".xml")
+  xml_lines <- xml_lines <- head(xml_lines, -1)# remove empty last line
 
   # Write the XML lines directly
-  writeLines(xml_lines, dest, useBytes = TRUE)
+  tmp <- tempfile(fileext = ".xml")
+  con <- file(tmp, "w")
+  writeLines(xml_lines, con, useBytes = TRUE)
+  close(con)
 
+  # Add to cache
+  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "move")
+  rid <- names(res)
+
+  message("Downloaded & cached: ", pathway_id)
+  return(bfcpath(bfc, rid))
+  # return(dest)
+
+  # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
   # # create cache entry
   # dest <- bfcnew(bfc, rname = rname, ext = ".xml")
 
@@ -143,7 +153,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
 
   # message("Downloaded & cached: ", pathway_id)
   # return(bfcpath(bfc, rid))
-  return(dest)
+  # return(dest)
 }
 
 
