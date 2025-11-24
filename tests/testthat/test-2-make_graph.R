@@ -38,7 +38,7 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
 
     # Structure checks
     expect_true(is.data.frame(result), info = test_name)
-    expect_equal(colnames(result), c("KEGG", "value", "source"),
+    expect_equal(colnames(result), c("KEGG", "plot_value", "source"),
                  info = paste0(test_name, "unexpected column names"))
 
     # Source tracking

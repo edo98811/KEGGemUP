@@ -29,7 +29,8 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
 
     # --- Structure checks ---
     expect_true(is.data.frame(mapped_nodes), info = test_name)
-    expect_true(all(c("value", "color", "source", "text") %in% colnames(mapped_nodes)),
+
+    expect_true(all(c("plot_value", "color", "source", "text") %in% colnames(mapped_nodes)),
       info = paste0(test_name, " missing expected columns")
     )
     expect_equal(nrow(mapped_nodes), nrow(nodes_df),
