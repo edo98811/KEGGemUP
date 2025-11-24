@@ -43,8 +43,9 @@ get_pathway_name <- function(id) {
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
 #' @return Path to the cached KGML file.
 #'
-#' @importFrom httr GET http_error content status_code
-#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd
+#' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
+#' @importFrom BiocFileCache bfcquery bfcpath bfcadd
+#' @importFrom xml2 write_xml
 get_and_cache_kgml <- function(pathway_id, bfc) {
   # Cache key / name
   rname <- paste0(pathway_id, ".xml")
@@ -59,26 +60,21 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # Download KGML
   message("Downloading KGML for ", pathway_id, " ...")
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
-  resp <- httr::GET(url)
+  resp <- request(url) |>
+    req_retry(max_tries = 3) |>
+    req_perform(error = FALSE)
 
-  # Check if the request was successful (status 200)
-  if (httr::http_error(resp)) {
+  # Check success
+  if (resp_is_error(resp)) {
     warning(
       "Failed to download KGML from URL: ", url,
-      " (HTTP status ", httr::status_code(resp), ")"
+      " (HTTP status ", resp_status(resp), ")"
     )
     return(NULL)
   }
 
   # Get content as raw vector and check
-  kgml_raw <- httr::content(resp, as = "raw", encoding = "")
-  if (is.null(kgml_raw)) {
-    warning("Failed to download KGML for ", pathway_id)
-    return(NULL)
-  }
-
-  # Parse XML directly from raw vector
-  kgml_xml <- read_xml(kgml_raw)
+  kgml_xml <- resp_body_xml(resp)
 
   # Optionally: write to cache file
   tmp <- tempfile(fileext = ".xml")
