@@ -111,7 +111,7 @@ map_results_to_nodes <- function(g,
     }
 
     # Keep only valid entries
-    de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
+    de_results <- de_results[vapply(names(de_results), function(name) is_valid_de_entry(de_results[[name]], name), logical(1))]
   }
 
   # --- 1. Extract nodes and edges from igraph ---

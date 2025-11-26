@@ -39,11 +39,3 @@ expand_keggs <- function(kegg_df) {
   return(data.frame(name = ids_out, KEGG = kegg_out, stringsAsFactors = FALSE))
 }
 
-
-is_valid_pathway <- function(pathway_id) {
-  # Check if pathway_id matches KEGG pathway formats: "hsa04110" or "04110"
-  if (!is.character(pathway_id) || length(pathway_id) != 1) {
-    return(FALSE)
-  }
-  grepl("^[a-z]{2,3}\\d{5}$", pathway_id) || grepl("^\\d{5}$", pathway_id)
-}
