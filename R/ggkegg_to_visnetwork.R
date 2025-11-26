@@ -20,11 +20,6 @@ kegg_to_graph <- function(path_id,
     choices = c("igraph", "visNetwork"),
     several.ok = FALSE
   )
-  organism <- match.arg(
-    organism,
-    choices = c("hsa", "mmu"),
-    several.ok = FALSE
-  )
 
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
