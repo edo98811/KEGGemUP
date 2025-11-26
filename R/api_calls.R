@@ -62,7 +62,7 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
   resp <- request(url) |>
     req_retry(max_tries = 3) |>
-    req_perform(error = FALSE)
+    req_perform(error_call = FALSE)
 
   # Check success
   if (resp_is_error(resp)) {
