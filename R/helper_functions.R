@@ -47,23 +47,3 @@ is_valid_pathway <- function(pathway_id) {
   }
   grepl("^[a-z]{2,3}\\d{5}$", pathway_id) || grepl("^\\d{5}$", pathway_id)
 }
-
-#' Convert organism name or abbreviation to KEGG organism code
-#' @param organism Organism name or abbreviation (e.g., "human", "hs", "mouse", "mm")
-#' @return KEGG organism code (e.g., "hsa" for human, "mmu" for mouse)
-to_organism_kegg <- function(organism) {
-  if (missing(organism) || !nzchar(organism)) {
-    stop("You must provide a valid KEGG organism code.")
-  }
-  # Handle common abbreviations
-  organism_code <- switch(tolower(organism),
-    "hs" = "hsa",
-    "mm" = "mmu",
-    "human" = "hsa",
-    "mouse" = "mmu",
-    "hsa" = "hsa",
-    "mmu" = "mmu",
-    stop(sprintf("Unknown organism abbreviation: %s", organism))
-  )
-  return(organism_code)
-}
