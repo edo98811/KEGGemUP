@@ -11,7 +11,6 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          organism = "hsa",
                           de_results = NULL,
                           return_type = "igraph",
                           scaling_factor = 1.5) {
@@ -29,8 +28,7 @@ kegg_to_graph <- function(path_id,
 
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
-  if (!is.character(organism) || length(organism) != 1) stop("organism must be a single character string")
-  organism <- to_organism_kegg(organism)
+
 
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
