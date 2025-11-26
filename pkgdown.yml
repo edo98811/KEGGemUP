@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   kegg-graph-real-data: kegg-graph-real-data.html
-last_built: 2025-11-24T15:23Z
+last_built: 2025-11-26T10:33Z
 urls:
   reference: https://edo98811.github.io/KEGGemUP/reference
   article: https://edo98811.github.io/KEGGemUP/articles
