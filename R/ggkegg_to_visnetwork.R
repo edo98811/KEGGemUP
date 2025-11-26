@@ -129,7 +129,6 @@ map_results_to_nodes <- function(g,
     results_combined <- combine_results_in_dataframe(de_results)
     nodes_df <- add_results_nodes(nodes_df, results_combined)
 
-
     # --- 3. Color and style nodes and edges ---
     nodes_df <- add_colors_to_nodes(nodes_df)
     nodes_df <- add_tooltip(nodes_df)
@@ -188,9 +187,6 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
     g <- igraph::delete_edges(g, igraph::E(g))
-    # remove the fake edge
-    # g <- make_empty_graph(n = 0, directed = FALSE)
-    # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
   } else {
     g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
   }
@@ -243,16 +239,10 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' @details The tooltip includes a button to the specific KEGG entry page. If multiple KEGG IDs are present, they are concatenated with '+' in the URL. It also adds information about the node name, source of differential expression data, and value.
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
-  #  base_link, gsub(" ", "+", nodes_df$kegg_name)
 
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
-    # paste0(
-    #   '<a href="', nodes_df$link,
-    #   '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
-    #   '<button type="button">KEGG entry</button></a><br>'
-    # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
       '<a href="', ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_),
@@ -275,7 +265,7 @@ add_tooltip <- function(nodes_df) {
     safe(nodes_df$kegg_name) == "undefined",
     paste0("Group Node Placeholder: ", nodes_df$group, "<br>"),
     paste0(
-      "Name: ", safe(nodes_df$kegg_name), "<br>",
+      "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50,nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
       "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
       button_html
