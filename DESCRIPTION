@@ -2,8 +2,17 @@ Package: KEGGemUP
 Title: A package to map you differential expression results on KEGG pathways
 Version: 0.1.0
 Authors@R: 
-    person("Edoardo", "Filippi", , "edoardo.filippi@uni-mainz.de", role = c("aut", "cre"))
-Description: Simplify the analysis of multiomics datasets.
+    c(
+        person(
+            given = "Edoardo", family = "Filippi", role = c("aut", "cre"),
+            email = "edoardo.filippi@uni-mainz.de", comment = c(ORCID = "0009-0003-9858-0137")
+        ),
+        person(
+            given = "Federico", family = "Marini", role = c("aut"), 
+            email = "marinif@uni-mainz.de", comment = c(ORCID = "0000-0003-3252-7758")
+        )
+    )
+Description: TODO Simplify the analysis of multiomics datasets.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
