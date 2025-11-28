@@ -1,6 +1,6 @@
 Package: KEGGemUP
 Title: A package to map you differential expression results on KEGG pathways
-Version: 0.1
+Version: 0.1.0
 Authors@R: 
     person("Edoardo", "Filippi", , "edoardo.filippi@uni-mainz.de", role = c("aut", "cre"))
 Description: Simplify the analysis of multiomics datasets.
