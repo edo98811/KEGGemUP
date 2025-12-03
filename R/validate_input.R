@@ -8,21 +8,21 @@ check_de_entry <- function(de_entry, name) {
 
   # --- Structure checks ---
   if (!is.list(de_entry) || !all(c("de_table", "value_column", "feature_column") %in% names(de_entry))) {
-    warning(paste0("Each entry in de_results must be a list with elements: de_table, value_column, feature_column (problem in '", name, "')"))
+    warning("Each entry in de_results must be a list with elements: de_table, value_column, feature_column (problem in '", name, "')")
     return(FALSE)
   }
   if (!inherits(de_entry$de_table, "data.frame")) {
-    warning(paste0("de_results[['", name, "']]$de_table must be a data frame"))
+    warning("de_results[['", name, "']]$de_table must be a data frame")
     return(FALSE)
   }
   # Check that value_column is character and present in de_table
   if (!is.character(de_entry$value_column) || !(de_entry$value_column %in% colnames(de_entry$de_table))) {
-    warning(paste0("de_results[['", name, "']]$value_column must be a column name in de_results[['", name, "']]$de_table"))
+    warning("de_results[['", name, "']]$value_column must be a column name in de_results[['", name, "']]$de_table")
     return(FALSE)
   }
   # Check feature_column is character and present in de_table or is "rownames"
   if (!is.character(de_entry$feature_column) || !(de_entry$feature_column %in% c(colnames(de_entry$de_table), "rownames"))) {
-    warning(paste0("de_results[['", name, "']]$feature_column must be a column name in de_results[['", name, "']]$de_table or 'rownames'"))
+    warning("de_results[['", name, "']]$feature_column must be a column name in de_results[['", name, "']]$de_table or 'rownames'")
     return(FALSE)
   }
 

@@ -388,7 +388,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
           nodes_df$source[i] <- results_combined$source[j]
           # nodes_df$text[i] <- list()
         } else { # If value warn
-          warning(paste0("Multiple results mapped to node ", nodes_df$kegg_name[i], ". Keeping the first occurrence to color the node."))
+          warning("Multiple results mapped to node ", nodes_df$kegg_name[i], ". Keeping the first occurrence to color the node.")
         }
 
         # This will be added in any case
