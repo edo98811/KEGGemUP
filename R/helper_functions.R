@@ -11,10 +11,9 @@ remove_kegg_prefix_str <- function(kegg_ids) {
 #' @return List of character vectors with KEGG IDs without prefixes
 remove_kegg_prefix <- function(kegg_ids) {
   # Remove prefix (e.g., "cpd:", "mmu:", "ko:", "path:")
-  ids <- sapply(kegg_ids, function(x) sub("^[a-z]+:", "", x))
+  ids <- vapply(kegg_ids, function(x) sub("^[a-z]+:", "", x), FUN.VALUE = character(1))
   return(ids)
 }
-
 
 #' Handle multiple KEGG IDs in a single string separated by ";"
 #' @param kegg_df Data frame with at least two columns: 'name' and 'KEGG'
