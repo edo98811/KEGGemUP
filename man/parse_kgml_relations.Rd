@@ -10,7 +10,7 @@ parse_kgml_relations(file)
 \item{file}{Path to the KGML XML file.}
 }
 \value{
-A tibble with the following columns:
+A data.frame with the following columns:
 \describe{
 \item{from}{The ID of the source entry (node) in the pathway, corresponding to the \code{entry1} attribute in the KGML \verb{<relation>} tag.}
 \item{to}{The ID of the target entry (node) in the pathway, corresponding to the \code{entry2} attribute in the KGML \verb{<relation>} tag.}
@@ -27,7 +27,7 @@ The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathwa
 information as XML, and extracts all \verb{<relation>} elements that describe the
 interactions or relationships between entities in the pathway. Each \verb{<relation>} may
 contain one or more \verb{<subtype>} elements that provide additional details about
-the interaction. The result is a tidy tibble suitable for network analysis or
+the interaction. The result is a tidy data.frame suitable for network analysis or
 visualization, where each row represents one relation–subtype pair.
 }
 \examples{

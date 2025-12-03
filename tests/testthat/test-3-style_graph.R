@@ -33,7 +33,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     expect_true(all(c("plot_value", "color", "source", "text") %in% colnames(mapped_nodes)),
       info = paste0(test_name, " missing expected columns")
     )
-    expect_equal(nrow(mapped_nodes), nrow(nodes_df),
+    expect_equal(nrow(mapped_nodes), nrow(expected_nodes_cols),
       info = paste0(test_name, " wrong number of rows")
     )
 
@@ -181,8 +181,8 @@ test_that("tooltip is formatted correctly", {
 })
 
 test_that("make igraph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+    nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
     title = "Test Pathway"
 
@@ -201,9 +201,9 @@ test_that("make igraph works", {
 })
 
 test_that("make visnetwork graph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
     nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
     title = "Test Pathway"
 

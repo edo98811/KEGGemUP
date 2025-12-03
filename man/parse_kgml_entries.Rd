@@ -10,7 +10,7 @@ parse_kgml_entries(file)
 \item{file}{Path to the KGML XML file.}
 }
 \value{
-A tibble with the following columns:
+A data.frame with the following columns:
 \describe{
 \item{id}{Unique identifier of the entry within the KGML pathway (from the \code{id} attribute).}
 \item{kegg_name}{The KEGG-specific name or identifier of the entity (from the \code{name} attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
@@ -38,7 +38,7 @@ Each node may contain nested \verb{<graphics>} elements defining visual properti
 (such as position, size, and colors) and \verb{<component>} elements that define group
 membership for composite entities.
 
-The resulting tibble provides a tidy, one-row-per-entry representation suitable
+The resulting data provides a tidy, one-row-per-entry representation suitable
 for integration with relational data models or network visualization frameworks
 (e.g., \code{igraph}or \code{visNetwork}).
 }

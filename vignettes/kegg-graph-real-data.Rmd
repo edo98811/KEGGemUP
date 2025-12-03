@@ -20,6 +20,9 @@ knitr::opts_chunk$set(
 library("KEGGemUP")
 ```
 
+<details>
+<summary> Setting up the data </summary>
+
 ```{r load-fake-results}
 message("--- Loading packages...")
 
@@ -115,6 +118,8 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 )@result
 
 ```
+
+</details>
 ## Functions to parse KGML files
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so.
@@ -123,12 +128,12 @@ nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = 
 edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
 ```
 
-### The output tibble frame for nodes
+### The output data.frame frame for nodes
 ```{r}
 knitr::kable(head(nodes_df))
 ```
 
-### The output tibble frame for edges
+### The output data.frame frame for edges
 
 ```{r}
 knitr::kable(head(edges_df))

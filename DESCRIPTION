@@ -31,8 +31,7 @@ Imports:
     visNetwork,
     RColorBrewer,
     purrr,
-    xml2,
-    tibble
+    xml2
 Suggests: 
     shinytest2,
     mockery,
