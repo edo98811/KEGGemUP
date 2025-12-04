@@ -12,7 +12,6 @@
 #' }
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
-#' @importFrom purrr map_dfr
 #'
 #' @details
 #' The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
@@ -32,7 +31,7 @@ parse_kgml_relations <- function(file) {
 
   rels <- xml_find_all(doc, ".//relation")
 
-  purrr::map_dfr(rels, function(rel) {
+  rels_list <- lapply(rels, function(rel) {
     entry1 <- xml_attr(rel, "entry1")
     entry2 <- xml_attr(rel, "entry2")
     type <- xml_attr(rel, "type")
@@ -56,6 +55,8 @@ parse_kgml_relations <- function(file) {
       )
     }
   })
+  edges_df <- do.call(rbind, rels_list)
+  return(edges_df)
 }
 
 
@@ -82,7 +83,6 @@ parse_kgml_relations <- function(file) {
 #' }
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
-#' @importFrom purrr map_dfr
 #'
 #' @details
 #' The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
@@ -109,8 +109,8 @@ parse_kgml_entries <- function(file) {
   entries <- xml2::xml_find_all(doc, ".//entry")
 
   # Map over each entry (can then have do.call but do.call returns dataframe)
-  purrr::map_dfr(entries, function(entry) {
-    graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
+  nodes_list <- lapply(entries, function(entry) {
+graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
     group_components <- xml2::xml_find_all(entry, ".//component")
 
     # Base row with initialized attributes
@@ -157,6 +157,8 @@ parse_kgml_entries <- function(file) {
 
     node_row
   })
+  nodes_df <- do.call(rbind, nodes_list)
+  return(nodes_df)
 }
 
 #' Add columns to nodes_df with default values

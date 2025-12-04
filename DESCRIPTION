@@ -30,7 +30,6 @@ Imports:
     KEGGREST,
     visNetwork,
     RColorBrewer,
-    purrr,
     xml2
 Suggests: 
     shinytest2,
@@ -45,5 +44,6 @@ Suggests:
     AnnotationDbi,
     clusterProfiler,
     limma,
-    edgeR
+    edgeR,
+    purrr
 Config/testthat/edition: 3
