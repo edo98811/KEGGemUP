@@ -5,8 +5,8 @@ A package to map you differential expression results on KEGG pathways
 ## Installation
 
 ``` r
-install.packages("devtools")     
-devtools::install_github("edo98811/KEGGemUP")
+install.packages("remotes")     
+remotes::install_github("edo98811/KEGGemUP")
 ```
 
 ## Usage

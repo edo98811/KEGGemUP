@@ -16,4 +16,4 @@ add_group(nodes_df)
 
 ## Value
 
-nodes_df with added 'group' column for visNetwork grouping.
+nodes_df with updated 'group' column.

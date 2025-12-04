@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">KEGGemUP</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">kegg-graph</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/edo98811/KEGGemUP/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -55,30 +56,30 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with the following columns:</p><dl><dt>from</dt>
-<dd><p>The ID of the source entry (node) in the pathway, corresponding to the `entry1` attribute in the KGML `&lt;relation&gt;` tag.</p></dd>
+    <p>A data.frame with the following columns:</p><dl><dt>from</dt>
+<dd><p>The ID of the source entry (node) in the pathway, corresponding to the <code>entry1</code> attribute in the KGML <code>&lt;relation&gt;</code> tag.</p></dd>
 
-  <dt>to</dt>
-<dd><p>The ID of the target entry (node) in the pathway, corresponding to the `entry2` attribute in the KGML `&lt;relation&gt;` tag.</p></dd>
+<dt>to</dt>
+<dd><p>The ID of the target entry (node) in the pathway, corresponding to the <code>entry2</code> attribute in the KGML <code>&lt;relation&gt;</code> tag.</p></dd>
 
-  <dt>type</dt>
-<dd><p>The general type of relationship between the two entries (e.g., `"ECrel"`, `"PPrel"`, `"GErel"`, `"PCrel"`, `"maplink"`). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.</p></dd>
+<dt>type</dt>
+<dd><p>The general type of relationship between the two entries (e.g., <code>"ECrel"</code>, <code>"PPrel"</code>, <code>"GErel"</code>, <code>"PCrel"</code>, <code>"maplink"</code>). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.</p></dd>
 
-  <dt>subtype</dt>
-<dd><p>A more specific subtype of the relation, derived from the `&lt;subtype&gt;` child elements of the `&lt;relation&gt;` node (e.g., `"activation"`, `"inhibition"`, `"expression"`, `"compound"`). If no subtype is defined, this will be `NA`.</p></dd>
+<dt>subtype</dt>
+<dd><p>A more specific subtype of the relation, derived from the <code>&lt;subtype&gt;</code> child elements of the <code>&lt;relation&gt;</code> node (e.g., <code>"activation"</code>, <code>"inhibition"</code>, <code>"expression"</code>, <code>"compound"</code>). If no subtype is defined, this will be <code>NA</code>.</p></dd>
 
-  <dt>rel_value</dt>
-<dd><p>A categorical value associated with the subtype, which encodes the apearence of the arrow (from the `value` attribute of `&lt;subtype&gt;`). If not present, this will be `NA`.</p></dd>
+<dt>rel_value</dt>
+<dd><p>A categorical value associated with the subtype, which encodes the apearence of the arrow (from the <code>value</code> attribute of <code>&lt;subtype&gt;</code>). If not present, this will be <code>NA</code>.</p></dd>
 
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
-information as XML, and extracts all `&lt;relation&gt;` elements that describe the
-interactions or relationships between entities in the pathway. Each `&lt;relation&gt;` may
-contain one or more `&lt;subtype&gt;` elements that provide additional details about
-the interaction. The result is a tidy tibble suitable for network analysis or
+information as XML, and extracts all <code>&lt;relation&gt;</code> elements that describe the
+interactions or relationships between entities in the pathway. Each <code>&lt;relation&gt;</code> may
+contain one or more <code>&lt;subtype&gt;</code> elements that provide additional details about
+the interaction. The result is a tidy data.frame suitable for network analysis or
 visualization, where each row represents one relation–subtype pair.</p>
     </div>
 
@@ -95,7 +96,7 @@ visualization, where each row represents one relation–subtype pair.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edoardo Filippi.</p>
+  <p>Developed by Edoardo Filippi, Federico Marini.</p>
 </div>
 
 <div class="pkgdown-footer-right">

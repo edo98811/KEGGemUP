@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">KEGGemUP</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">kegg-graph</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/edo98811/KEGGemUP/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -55,60 +56,60 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with the following columns:</p><dl><dt>id</dt>
-<dd><p>Unique identifier of the entry within the KGML pathway (from the `id` attribute).</p></dd>
+    <p>A data.frame with the following columns:</p><dl><dt>id</dt>
+<dd><p>Unique identifier of the entry within the KGML pathway (from the <code>id</code> attribute).</p></dd>
 
-  <dt>kegg_name</dt>
-<dd><p>The KEGG-specific name or identifier of the entity (from the `name` attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID</p></dd>
+<dt>kegg_name</dt>
+<dd><p>The KEGG-specific name or identifier of the entity (from the <code>name</code> attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID</p></dd>
 
-  <dt>type</dt>
-<dd><p>Type of the node (from the `type` attribute), indicating the biological entity class such as `"gene"`, `"enzyme"`, `"compound"`, `"map"`, `"ortholog"`, or `"group"`.</p></dd>
+<dt>type</dt>
+<dd><p>Type of the node (from the <code>type</code> attribute), indicating the biological entity class such as <code>"gene"</code>, <code>"enzyme"</code>, <code>"compound"</code>, <code>"map"</code>, <code>"ortholog"</code>, or <code>"group"</code>.</p></dd>
 
-  <dt>link</dt>
-<dd><p>URL linking to the KEGG resource for this entry, if available (from the `link` attribute).</p></dd>
+<dt>link</dt>
+<dd><p>URL linking to the KEGG resource for this entry, if available (from the <code>link</code> attribute).</p></dd>
 
-  <dt>reaction</dt>
-<dd><p>Associated reaction ID(s), if any (from the `reaction` attribute). Typically present for enzyme entries.</p></dd>
+<dt>reaction</dt>
+<dd><p>Associated reaction ID(s), if any (from the <code>reaction</code> attribute). Typically present for enzyme entries.</p></dd>
 
-  <dt>graphics_name</dt>
-<dd><p>Display name for the entry, taken from the `name` attribute of the `&lt;graphics&gt;` node.</p></dd>
+<dt>graphics_name</dt>
+<dd><p>Display name for the entry, taken from the <code>name</code> attribute of the <code>&lt;graphics&gt;</code> node.</p></dd>
 
-  <dt>label</dt>
+<dt>label</dt>
 <dd><p>Text label for visualization purposes.</p></dd>
 
-  <dt>fgcolor</dt>
-<dd><p>Foreground color of the graphical element (from the `fgcolor` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>fgcolor</dt>
+<dd><p>Foreground color of the graphical element (from the <code>fgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
-  <dt>bgcolor</dt>
-<dd><p>Background color of the graphical element (from the `bgcolor` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>bgcolor</dt>
+<dd><p>Background color of the graphical element (from the <code>bgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
-  <dt>graphics_type</dt>
-<dd><p>Shape or representation type of the graphical element (from the `type` attribute of `&lt;graphics&gt;`), such as `"rectangle"`, `"circle"`, or `"line"`.</p></dd>
+<dt>graphics_type</dt>
+<dd><p>Shape or representation type of the graphical element (from the <code>type</code> attribute of <code>&lt;graphics&gt;</code>), such as <code>"rectangle"</code>, <code>"circle"</code>, or <code>"line"</code>.</p></dd>
 
-  <dt>x</dt>
-<dd><p>X-coordinate of the node’s position in the pathway diagram (from the `x` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>x</dt>
+<dd><p>X-coordinate of the node’s position in the pathway diagram (from the <code>x</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
-  <dt>y</dt>
-<dd><p>Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>y</dt>
+<dd><p>Y-coordinate of the node’s position in the pathway diagram (from the <code>y</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
-  <dt>width</dt>
-<dd><p>Width of the graphical element (from the `width` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>width</dt>
+<dd><p>Width of the graphical element (from the <code>width</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
-  <dt>height</dt>
-<dd><p>Height of the graphical element (from the `height` attribute of `&lt;graphics&gt;`).</p></dd>
+<dt>height</dt>
+<dd><p>Height of the graphical element (from the <code>height</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
-`&lt;entry&gt;` elements, each representing a biological entity in a KEGG pathway diagram.
-Each node may contain nested `&lt;graphics&gt;` elements defining visual properties
-(such as position, size, and colors) and `&lt;component&gt;` elements that define group
+<code>&lt;entry&gt;</code> elements, each representing a biological entity in a KEGG pathway diagram.
+Each node may contain nested <code>&lt;graphics&gt;</code> elements defining visual properties
+(such as position, size, and colors) and <code>&lt;component&gt;</code> elements that define group
 membership for composite entities.</p>
-<p>The resulting tibble provides a tidy, one-row-per-entry representation suitable
+<p>The resulting data provides a tidy, one-row-per-entry representation suitable
 for integration with relational data models or network visualization frameworks
-(e.g., `igraph`or `visNetwork`).</p>
+(e.g., <code>igraph</code>or <code>visNetwork</code>).</p>
     </div>
 
     <div class="section level2">
@@ -124,7 +125,7 @@ for integration with relational data models or network visualization frameworks
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edoardo Filippi.</p>
+  <p>Developed by Edoardo Filippi, Federico Marini.</p>
 </div>
 
 <div class="pkgdown-footer-right">
