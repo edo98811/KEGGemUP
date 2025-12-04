@@ -4,7 +4,7 @@
 #' @param name The name of the entry in the de_results list (for error messages)
 #' 
 #' @return Invisible TRUE if all checks pass, otherwise stops with an error
-check_de_entry <- function(de_entry, name) {
+is_valid_de_entry <- function(de_entry, name) {
 
   # --- Structure checks ---
   if (!is.list(de_entry) || !all(c("de_table", "value_column", "feature_column") %in% names(de_entry))) {
@@ -43,7 +43,10 @@ check_de_entry <- function(de_entry, name) {
   return(TRUE)
 }
 
-check_valid_kgml <- function(file_path) {
+#' Validate KGML file structure
+#' @param file_path Path to the KGML file
+#' @return TRUE if valid KGML, FALSE otherwise
+is_valid_kgml <- function(file_path) {
   # Try to read the XML file
   xml_content <- tryCatch(
     {
@@ -67,4 +70,15 @@ check_valid_kgml <- function(file_path) {
   }
 
   return(TRUE)
+}
+
+#' Validate KEGG pathway ID format
+#' @param pathway_id KEGG pathway ID (e.g., "hsa04110")
+#' @return TRUE if valid format, FALSE otherwise
+is_valid_pathway <- function(pathway_id) {
+  # Check if pathway_id matches KEGG pathway formats: "hsa04110" or "04110"
+  if (!is.character(pathway_id) || length(pathway_id) != 1) {
+    return(FALSE)
+  }
+  grepl("^[a-z]{2,3}\\d{5}$", pathway_id)
 }

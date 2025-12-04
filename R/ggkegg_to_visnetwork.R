@@ -1,7 +1,6 @@
 #' Transform a ggkegg graph to igraph or visNetwork
 #'
 #' @param path_id KEGG pathway ID (e.g., "hsa:04110" or "04110").
-#' @param organism KEGG organism code (e.g., "hsa" for human, "mmu" for mouse).
 #' @param de_results Named list of differential expression results. Each entry should be a list with elements: de_table (data.frame), value_column (character), feature_column (character), threshold (numeric).
 #' @param return_type Output type: "igraph" or "visNetwork".
 #' @param scaling_factor Numeric factor to scale node sizes.
@@ -11,7 +10,6 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          organism = "hsa",
                           de_results = NULL,
                           return_type = "igraph",
                           scaling_factor = 1.5) {
@@ -21,16 +19,10 @@ kegg_to_graph <- function(path_id,
     choices = c("igraph", "visNetwork"),
     several.ok = FALSE
   )
-  organism <- match.arg(
-    organism,
-    choices = c("hsa", "mmu"),
-    several.ok = FALSE
-  )
 
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
-  if (!is.character(organism) || length(organism) != 1) stop("organism must be a single character string")
-  organism <- to_organism_kegg(organism)
+
 
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
@@ -122,7 +114,7 @@ map_results_to_nodes <- function(g,
     }
 
     # Keep only valid entries
-    de_results <- de_results[vapply(names(de_results), function(name) check_de_entry(de_results[[name]], name), logical(1))]
+    de_results <- de_results[vapply(names(de_results), function(name) is_valid_de_entry(de_results[[name]], name), logical(1))]
   }
 
   # --- 1. Extract nodes and edges from igraph ---
@@ -139,7 +131,6 @@ map_results_to_nodes <- function(g,
     # --- 2. Map DE results to nodes ---
     results_combined <- combine_results_in_dataframe(de_results)
     nodes_df <- add_results_nodes(nodes_df, results_combined)
-
 
     # --- 3. Color and style nodes and edges ---
     nodes_df <- add_colors_to_nodes(nodes_df)
@@ -199,9 +190,6 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
     g <- igraph::delete_edges(g, igraph::E(g))
-    # remove the fake edge
-    # g <- make_empty_graph(n = 0, directed = FALSE)
-    # g <- add_vertices(g, nrow(nodes_df), attr = as.list(nodes_df))
   } else {
     g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
   }
@@ -267,16 +255,10 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' @details The tooltip includes a button to the specific KEGG entry page. If multiple KEGG IDs are present, they are concatenated with '+' in the URL. It also adds information about the node name, source of differential expression data, and value.
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
-  #  base_link, gsub(" ", "+", nodes_df$kegg_name)
 
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
     "",
-    # paste0(
-    #   '<a href="', nodes_df$link,
-    #   '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
-    #   '<button type="button">KEGG entry</button></a><br>'
-    # )
     paste0(
       '<div style="text-align:center; margin-top:5px;">',
       '<a href="', ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_),
@@ -299,7 +281,7 @@ add_tooltip <- function(nodes_df) {
     safe(nodes_df$kegg_name) == "undefined",
     paste0("Group Node Placeholder: ", nodes_df$group, "<br>"),
     paste0(
-      "Name: ", safe(nodes_df$kegg_name), "<br>",
+      "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50,nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
       "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
       button_html
