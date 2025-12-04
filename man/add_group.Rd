@@ -10,7 +10,7 @@ add_group(nodes_df)
 \item{nodes_df}{Data frame of nodes with columns: id, kegg_name, components.}
 }
 \value{
-nodes_df with added 'group' column for visNetwork grouping.
+nodes_df with updated 'group' column.
 }
 \description{
 Add group information to nodes based on 'undefined' groups.
