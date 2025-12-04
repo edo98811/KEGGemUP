@@ -11,10 +11,9 @@ remove_kegg_prefix_str <- function(kegg_ids) {
 #' @return List of character vectors with KEGG IDs without prefixes
 remove_kegg_prefix <- function(kegg_ids) {
   # Remove prefix (e.g., "cpd:", "mmu:", "ko:", "path:")
-  ids <- sapply(kegg_ids, function(x) sub("^[a-z]+:", "", x))
+  ids <- vapply(kegg_ids, function(x) sub("^[a-z]+:", "", x), FUN.VALUE = character(1))
   return(ids)
 }
-
 
 #' Handle multiple KEGG IDs in a single string separated by ";"
 #' @param kegg_df Data frame with at least two columns: 'name' and 'KEGG'
@@ -39,31 +38,3 @@ expand_keggs <- function(kegg_df) {
   return(data.frame(name = ids_out, KEGG = kegg_out, stringsAsFactors = FALSE))
 }
 
-
-is_valid_pathway <- function(pathway_id) {
-  # Check if pathway_id matches KEGG pathway formats: "hsa04110" or "04110"
-  if (!is.character(pathway_id) || length(pathway_id) != 1) {
-    return(FALSE)
-  }
-  grepl("^[a-z]{2,3}\\d{5}$", pathway_id) || grepl("^\\d{5}$", pathway_id)
-}
-
-#' Convert organism name or abbreviation to KEGG organism code
-#' @param organism Organism name or abbreviation (e.g., "human", "hs", "mouse", "mm")
-#' @return KEGG organism code (e.g., "hsa" for human, "mmu" for mouse)
-to_organism_kegg <- function(organism) {
-  if (missing(organism) || !nzchar(organism)) {
-    stop("You must provide a valid KEGG organism code.")
-  }
-  # Handle common abbreviations
-  organism_code <- switch(tolower(organism),
-    "hs" = "hsa",
-    "mm" = "mmu",
-    "human" = "hsa",
-    "mouse" = "mmu",
-    "hsa" = "hsa",
-    "mmu" = "mmu",
-    stop(sprintf("Unknown organism abbreviation: %s", organism))
-  )
-  return(organism_code)
-}

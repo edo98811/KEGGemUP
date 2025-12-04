@@ -6,7 +6,6 @@
 \usage{
 kegg_to_graph(
   path_id,
-  organism = "hsa",
   de_results = NULL,
   return_type = "igraph",
   scaling_factor = 1.5
@@ -14,8 +13,6 @@ kegg_to_graph(
 }
 \arguments{
 \item{path_id}{KEGG pathway ID (e.g., "hsa:04110" or "04110").}
-
-\item{organism}{KEGG organism code (e.g., "hsa" for human, "mmu" for mouse).}
 
 \item{de_results}{Named list of differential expression results. Each entry should be a list with elements: de_table (data.frame), value_column (character), feature_column (character), threshold (numeric).}
 
