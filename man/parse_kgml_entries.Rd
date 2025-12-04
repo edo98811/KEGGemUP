@@ -10,22 +10,22 @@ parse_kgml_entries(file)
 \item{file}{Path to the KGML XML file.}
 }
 \value{
-A tibble with the following columns:
+A data.frame with the following columns:
 \describe{
-  \item{id}{Unique identifier of the entry within the KGML pathway (from the `id` attribute).}
-  \item{kegg_name}{The KEGG-specific name or identifier of the entity (from the `name` attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
-  \item{type}{Type of the node (from the `type` attribute), indicating the biological entity class such as `"gene"`, `"enzyme"`, `"compound"`, `"map"`, `"ortholog"`, or `"group"`.}
-  \item{link}{URL linking to the KEGG resource for this entry, if available (from the `link` attribute).}
-  \item{reaction}{Associated reaction ID(s), if any (from the `reaction` attribute). Typically present for enzyme entries.}
-  \item{graphics_name}{Display name for the entry, taken from the `name` attribute of the `<graphics>` node.}
-  \item{label}{Text label for visualization purposes.}
-  \item{fgcolor}{Foreground color of the graphical element (from the `fgcolor` attribute of `<graphics>`).}
-  \item{bgcolor}{Background color of the graphical element (from the `bgcolor` attribute of `<graphics>`).}
-  \item{graphics_type}{Shape or representation type of the graphical element (from the `type` attribute of `<graphics>`), such as `"rectangle"`, `"circle"`, or `"line"`.}
-  \item{x}{X-coordinate of the node’s position in the pathway diagram (from the `x` attribute of `<graphics>`).}
-  \item{y}{Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `<graphics>`).}
-  \item{width}{Width of the graphical element (from the `width` attribute of `<graphics>`).}
-  \item{height}{Height of the graphical element (from the `height` attribute of `<graphics>`).}
+\item{id}{Unique identifier of the entry within the KGML pathway (from the \code{id} attribute).}
+\item{kegg_name}{The KEGG-specific name or identifier of the entity (from the \code{name} attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
+\item{type}{Type of the node (from the \code{type} attribute), indicating the biological entity class such as \code{"gene"}, \code{"enzyme"}, \code{"compound"}, \code{"map"}, \code{"ortholog"}, or \code{"group"}.}
+\item{link}{URL linking to the KEGG resource for this entry, if available (from the \code{link} attribute).}
+\item{reaction}{Associated reaction ID(s), if any (from the \code{reaction} attribute). Typically present for enzyme entries.}
+\item{graphics_name}{Display name for the entry, taken from the \code{name} attribute of the \verb{<graphics>} node.}
+\item{label}{Text label for visualization purposes.}
+\item{fgcolor}{Foreground color of the graphical element (from the \code{fgcolor} attribute of \verb{<graphics>}).}
+\item{bgcolor}{Background color of the graphical element (from the \code{bgcolor} attribute of \verb{<graphics>}).}
+\item{graphics_type}{Shape or representation type of the graphical element (from the \code{type} attribute of \verb{<graphics>}), such as \code{"rectangle"}, \code{"circle"}, or \code{"line"}.}
+\item{x}{X-coordinate of the node’s position in the pathway diagram (from the \code{x} attribute of \verb{<graphics>}).}
+\item{y}{Y-coordinate of the node’s position in the pathway diagram (from the \code{y} attribute of \verb{<graphics>}).}
+\item{width}{Width of the graphical element (from the \code{width} attribute of \verb{<graphics>}).}
+\item{height}{Height of the graphical element (from the \code{height} attribute of \verb{<graphics>}).}
 }
 }
 \description{
@@ -33,14 +33,14 @@ Parse KEGG KGML files to extract nodes data frame.
 }
 \details{
 The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
-`<entry>` elements, each representing a biological entity in a KEGG pathway diagram.
-Each node may contain nested `<graphics>` elements defining visual properties
-(such as position, size, and colors) and `<component>` elements that define group
+\verb{<entry>} elements, each representing a biological entity in a KEGG pathway diagram.
+Each node may contain nested \verb{<graphics>} elements defining visual properties
+(such as position, size, and colors) and \verb{<component>} elements that define group
 membership for composite entities.
 
-The resulting tibble provides a tidy, one-row-per-entry representation suitable
+The resulting data provides a tidy, one-row-per-entry representation suitable
 for integration with relational data models or network visualization frameworks
-(e.g., `igraph`or `visNetwork`).
+(e.g., \code{igraph}or \code{visNetwork}).
 }
 \examples{
 \dontrun{

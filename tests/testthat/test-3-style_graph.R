@@ -181,8 +181,8 @@ test_that("tooltip is formatted correctly", {
 })
 
 test_that("make igraph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+    nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
     title = "Test Pathway"
 
@@ -201,9 +201,9 @@ test_that("make igraph works", {
 })
 
 test_that("make visnetwork graph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+    nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
     nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+    edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
     title = "Test Pathway"
 
@@ -223,7 +223,7 @@ test_that("make visnetwork graph works", {
 test_that("add groups add groups correctly", {
   styled <- add_group(expected_nodes_cols)
 
-  expect_equal(unique(styled$group), c("group_5", NA))
-  expect_equal(sum(styled$group[!is.na(styled$group)] == "group_5"), 3)
+  expect_equal(unique(styled$group), c("GENE1, aliasA;GENE2, GENE3;NA", NA))
+  expect_equal(sum(styled$group[!is.na(styled$group)] == "GENE1, aliasA;GENE2, GENE3;NA"), 3)
 
 })

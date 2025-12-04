@@ -2,7 +2,7 @@
 #'
 #' @param file Path to the KGML XML file.
 #'
-#' @return A tibble with the following columns:
+#' @return A data.frame with the following columns:
 #' \describe{
 #'   \item{from}{The ID of the source entry (node) in the pathway, corresponding to the `entry1` attribute in the KGML `<relation>` tag.}
 #'   \item{to}{The ID of the target entry (node) in the pathway, corresponding to the `entry2` attribute in the KGML `<relation>` tag.}
@@ -12,15 +12,13 @@
 #' }
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
-#' @importFrom tibble tibble
-#' @importFrom purrr map_dfr
 #'
 #' @details
 #' The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
 #' information as XML, and extracts all `<relation>` elements that describe the
 #' interactions or relationships between entities in the pathway. Each `<relation>` may
 #' contain one or more `<subtype>` elements that provide additional details about
-#' the interaction. The result is a tidy tibble suitable for network analysis or
+#' the interaction. The result is a tidy data.frame suitable for network analysis or
 #' visualization, where each row represents one relation–subtype pair.
 #' @examples
 #' \dontrun{
@@ -33,14 +31,14 @@ parse_kgml_relations <- function(file) {
 
   rels <- xml_find_all(doc, ".//relation")
 
-  purrr::map_dfr(rels, function(rel) {
+  rels_list <- lapply(rels, function(rel) {
     entry1 <- xml_attr(rel, "entry1")
     entry2 <- xml_attr(rel, "entry2")
     type <- xml_attr(rel, "type")
     subnodes <- xml_find_all(rel, ".//subtype")
 
     if (length(subnodes) == 0) {
-      tibble(
+      data.frame(
         from = entry1,
         to = entry2,
         type = type,
@@ -48,7 +46,7 @@ parse_kgml_relations <- function(file) {
         rel_value = NA_character_ # value controls the vidth of edges
       )
     } else {
-      tibble(
+      data.frame(
         from = entry1,
         to = entry2,
         type = type,
@@ -57,6 +55,8 @@ parse_kgml_relations <- function(file) {
       )
     }
   })
+  edges_df <- do.call(rbind, rels_list)
+  return(edges_df)
 }
 
 
@@ -64,7 +64,7 @@ parse_kgml_relations <- function(file) {
 #'
 #' @param file Path to the KGML XML file.
 #'
-#' @return A tibble with the following columns:
+#' @return A data.frame with the following columns:
 #' \describe{
 #'   \item{id}{Unique identifier of the entry within the KGML pathway (from the `id` attribute).}
 #'   \item{kegg_name}{The KEGG-specific name or identifier of the entity (from the `name` attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
@@ -83,8 +83,6 @@ parse_kgml_relations <- function(file) {
 #' }
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr
-#' @importFrom tibble tibble
-#' @importFrom purrr map_dfr
 #'
 #' @details
 #' The function parses a KEGG KGML (KEGG Markup Language) XML file and extracts all
@@ -93,7 +91,7 @@ parse_kgml_relations <- function(file) {
 #' (such as position, size, and colors) and `<component>` elements that define group
 #' membership for composite entities.
 #'
-#' The resulting tibble provides a tidy, one-row-per-entry representation suitable
+#' The resulting data provides a tidy, one-row-per-entry representation suitable
 #' for integration with relational data models or network visualization frameworks
 #' (e.g., `igraph`or `visNetwork`).
 #'
@@ -111,12 +109,12 @@ parse_kgml_entries <- function(file) {
   entries <- xml2::xml_find_all(doc, ".//entry")
 
   # Map over each entry (can then have do.call but do.call returns dataframe)
-  purrr::map_dfr(entries, function(entry) {
-    graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
+  nodes_list <- lapply(entries, function(entry) {
+graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
     group_components <- xml2::xml_find_all(entry, ".//component")
 
     # Base row with initialized attributes
-    node_row <- tibble::tibble(
+    node_row <- data.frame(
       name = xml2::xml_attr(entry, "id"), # set name because thats how igraph builds connections
       id = xml2::xml_attr(entry, "id"),
       kegg_name = xml2::xml_attr(entry, "name"),
@@ -159,6 +157,8 @@ parse_kgml_entries <- function(file) {
 
     node_row
   })
+  nodes_df <- do.call(rbind, nodes_list)
+  return(nodes_df)
 }
 
 #' Add columns to nodes_df with default values

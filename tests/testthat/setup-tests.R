@@ -132,12 +132,12 @@ nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "KEGGe
 edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP")
 
 # Expected nodes
-expected_nodes <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+expected_nodes <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
 expected_nodes_cols <- add_columns_nodes_df(expected_nodes)
 expected_nodes_cols$KEGG <- vapply(expected_nodes_cols$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
 
 # Expected edges
-expected_edges <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+expected_edges <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
 # Empty edges
 empty_edges <- data.frame(

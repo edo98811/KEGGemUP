@@ -76,13 +76,17 @@ kegg_to_graph <- function(path_id,
 #' @param g An igraph object representing the pathway.
 #' @param de_results Named list of differential expression results.
 #' @param return_type Output type: "igraph" or "visNetwork".
+#' @param feature_column Column name in de_table containing KEGG IDs (if de_results is a single data.frame).
+#' @param value_column Column name in de_table containing values to map (if de_results is a single data.frame).
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @export
 map_results_to_nodes <- function(g,
                                  de_results,
-                                 return_type = "visNetwork") {
+                                 return_type = "visNetwork", 
+                                 feature_column = NULL,
+                                 value_column = NULL) {
   # Check arguments
   return_type <- match.arg(
     return_type,
@@ -96,11 +100,10 @@ map_results_to_nodes <- function(g,
   if (!is.null(de_results)) {
     # If input is a data.frame, convert to default named list
     if (inherits(de_results, "data.frame")) {
-      warning("Using defaults. For personalisation use a named list of de results.")
       de_results <- list(de_input = list(
         de_table = de_results,
-        value_column = "log2FoldChange",
-        feature_column = "KEGG_ids"
+        value_column = ifelse(is.null(value_column, "log2FoldChange"), value_column) ,
+        feature_column = ifelse(is.null(feature_column, "KEGG_ids"), feature_column) 
       ))
     }
 
@@ -198,22 +201,35 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
 
 #' Add group information to nodes based on 'undefined' groups.
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
-#' @return nodes_df with added 'group' column for visNetwork grouping.
+#' @return nodes_df with updated 'group' column.
 add_group <- function(nodes_df) {
+
+  # The nodes that have as kegg name "undefined" are group nodes
   undefined_idx <- which(!is.na(nodes_df$kegg_name) & nodes_df$kegg_name == "undefined")
 
+  # If there are no undefined nodes, return original df
   if (length(undefined_idx) == 0) {
     return(nodes_df)
   }
 
+  # Subset undefined nodes
   undefined_nodes <- nodes_df[undefined_idx, , drop = FALSE]
 
+  # Iterate over undefined nodes using indeces
   for (i in seq_len(nrow(undefined_nodes))) {
+
+    # If no components in group (empty), skip
     if (is.na(undefined_nodes$components[i]) || undefined_nodes$components[i] == "") next # If group is NA
+
+    # Get component ids and add the group label to them, add the group node itself to this list
     ids <- strsplit(undefined_nodes$components[i], ";", fixed = TRUE)[[1]]
     ids <- append(ids, undefined_nodes$id[i])
 
-    group_label <- paste0("group_", undefined_nodes$id[i])
+    # Make group label 
+    # group_label <- paste0("group_", undefined_nodes$id[i])
+    group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";" )
+
+    # Assign group label to nodes_df
     nodes_df[nodes_df$id %in% ids, "group"] <- group_label
   }
 
@@ -370,7 +386,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
           nodes_df$source[i] <- results_combined$source[j]
           # nodes_df$text[i] <- list()
         } else { # If value warn
-          warning(paste0("Multiple results mapped to node ", nodes_df$kegg_name[i], ". Keeping the first occurrence to color the node."))
+          warning("Multiple results mapped to node ", nodes_df$kegg_name[i], ". Keeping the first occurrence to color the node.")
         }
 
         # This will be added in any case
