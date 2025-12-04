@@ -84,13 +84,17 @@ kegg_to_graph <- function(path_id,
 #' @param g An igraph object representing the pathway.
 #' @param de_results Named list of differential expression results.
 #' @param return_type Output type: "igraph" or "visNetwork".
+#' @param feature_column Column name in de_table containing KEGG IDs (if de_results is a single data.frame).
+#' @param value_column Column name in de_table containing values to map (if de_results is a single data.frame).
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @export
 map_results_to_nodes <- function(g,
                                  de_results,
-                                 return_type = "visNetwork") {
+                                 return_type = "visNetwork", 
+                                 feature_column = NULL,
+                                 value_column = NULL) {
   # Check arguments
   return_type <- match.arg(
     return_type,
@@ -104,11 +108,10 @@ map_results_to_nodes <- function(g,
   if (!is.null(de_results)) {
     # If input is a data.frame, convert to default named list
     if (inherits(de_results, "data.frame")) {
-      warning("Using defaults. For personalisation use a named list of de results.")
       de_results <- list(de_input = list(
         de_table = de_results,
-        value_column = "log2FoldChange",
-        feature_column = "KEGG_ids"
+        value_column = ifelse(is.null(value_column, "log2FoldChange"), value_column) ,
+        feature_column = ifelse(is.null(feature_column, "KEGG_ids"), feature_column) 
       ))
     }
 
