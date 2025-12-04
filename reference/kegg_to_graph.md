@@ -7,7 +7,6 @@ Transform a ggkegg graph to igraph or visNetwork
 ``` r
 kegg_to_graph(
   path_id,
-  organism = "hsa",
   de_results = NULL,
   return_type = "igraph",
   scaling_factor = 1.5
@@ -19,10 +18,6 @@ kegg_to_graph(
 - path_id:
 
   KEGG pathway ID (e.g., "hsa:04110" or "04110").
-
-- organism:
-
-  KEGG organism code (e.g., "hsa" for human, "mmu" for mouse).
 
 - de_results:
 

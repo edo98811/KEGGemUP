@@ -16,8 +16,6 @@
   : Add results from combined results data frame to nodes data frame
 - [`add_tooltip()`](https://edo98811.github.io/KEGGemUP/reference/add_tooltip.md)
   : Add tooltips to nodes for visNetwork visualization.
-- [`check_de_entry()`](https://edo98811.github.io/KEGGemUP/reference/check_de_entry.md)
-  : Check the structure and validity of each entry in de_results
 - [`combine_results_in_dataframe()`](https://edo98811.github.io/KEGGemUP/reference/combine_results_in_dataframe.md)
   : Combine multiple differential expression results into a single data
   frame
@@ -31,6 +29,12 @@
   : Get KEGG glycans with caching.
 - [`get_pathway_name()`](https://edo98811.github.io/KEGGemUP/reference/get_pathway_name.md)
   : Convert KEGG pathway ID to readable pathway name
+- [`is_valid_de_entry()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_de_entry.md)
+  : Check the structure and validity of each entry in de_results
+- [`is_valid_kgml()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_kgml.md)
+  : Validate KGML file structure
+- [`is_valid_pathway()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_pathway.md)
+  : Validate KEGG pathway ID format
 - [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
   : Transform a ggkegg graph to igraph or visNetwork
 - [`make_igraph_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_igraph_graph.md)
@@ -51,5 +55,3 @@
   : Style edges based on their subtype for visNetwork visualization.
 - [`style_nodes()`](https://edo98811.github.io/KEGGemUP/reference/style_nodes.md)
   : Style nodes based on their type for visNetwork visualization.
-- [`to_organism_kegg()`](https://edo98811.github.io/KEGGemUP/reference/to_organism_kegg.md)
-  : Convert organism name or abbreviation to KEGG organism code
