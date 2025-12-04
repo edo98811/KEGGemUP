@@ -102,8 +102,8 @@ map_results_to_nodes <- function(g,
     if (inherits(de_results, "data.frame")) {
       de_results <- list(de_input = list(
         de_table = de_results,
-        value_column = ifelse(is.null(value_column, "log2FoldChange"), value_column) ,
-        feature_column = ifelse(is.null(feature_column, "KEGG_ids"), feature_column) 
+        value_column = ifelse(is.null(value_column), "log2FoldChange", value_column) ,
+        feature_column = ifelse(is.null(feature_column), "KEGG_ids", feature_column) 
       ))
     }
 
