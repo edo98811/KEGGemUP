@@ -111,8 +111,8 @@ parse_kgml_entries <- function(file) {
   entries <- xml2::xml_find_all(doc, ".//entry")
 
   # Map over each entry (can then have do.call but do.call returns dataframe)
-  purrr::map_dfr(entries, function(entry) {
-    graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
+  nodes_list <- lapply(entries, function(entry) {
+  graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
     group_components <- xml2::xml_find_all(entry, ".//component")
 
     # Base row with initialized attributes
