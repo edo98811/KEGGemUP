@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 library("KEGGemUP")
 ```
 
+KEGG pathways are used in may bioinfomratics contexts, this package package can make it very easy to implement these to the analysis of real data.
+
 <details>
 <summary> Setting up the data </summary>
 
@@ -166,6 +168,7 @@ de_results_list <-list(
 You can also provide a single differential expression results table as a data.frame. For that the column names need to respect the default values:
 - "KEGG_ids": the column containing the KEGG feature IDs (without organism prefix)
 - "log2FoldChange": the column containing the values to map to the nodes
+
 ```{r}
 de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)[res_macrophage_IFNg_vs_naive_limma$adj.P.Val < 0.05, ]
 de_results_limma$log2FoldChange <- de_results_limma$logFC
