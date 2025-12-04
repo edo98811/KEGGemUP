@@ -223,7 +223,7 @@ test_that("make visnetwork graph works", {
 test_that("add groups add groups correctly", {
   styled <- add_group(expected_nodes_cols)
 
-  expect_equal(unique(styled$group), c("group_5", NA))
-  expect_equal(sum(styled$group[!is.na(styled$group)] == "group_5"), 3)
+  expect_equal(unique(styled$group), c("GENE1, aliasA;GENE2, GENE3;NA", NA))
+  expect_equal(sum(styled$group[!is.na(styled$group)] == "GENE1, aliasA;GENE2, GENE3;NA"), 3)
 
 })
