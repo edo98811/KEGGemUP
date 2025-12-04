@@ -38,7 +38,7 @@ nodes_compounds_df <- data.frame(
 
 # --- EXAMPLE FAKE DE RESULTS LISTS ---
 
-# ✅ Basic case — two datasets, consistent and simple
+# Basic case — two datasets, consistent and simple
 de_results_list_1 <- list(
   genes = list(
     de_table = nodes_A_df,
@@ -52,7 +52,7 @@ de_results_list_1 <- list(
   )
 )
 
-# ⚠️ Mixed column names and redundant identifiers
+# Mixed column names and redundant identifiers
 de_results_list_2 <- list(
   transcr = list(
     de_table = nodes_C_df,
@@ -71,7 +71,7 @@ de_results_list_2 <- list(
   )
 )
 
-# 🔁 Duplicates and cross-referenced names (e.g., same nodes across lists)
+# Duplicates and cross-referenced names 
 de_results_list_3 <- list(
   group1 = list(
     de_table = nodes_D_df,
@@ -85,7 +85,7 @@ de_results_list_3 <- list(
   )
 )
 
-# 🧪 Mixed types and random naming — stress test
+# Mixed types and random naming 
 de_results_list_4 <- list(
   transcriptomics = list(
     de_table = nodes_A_df,
