@@ -4,7 +4,13 @@
 \alias{map_results_to_nodes}
 \title{Map differential expression results to nodes}
 \usage{
-map_results_to_nodes(g, de_results, return_type = "visNetwork")
+map_results_to_nodes(
+  g,
+  de_results,
+  return_type = "visNetwork",
+  feature_column = NULL,
+  value_column = NULL
+)
 }
 \arguments{
 \item{g}{An igraph object representing the pathway.}
@@ -12,6 +18,10 @@ map_results_to_nodes(g, de_results, return_type = "visNetwork")
 \item{de_results}{Named list of differential expression results.}
 
 \item{return_type}{Output type: "igraph" or "visNetwork".}
+
+\item{feature_column}{Column name in de_table containing KEGG IDs (if de_results is a single data.frame).}
+
+\item{value_column}{Column name in de_table containing values to map (if de_results is a single data.frame).}
 }
 \value{
 An igraph or visNetwork object with mapped results.
