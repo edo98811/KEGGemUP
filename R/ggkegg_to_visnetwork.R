@@ -88,7 +88,7 @@ kegg_to_graph <- function(path_id,
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-#' The pathwhay given as input must be the output of the function /code{kegg_to_graph}. 
+#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}. 
 #' @export
 map_results_to_nodes <- function(g,
                                  de_results,
@@ -366,6 +366,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
     return(nodes_df)
   }
 
+  warn <- FALSE
   # Iterate through nodes_df and results_combined to map values
   # For each node iterate over all results_combined
   for (i in seq_len(nrow(nodes_df))) {
@@ -381,7 +382,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
           nodes_df$source[i] <- results_combined$source[j]
           # nodes_df$text[i] <- list()
         } else { # If value warn
-          warning(paste0("Multiple results mapped to node ", nodes_df$kegg_name[i], ". Keeping the first occurrence to color the node."))
+          warn <- TRUE
         }
 
         # This will be added in any case
@@ -394,6 +395,10 @@ add_results_nodes <- function(nodes_df, results_combined) {
         )
       }
     }
+  }
+
+  if (warn) {
+    warning("Some nodes had multiple matching KEGG IDs; only the first match was assigned a value.")
   }
 
   return(nodes_df)
