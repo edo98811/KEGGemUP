@@ -113,7 +113,7 @@ all_de_test_lists <- list(
   genes_metabolites     = de_results_list_1, # Basic and consistent
   mixed_omics           = de_results_list_2, # Mixed omics, column name variations
   duplicates_overlap    = de_results_list_3, # Duplicate / overlapping feature IDs
-  full_stress           = de_results_list_4 # Large mixed test case
+  all                   = de_results_list_4 # Large mixed test case
 )
 
 throw_warning <- names(all_de_test_lists)[c(2, 3, 4)]
