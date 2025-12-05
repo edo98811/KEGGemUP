@@ -60,34 +60,6 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
   })
 })
 
-
-# test_that("download_kgml caches and returns file path", {
-
-#   expect_true(file.exists(kgml_pah_real_example))
-
-#   # Read its raw bytes (what get_kgml would normally return)
-#   xml_content <- readBin(kgml_pah_real_example, what = "raw", n = file.info(kgml_pah_real_example)$size)
-
-#   mock_get <- mock(xml_content)
-
-#   bfc <- BiocFileCache(tempfile(), ask = FALSE)
-
-#   with_mocked_bindings(
-#     get_kgml = mock_get,  
-#     {
-#       file <- download_kgml("hsa40010", bfc)
-
-#       expect_true(file.exists(file))
-
-#       # verify mock was called exactly once
-#       expect_equal(length(mock_args(mock_get)), 1)
-
-#       # check that file contains KGML XML
-#       expect_true(check_valid_kgml(file))
-#     }
-#   )
-# })
-
 test_that("add_compound_names caches and assigns glycan and compounds names", {
 
   bfc <- BiocFileCache(tempfile(), ask = FALSE)

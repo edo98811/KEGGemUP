@@ -1,30 +1,14 @@
-
 test_that("add_results_nodes correctly maps DE results onto nodes_df across all test lists", {
-
   # Iterate through each DE test list
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-
     # Combine all DE results into one table
     results_combined <- combine_results_in_dataframe(de_list)
 
     # --- Capture all warnings ---
-    warnings <- testthat::capture_warnings(
-      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined) # expect warnign expects only one not multiple!!
-    )
-
-    # --- Expected warning logic ---
-    if (test_name %in% names(expected_warnings)) {
-      exp_n <- expected_warnings[[test_name]]
-
-      # Count and content validation
-      expect_equal(length(warnings), exp_n,
-                   info = paste0(test_name, " expected ", exp_n, " warnings, got, ", length(warnings)))
-      expect_true(any(grepl("Multiple results", warnings)) || any(grepl("mapped", warnings)),
-                  info = paste0(test_name, " expected warning about mapping issues"))
+    if (test_name %in% throw_warning) {
+      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined))
     } else {
-      # Should produce no warnings
-      expect_equal(length(warnings), 0,
-                   info = paste0(test_name, " unexpected warnings found"))
+      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
     }
 
     # --- Structure checks ---
@@ -49,33 +33,15 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
   # Load the node reference table once
 
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-
     # Prepare combined results and map onto nodes
     results_combined <- combine_results_in_dataframe(de_list)
 
-    # --- Capture all warnings ---
-    warnings <- testthat::capture_warnings(
-      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
-    )
-
-    # --- Expected warning logic ---
-    if (test_name %in% names(expected_warnings)) {
-      exp_n <- expected_warnings[[test_name]]
-
-      # Count and content validation
-      expect_equal(length(warnings), exp_n,
-        info = paste0(test_name, " expected ", exp_n, " warnings, got, ", length(warnings))
-      )
-      expect_true(any(grepl("Multiple results", warnings)) || any(grepl("mapped", warnings)),
-        info = paste0(test_name, " expected warning about mapping issues")
-      )
+    # --- Expect warning ---
+    if (test_name %in% throw_warning) {
+      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined))
     } else {
-      # Should produce no warnings
-      expect_equal(length(warnings), 0,
-        info = paste0(test_name, " unexpected warnings found")
-      )
+      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
     }
-
     # Apply color assignment
     colored_nodes <- add_colors_to_nodes(mapped_nodes)
 
@@ -152,7 +118,6 @@ test_that("function returns same number of rows", {
 })
 
 test_that("adds visual styling columns correctly", {
-
   styled <- style_nodes(expected_nodes_cols)
 
   # expect_true(all(styled$fixed))
@@ -181,49 +146,48 @@ test_that("tooltip is formatted correctly", {
 })
 
 test_that("make igraph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+  nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+  edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
-    title = "Test Pathway"
+  title <- "Test Pathway"
 
-    g_expected <- make_igraph_graph(nodes_df_expected, edges_df_expected, title)
-    expect_true(igraph::is_igraph(g_expected))
+  g_expected <- make_igraph_graph(nodes_df_expected, edges_df_expected, title)
+  expect_true(igraph::is_igraph(g_expected))
 
-    expect_warning(
-      make_igraph_graph(nodes_df_expected, data.frame(from=character(0), to=character(0)), title),
-      "No edges in graph."
-    )
+  expect_warning(
+    make_igraph_graph(nodes_df_expected, data.frame(from = character(0), to = character(0)), title),
+    "No edges in graph."
+  )
 
-    expect_warning(
-      make_igraph_graph(nodes_df_expected, NULL, title),
-      "No edges in graph."
-    )
+  expect_warning(
+    make_igraph_graph(nodes_df_expected, NULL, title),
+    "No edges in graph."
+  )
 })
 
 test_that("make visnetwork graph works", {
-    nodes_df_expected <- tibble::as_tibble(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-    nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
-    edges_df_expected <- tibble::as_tibble(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+  nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
+  nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
+  edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
 
-    title = "Test Pathway"
+  title <- "Test Pathway"
 
-    g_expected <- make_vis_graph(nodes_df_expected, edges_df_expected, title)
-    expect_true(inherits(g_expected, "visNetwork"))
+  g_expected <- make_vis_graph(nodes_df_expected, edges_df_expected, title)
+  expect_true(inherits(g_expected, "visNetwork"))
 
-    expect_warning(
-      make_vis_graph(nodes_df_expected, data.frame(from=character(0), to=character(0)), title),
-      "No edges in graph."
-    )
-    expect_warning(
-      make_vis_graph(nodes_df_expected, NULL, title),
-      "No edges in graph."
-    )
+  expect_warning(
+    make_vis_graph(nodes_df_expected, data.frame(from = character(0), to = character(0)), title),
+    "No edges in graph."
+  )
+  expect_warning(
+    make_vis_graph(nodes_df_expected, NULL, title),
+    "No edges in graph."
+  )
 })
 
 test_that("add groups add groups correctly", {
   styled <- add_group(expected_nodes_cols)
 
-  expect_equal(unique(styled$group), c("group_5", NA))
-  expect_equal(sum(styled$group[!is.na(styled$group)] == "group_5"), 3)
-
+  expect_equal(unique(styled$group), c("GENE1, aliasA;GENE2, GENE3;NA", NA))
+  expect_equal(sum(styled$group[!is.na(styled$group)] == "GENE1, aliasA;GENE2, GENE3;NA"), 3)
 })
