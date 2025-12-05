@@ -26,3 +26,12 @@ An igraph or visNetwork object representing the pathway.
 \description{
 Transform a ggkegg graph to igraph or visNetwork
 }
+\details{
+This function downloads the KGML file for the specified KEGG pathway, then parses it to generate a graph representation using either the igraph or visNetwork package. It styles nodes and edges based on their types the output can be used for visualization or further analysis. If differential expression results are provided, they can be mapped to the nodes using the function \code{map_results_to_nodes}.
+}
+\examples{
+pathway <- "hsa04110"  # Example pathway ID
+graph <- kegg_to_graph(pathway)
+kegg_to_graph(pathway, return_type = "visNetwork")
+
+}
