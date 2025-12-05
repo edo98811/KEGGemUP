@@ -5,6 +5,12 @@
 #' @param return_type Output type: "igraph" or "visNetwork".
 #' @param scaling_factor Numeric factor to scale node sizes.
 #' @return An igraph or visNetwork object representing the pathway.
+#' 
+#' @details This function downloads the KGML file for the specified KEGG pathway, then parses it to generate a graph representation using either the igraph or visNetwork package. It styles nodes and edges based on their types the output can be used for visualization or further analysis. If differential expression results are provided, they can be mapped to the nodes using the function \code{map_results_to_nodes}.
+#' @examples 
+#' pathway <- "hsa04110"  # Example pathway ID
+#' graph <- kegg_to_graph(pathway)
+#' kegg_to_graph(pathway, return_type = "visNetwork")
 #'
 #' @importFrom igraph graph_from_data_frame graph_attr make_empty_graph add_vertices delete_edges E V
 #'
@@ -81,6 +87,8 @@ kegg_to_graph <- function(path_id,
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
+#' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
+#' The pathwhay given as input must be the output of the function /code{kegg_to_graph}. 
 #' @export
 map_results_to_nodes <- function(g,
                                  de_results,

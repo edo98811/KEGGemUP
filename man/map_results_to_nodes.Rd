@@ -29,3 +29,7 @@ An igraph or visNetwork object with mapped results.
 \description{
 Map differential expression results to nodes
 }
+\details{
+This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
+The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
+}
