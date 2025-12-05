@@ -14,18 +14,18 @@ library("KEGGemUP")
 ```
 
 KEGG pathways are used in may bioinformatics contexts, this package
-package can make it very easy to implement these to the analysis of real
+package can make it very easy to implement these in the analysis of real
 data. A very important part of bioinformatics analyses is both data
-integration and visiazionation. KEGGemup aims to facilitate these tasks
+integration and visiazionation. KEGGemUP aims to facilitate these tasks
 by providing functions to parse KEGG pathways and build graph objects,
 the idea is then to use these graph to map on them thre results of
 differential expression analyses.
 
 These vignette assumes you have already performed a differential
-expression analysis and have the results available as a data.frame or a
-result object from limma or DESeq2. To reproduce this situation we will
-now build a fake differential expression results using the macrophage
-dataset from the macrophage package.
+expression analysis and have the results available as a `data.frame` or
+a result object from `limma` or `DESeq2`. To reproduce this situation we
+will now build a examplary differential expression results using the
+macrophage dataset from the macrophage package.
 
 Setting up the data
 
@@ -42,6 +42,8 @@ suppressPackageStartupMessages({
   library("limma")
   library("edgeR")
 })
+#> Warning: replacing previous import 'S4Arrays::makeNindexFromArrayViewport' by
+#> 'DelayedArray::makeNindexFromArrayViewport' when loading 'SummarizedExperiment'
 message("- Done!")
 #> - Done!
 
@@ -153,7 +155,7 @@ KGML is the format that KEGG uses to save the pathway structure and it
 is what this package interfaces itself with.
 
 You can use these functions to parse KGML files directly. From these you
-can build a graph object if you wish to do so and you have expertiese
+can build a graph object if you wish to do so and you have expertese
 with graph analysis in R.
 
 ``` r
@@ -208,17 +210,22 @@ dataframe must contain at least two columns: one with the KEGG feature
 IDs (without organism prefix) and another with the values to map to the
 nodes (e.g., log2 fold changes). You can pass to the function the names
 of these columns if they differ from the default ones with the
-parameters `feature_column` and `value_column`. The defualt parameters
-are: - feature_column = “KEGG_ids” - value_column = “log2FoldChange”
+parameters `feature_column` and `value_column`.
+
+Note that the KEGG IDs without organism prefix are the the ENTREZ IDs
+for genes.
+
+The defualt parameters are: - feature_column = “KEGG_ids” - value_column
+= “log2FoldChange”
 
 If you have multiple differential expression results tables (for example
 if you have one metabolomics and one transcriptomics) to map to the
 nodes you can pass a list of lists. Each sublist must contain the
 following elements:
 
-- de_table: a data.frame with the differential expression results
+- de_table: a data.frame with the differential expression results.
 - value_column: the name of the column in de_table containing the values
-  to map to the nodes
+  to map to the nodes.
 - feature_column: the name of the column in de_table containing the
   feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the
   graph (without organism prefix).
@@ -238,7 +245,12 @@ de_results_list <-list(
 )
 ```
 
-### Example of usage with a single DE results table
+### Example of usage with the list of DE results tables
+
+We will now take a KEGG pathway from the enrichment results we built
+earlier and map the differential expression results to its nodes. As you
+can see you simply need to pass to the function the graph object and the
+list of differential expression results tables that we defined before.
 
 ``` r
 pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
@@ -249,136 +261,8 @@ graph <- kegg_to_graph(pathway)
 #> Downloading KEGG glycans...
 graph <- map_results_to_nodes(graph, de_results_list)
 #> Mapping differential expression results to nodes...
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:8705. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:8705. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:8818. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:8733. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:8733. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:2822. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:65258. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:65258. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:65258. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:65258. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:65258. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:80055. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:80055. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:27315. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:93210. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:93210. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84302. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84302. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5277. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5277. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5277. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:9488. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:9488. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:9488. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5279. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5281. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5281. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5281. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5281. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:54872. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:54872. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:54872. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:54872. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:5283. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:10026. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:10026. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:10026. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:10026. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:9487. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:93183. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:93183. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:93183. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:23556. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:23556. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:23556. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84720. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84720. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84720. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:84720. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:51227. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:9091. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:94005. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:94005. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:51604. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:51604. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:128869. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:128869. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:55650. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:55650. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:55650. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:284098. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:54965. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:80235. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:80235. Keeping the first occurrence to color the node.
-#> Warning in add_results_nodes(nodes_df, results_combined): Multiple results
-#> mapped to node hsa:80235. Keeping the first occurrence to color the node.
+#> Warning in add_results_nodes(nodes_df, results_combined): Some nodes had
+#> multiple matching KEGG IDs; only the first match was assigned a value.
 graph
 ```
 
@@ -388,12 +272,12 @@ Let’s first build a filtered differential expression results table with
 only the significant results.
 
 ``` r
-de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)[res_macrophage_IFNg_vs_naive_limma$adj.P.Val < 0.05, ]
+de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 ```
 
 Then we will call the function with this table as input. The parameter
-feature_column and value column are set to match the column names in our
-differential expression results table.
+`feature_column` and `value_column` are set to match the column names in
+our differential expression results table.
 
 ``` r
 graph <- kegg_to_graph(pathway)

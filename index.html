@@ -56,10 +56,11 @@
 <div class="section level1">
 <div class="page-header"><h1 id="keggemup">KEGGemUP<a class="anchor" aria-label="anchor" href="#keggemup"></a>
 </h1></div>
-<p>A package to map you differential expression results on KEGG pathways</p>
+<p>A package to map you differential expression results on KEGG pathways.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>To install the package you need an up to date R version (R &gt;= 4.5.0) and devtools or remotes package installed. Then you can install KEGGemUP from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>     </span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"edo98811/KEGGemUP"</span><span class="op">)</span></span></code></pre></div>
@@ -67,23 +68,23 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>To use the Kegg pathway visualization function:</p>
-<p>To use it with a single differential expression results table: Make sure there are the two dfault columns: “KEGG_ids” for the kegg ids and “log2FoldChange” for the values to map.</p>
+<p>To use the Kegg pathway visualization function you only need a kegg id of the pathway you want to visualize. You can run the function kegg_to_graph to get the igraph representation of the pathway. If you wish to plot it directly to visnetwork then it is enough to add the parameter <code>return_type = "visnetwork"</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_nodes.html">map_results_to_nodes</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">de_results_table</span><span class="op">)</span></span>
-<span><span class="va">graph</span></span></code></pre></div>
-<p>or</p>
+<span></span>
+<span><span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span>, return_type <span class="op">=</span> <span class="st">"visnetwork"</span><span class="op">)</span></span></code></pre></div>
+<p>After that you can use the function map_results_to_nodes to map your differential expression results to the nodes of the graph. You can provide either a single data frame or a list of data frames containing your differential expression results. Each data frame should have a column for the feature IDs (e.g., ENTREZID) and a column for the values you want to map (e.g., logFC or log2FoldChange).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
+<span></span>
 <span><span class="va">de_results_list</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  trans_limma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    de_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">[</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    de_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">)</span>,</span>
 <span>    value_column <span class="op">=</span> <span class="st">"logFC"</span>,</span>
 <span>    feature_column <span class="op">=</span> <span class="st">"ENTREZID"</span></span>
 <span>  <span class="op">)</span>,</span>
@@ -96,6 +97,15 @@
 <span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_nodes.html">map_results_to_nodes</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">de_results_list</span><span class="op">)</span></span>
+<span><span class="va">graph</span></span></code></pre></div>
+<p>If using a single data frame you can do it like this:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
+<span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_nodes.html">map_results_to_nodes</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span></code></pre></div>
 </div>
 </div>

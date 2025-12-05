@@ -41,3 +41,9 @@ map_results_to_nodes(
 ## Value
 
 An igraph or visNetwork object with mapped results.
+
+## Details
+
+This functionmaps differential expression results onto the nodes of a
+KEGG pathway graph. The pathwhay given as input must be the output of
+the function `kegg_to_graph`.
