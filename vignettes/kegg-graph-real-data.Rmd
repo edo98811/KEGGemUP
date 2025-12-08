@@ -16,9 +16,26 @@ knitr::opts_chunk$set(
 )
 ```
 
+If you dont have the package installed you can do so by running:
+
+```{r install-package, eval=FALSE}
+install.packages("remotes")     
+remotes::install_github("edo98811/KEGGemUP")
+```
+
+The load it.
+
 ```{r}
 library("KEGGemUP")
 ```
+
+KEGG pathways are used in many bioinformatics contexts, this package package can make it very easy to implement these in the analysis of real data.
+A very important part of bioinformatics analyses is both data integration and visiazionation. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them thre results of differential expression analyses.
+
+These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` or a result object from `limma` or `DESeq2`. To reproduce this situation we will now build a examplary differential expression results using the macrophage dataset from the macrophage package.
+
+<details>
+<summary> Setting up the data </summary>
 
 KEGG pathways are used in many bioinformatics contexts, this package package can make it very easy to implement these in the analysis of real data.
 A very important part of bioinformatics analyses is both data integration and visiazionation. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them thre results of differential expression analyses.
@@ -123,13 +140,18 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 )@result
 
 ```
+
+</details>
 ## Functions to parse KGML files
 
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertese with graph analysis in R.
 
-You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so.
+KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
+
+You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertese with graph analysis in R.
+
 ```{r kgml-parsing}
 nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
 edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
@@ -209,7 +231,7 @@ Then we will call the function with this table as input. The parameter `feature_
 
 ```{r use-package-2}
 graph <- kegg_to_graph(pathway)
-graph <- map_results_to_nodes(graph, de_results_limma)
+graph <- map_results_to_nodes(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
 graph
 ```
 

@@ -209,22 +209,35 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
 
 #' Add group information to nodes based on 'undefined' groups.
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
-#' @return nodes_df with added 'group' column for visNetwork grouping.
+#' @return nodes_df with updated 'group' column.
 add_group <- function(nodes_df) {
+
+  # The nodes that have as kegg name "undefined" are group nodes
   undefined_idx <- which(!is.na(nodes_df$kegg_name) & nodes_df$kegg_name == "undefined")
 
+  # If there are no undefined nodes, return original df
   if (length(undefined_idx) == 0) {
     return(nodes_df)
   }
 
+  # Subset undefined nodes
   undefined_nodes <- nodes_df[undefined_idx, , drop = FALSE]
 
+  # Iterate over undefined nodes using indeces
   for (i in seq_len(nrow(undefined_nodes))) {
+
+    # If no components in group (empty), skip
     if (is.na(undefined_nodes$components[i]) || undefined_nodes$components[i] == "") next # If group is NA
+
+    # Get component ids and add the group label to them, add the group node itself to this list
     ids <- strsplit(undefined_nodes$components[i], ";", fixed = TRUE)[[1]]
     ids <- append(ids, undefined_nodes$id[i])
 
-    group_label <- paste0("group_", undefined_nodes$id[i])
+    # Make group label 
+    # group_label <- paste0("group_", undefined_nodes$id[i])
+    group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";" )
+
+    # Assign group label to nodes_df
     nodes_df[nodes_df$id %in% ids, "group"] <- group_label
   }
 
