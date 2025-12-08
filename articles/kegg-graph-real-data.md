@@ -13,7 +13,7 @@ The load it.
 library("KEGGemUP")
 ```
 
-KEGG pathways are used in may bioinformatics contexts, this package
+KEGG pathways are used in many bioinformatics contexts, this package
 package can make it very easy to implement these in the analysis of real
 data. A very important part of bioinformatics analyses is both data
 integration and visiazionation. KEGGemUP aims to facilitate these tasks
@@ -165,6 +165,11 @@ edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package 
 
 ### The output data.frame frame for nodes
 
+Here you can see the first 5 columns of the dataframe that you get by
+parsing the nodes from a KGML file. It is a `data.frame` where each row
+represents a node in the KEGG pathway graph. No operations are done on
+the data, it is just a direct parsing of the KGML file.
+
 ``` r
 knitr::kable(head(nodes_df))
 ```
@@ -179,6 +184,11 @@ knitr::kable(head(nodes_df))
 | 24   | 24  | hsa:356                                                                                     | gene     | <https://www.kegg.jp/dbget-bin/www_bget?hsa:356>                                                                                     | NA       | FASLG, ALPS1B, APT1LG1, APTL, CD178, CD95-L, CD95L, FASL, TNFSF6, TNLG1A | FASLG, ALPS1B, APT1LG1, APTL, CD178, CD95-L, CD95L, FASL, TNFSF6, TNLG1A | \#000000 | \#BFFFBF | rectangle     | 137 | 692 | 46    | 17     | NA         |
 
 ### The output data.frame frame for edges
+
+Here you can see the first 5 columns of the dataframe that you get by
+parsing the edges from a KGML file. It is a `data.frame` where each row
+represents an edge in the KEGG pathway graph. No operations are done on
+the data, it is just a direct parsing of the KGML file.
 
 ``` r
 knitr::kable(head(edges_df))
@@ -205,7 +215,7 @@ differential expression results table.
 
 You can also pass as input to
 [`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md)
-a single data.frame with the differential expression results. This
+a single `data.frame` with the differential expression results. This
 dataframe must contain at least two columns: one with the KEGG feature
 IDs (without organism prefix) and another with the values to map to the
 nodes (e.g., log2 fold changes). You can pass to the function the names
@@ -213,20 +223,24 @@ of these columns if they differ from the default ones with the
 parameters `feature_column` and `value_column`.
 
 Note that the KEGG IDs without organism prefix are the the ENTREZ IDs
-for genes.
+for genes. For other feature types (e.g., compounds) you will need to
+make sure that the IDs in your differential expression results table
+match the KEGG IDs used in the graph.
 
-The defualt parameters are: - feature_column = “KEGG_ids” - value_column
-= “log2FoldChange”
+The defualt parameters are:
+
+- `feature_column`: “KEGG_ids”
+- `value_column`: “log2FoldChange”
 
 If you have multiple differential expression results tables (for example
 if you have one metabolomics and one transcriptomics) to map to the
 nodes you can pass a list of lists. Each sublist must contain the
 following elements:
 
-- de_table: a data.frame with the differential expression results.
-- value_column: the name of the column in de_table containing the values
-  to map to the nodes.
-- feature_column: the name of the column in de_table containing the
+- `de_table`: a data.frame with the differential expression results.
+- `value_column`: the name of the column in de_table containing the
+  values to map to the nodes.
+- `feature_column`: the name of the column in de_table containing the
   feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the
   graph (without organism prefix).
 
@@ -287,4 +301,82 @@ graph <- kegg_to_graph(pathway)
 graph <- map_results_to_nodes(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
 #> Mapping differential expression results to nodes...
 graph
+```
+
+``` r
+sessionInfo()
+#> R version 4.5.2 (2025-10-31)
+#> Platform: x86_64-pc-linux-gnu
+#> Running under: Ubuntu 24.04.3 LTS
+#> 
+#> Matrix products: default
+#> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> 
+#> locale:
+#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
+#>  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
+#>  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
+#> [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+#> 
+#> time zone: UTC
+#> tzcode source: system (glibc)
+#> 
+#> attached base packages:
+#> [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+#> [8] base     
+#> 
+#> other attached packages:
+#>  [1] edgeR_4.8.0                 limma_3.66.0               
+#>  [3] clusterProfiler_4.18.2      org.Hs.eg.db_3.22.0        
+#>  [5] AnnotationDbi_1.72.0        DESeq2_1.50.2              
+#>  [7] SummarizedExperiment_1.40.0 Biobase_2.70.0             
+#>  [9] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+#> [11] GenomicRanges_1.62.0        Seqinfo_1.0.0              
+#> [13] IRanges_2.44.0              S4Vectors_0.48.0           
+#> [15] BiocGenerics_0.56.0         generics_0.1.4             
+#> [17] macrophage_1.26.0           KEGGemUP_0.1.0             
+#> 
+#> loaded via a namespace (and not attached):
+#>   [1] RColorBrewer_1.1-3      jsonlite_2.0.0          tidydr_0.0.6           
+#>   [4] magrittr_2.0.4          ggtangle_0.0.9          farver_2.1.2           
+#>   [7] rmarkdown_2.30          fs_1.6.6                ragg_1.5.0             
+#>  [10] vctrs_0.6.5             memoise_2.0.1           ggtree_4.0.1           
+#>  [13] htmltools_0.5.9         S4Arrays_1.10.1         curl_7.0.0             
+#>  [16] SparseArray_1.10.4      gridGraphics_0.5-1      sass_0.4.10            
+#>  [19] bslib_0.9.0             htmlwidgets_1.6.4       desc_1.4.3             
+#>  [22] plyr_1.8.9              httr2_1.2.1             cachem_1.1.0           
+#>  [25] igraph_2.2.1            lifecycle_1.0.4         pkgconfig_2.0.3        
+#>  [28] gson_0.1.0              Matrix_1.7-4            R6_2.6.1               
+#>  [31] fastmap_1.2.0           digest_0.6.39           aplot_0.2.9            
+#>  [34] enrichplot_1.30.4       ggnewscale_0.5.2        patchwork_1.3.2        
+#>  [37] textshaping_1.0.4       RSQLite_2.4.5           filelock_1.0.3         
+#>  [40] polyclip_1.10-7         httr_1.4.7              abind_1.4-8            
+#>  [43] compiler_4.5.2          withr_3.0.2             bit64_4.6.0-1          
+#>  [46] fontquiver_0.2.1        S7_0.2.1                BiocParallel_1.44.0    
+#>  [49] DBI_1.2.3               ggforce_0.5.0           R.utils_2.13.0         
+#>  [52] MASS_7.3-65             rappdirs_0.3.3          DelayedArray_0.36.0    
+#>  [55] tools_4.5.2             ape_5.8-1               scatterpie_0.2.6       
+#>  [58] R.oo_1.27.1             glue_1.8.0              nlme_3.1-168           
+#>  [61] GOSemSim_2.36.0         grid_4.5.2              cluster_2.1.8.1        
+#>  [64] reshape2_1.4.5          fgsea_1.36.0            gtable_0.3.6           
+#>  [67] R.methodsS3_1.8.2       tidyr_1.3.1             data.table_1.17.8      
+#>  [70] xml2_1.5.1              XVector_0.50.0          ggrepel_0.9.6          
+#>  [73] pillar_1.11.1           stringr_1.6.0           yulab.utils_0.2.2      
+#>  [76] splines_4.5.2           tweenr_2.0.3            dplyr_1.1.4            
+#>  [79] BiocFileCache_3.0.0     treeio_1.34.0           lattice_0.22-7         
+#>  [82] bit_4.6.0               tidyselect_1.2.1        fontLiberation_0.1.0   
+#>  [85] GO.db_3.22.0            locfit_1.5-9.12         Biostrings_2.78.0      
+#>  [88] knitr_1.50              fontBitstreamVera_0.1.1 xfun_0.54              
+#>  [91] statmod_1.5.1           visNetwork_2.1.4        stringi_1.8.7          
+#>  [94] lazyeval_0.2.2          ggfun_0.2.0             yaml_2.3.11            
+#>  [97] evaluate_1.0.5          codetools_0.2-20        gdtools_0.4.4          
+#> [100] tibble_3.3.0            qvalue_2.42.0           ggplotify_0.1.3        
+#> [103] cli_3.6.5               systemfonts_1.3.1       jquerylib_0.1.4        
+#> [106] Rcpp_1.1.0              dbplyr_2.5.1            png_0.1-8              
+#> [109] parallel_4.5.2          pkgdown_2.2.0           ggplot2_4.0.1          
+#> [112] blob_1.2.4              DOSE_4.4.0              tidytree_0.4.6         
+#> [115] ggiraph_0.9.2           scales_1.4.0            purrr_1.2.0            
+#> [118] crayon_1.5.3            rlang_1.1.6             cowplot_1.2.0          
+#> [121] fastmatch_1.1-6         KEGGREST_1.50.0
 ```
