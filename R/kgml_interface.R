@@ -56,6 +56,19 @@ parse_kgml_relations <- function(file) {
     }
   })
   edges_df <- do.call(rbind, rels_list)
+
+  # Default to empty data.frame if no relations found
+  if (is.null(edges_df)) {
+    warning("No relations found in KGML file.")
+    edges_df <- data.frame(
+      from = character(0),
+      to = character(0),
+      type = character(0),
+      subtype = character(0),
+      rel_value = character(0)
+    )
+  }
+
   return(edges_df)
 }
 
