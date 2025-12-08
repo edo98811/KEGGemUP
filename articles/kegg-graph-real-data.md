@@ -171,14 +171,7 @@ KGML is the format that KEGG uses to save the pathway structure and it
 is what this package interfaces itself with.
 
 You can use these functions to parse KGML files directly. From these you
-can build a graph object if you wish to do so and you have expertese
-with graph analysis in R.
-
-KGML is the format that KEGG uses to save the pathway structure and it
-is what this package interfaces itself with.
-
-You can use these functions to parse KGML files directly. From these you
-can build a graph object if you wish to do so and you have expertese
+can build a graph object if you wish to do so and you have expertise
 with graph analysis in R.
 
 ``` r
