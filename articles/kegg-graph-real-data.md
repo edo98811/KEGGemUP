@@ -29,6 +29,22 @@ macrophage dataset from the macrophage package.
 
 Setting up the data
 
+KEGG pathways are used in many bioinformatics contexts, this package
+package can make it very easy to implement these in the analysis of real
+data. A very important part of bioinformatics analyses is both data
+integration and visiazionation. KEGGemUP aims to facilitate these tasks
+by providing functions to parse KEGG pathways and build graph objects,
+the idea is then to use these graph to map on them thre results of
+differential expression analyses.
+
+These vignette assumes you have already performed a differential
+expression analysis and have the results available as a `data.frame` or
+a result object from `limma` or `DESeq2`. To reproduce this situation we
+will now build a examplary differential expression results using the
+macrophage dataset from the macrophage package.
+
+Setting up the data
+
 ``` r
 message("--- Loading packages...")
 #> --- Loading packages...
@@ -150,6 +166,13 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 ```
 
 ## Functions to parse KGML files
+
+KGML is the format that KEGG uses to save the pathway structure and it
+is what this package interfaces itself with.
+
+You can use these functions to parse KGML files directly. From these you
+can build a graph object if you wish to do so and you have expertese
+with graph analysis in R.
 
 KGML is the format that KEGG uses to save the pathway structure and it
 is what this package interfaces itself with.
