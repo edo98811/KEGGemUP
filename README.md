@@ -10,8 +10,8 @@ A package to map you differential expression results on KEGG pathways.
 ## Installation
 To install the package you need an up to date R version (R >= 4.5.0) and devtools or remotes package installed. Then you can install KEGGemUP from GitHub:
 ```R
-install.packages("devtools")     
-devtools::install_github("edo98811/KEGGemUP")
+install.packages("remotes")     
+remotes::install_github("edo98811/KEGGemUP")
 ```
 ## Usage
 
