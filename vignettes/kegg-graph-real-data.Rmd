@@ -129,7 +129,6 @@ KGML is the format that KEGG uses to save the pathway structure and it is what t
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertese with graph analysis in R.
 
-You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so.
 ```{r kgml-parsing}
 nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
 edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
