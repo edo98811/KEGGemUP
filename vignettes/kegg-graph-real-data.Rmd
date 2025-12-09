@@ -142,6 +142,7 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 ```
 
 </details>
+
 ## Functions to parse KGML files
 
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
