@@ -4,12 +4,14 @@
 \alias{get_and_cache_kgml}
 \title{Download and cache KEGG KGML files.}
 \usage{
-get_and_cache_kgml(pathway_id, bfc)
+get_and_cache_kgml(pathway_id, bfc = NULL, file_name = NULL)
 }
 \arguments{
 \item{pathway_id}{KEGG pathway ID (e.g., "hsa04110").}
 
 \item{bfc}{BiocFileCache object for caching KEGG KGML files.}
+
+\item{file_name}{Optional file name to save the KGML file directly.}
 }
 \value{
 Path to the cached KGML file.

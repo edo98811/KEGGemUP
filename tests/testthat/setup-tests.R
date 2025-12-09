@@ -130,6 +130,7 @@ kgml_pah_real_example <- system.file("extdata", "hsa04010.xml", package = "KEGGe
 
 nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP")
 edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP")
+kgml_path_empty <- system.file("extdata", "empty_edges.xml", package = "KEGGemUP")
 
 # Expected nodes
 expected_nodes <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))

@@ -53,9 +53,9 @@ test_that("results are mapped on test graph", {
     }
   )
 
-  graph_output <- map_results_to_nodes(graph, all_de_test_lists$genes_metabolites)
+  graph_output <- suppressMessages(map_results_to_nodes(graph, all_de_test_lists$genes_metabolites))
   expect_true(inherits(graph_output, "visNetwork"))
 
-  graph_output <- map_results_to_nodes(graph, nodes_A_df, return_type = "visNetwork", feature_column = "KEGGID", value_column = "log2FoldChange")
+  graph_output <- suppressMessages(map_results_to_nodes(graph, nodes_A_df, return_type = "visNetwork", feature_column = "KEGGID", value_column = "log2FoldChange"))
   expect_true(inherits(graph_output, "visNetwork"))
 })

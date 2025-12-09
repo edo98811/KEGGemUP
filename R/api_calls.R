@@ -18,21 +18,52 @@ get_pathway_name <- function(id) {
 #' Download and cache KEGG KGML files.
 #' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
+#' @param file_name Optional file name to save the KGML file directly.
 #' @return Path to the cached KGML file.
 #'
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
-get_and_cache_kgml <- function(pathway_id, bfc) {
-  # Cache key / name
-  rname <- paste0(pathway_id, ".xml")
-
-  # Check cache
-  qr <- bfcquery(bfc, rname, field = "rname")
-  if (nrow(qr) > 0) {
-    message("Using cached KEGG KGML for ", pathway_id)
-    return(bfcpath(bfc, qr$rid[1]))
+#' @export 
+get_and_cache_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
+  # TODO: check pathway_id and file_name validity
+  # Determine mode: cache or file
+  if (!is.null(bfc) && !is.null(file_name)) {
+    stop("Provide either bfc OR file_name, not both.")
+  } else if (!is.null(bfc)) {
+    mode <- "cache"
+  } else if (!is.null(file_name)) {
+    mode <- "file"
+  } else {
+    stop("file_name or bfc must be provided.")
   }
+
+  if (mode == "cache") {
+    # Cache key / name
+    rname <- paste0(pathway_id, ".xml")
+
+    # Check cache
+    qr <- bfcquery(bfc, rname, field = "rname")
+
+    # Check if file exists
+
+    if (nrow(qr) > 0) {
+      cached_path <- bfcpath(bfc, qr$rid[1])
+
+      if (file.exists(cached_path)) { # if file exists return path
+        message("Using cached KEGG KGML for ", pathway_id)
+        return(invisible(cached_path))
+      } else { # file missing, re-download
+        message("Cache entry found but file missing. Re-downloading.")
+      }
+    }
+
+    # Temporary file to store KGML
+    file_name <- tempfile(fileext = ".xml")
+  } else {
+    file_name <- path.expand(file_name) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+  }
+
 
   # Download KGML
   message("Downloading KGML for ", pathway_id, " ...")
@@ -53,16 +84,16 @@ get_and_cache_kgml <- function(pathway_id, bfc) {
   # Get content as raw vector and check
   kgml_xml <- resp_body_xml(resp)
 
-  # Optionally: write to cache file
-  tmp <- tempfile(fileext = ".xml")
-  write_xml(kgml_xml, tmp) # preserves formatting
+  write_xml(kgml_xml, file_name)
 
-  # Add to BiocFileCache
-  res <- bfcadd(bfc, rname = rname, fpath = tmp, action = "copy")
-  rid <- names(res)
-
-  message("Downloaded & cached: ", pathway_id)
-  return(bfcpath(bfc, rid))
+  if (mode == "cache") { # add to BiocFileCache
+    res <- bfcadd(bfc, rname = rname, fpath = file_name, action = "copy")
+    rid <- names(res)
+    message("Downloaded & cached: ", pathway_id)
+    return(bfcpath(bfc, rid))
+  } else { # else return path
+    return(file_name)
+  }
 }
 
 #' Get KEGG compounds with caching.
