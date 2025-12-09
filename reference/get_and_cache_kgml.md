@@ -5,7 +5,7 @@ Download and cache KEGG KGML files.
 ## Usage
 
 ``` r
-get_and_cache_kgml(pathway_id, bfc)
+get_and_cache_kgml(pathway_id, bfc = NULL, file_name = NULL)
 ```
 
 ## Arguments
@@ -17,6 +17,10 @@ get_and_cache_kgml(pathway_id, bfc)
 - bfc:
 
   BiocFileCache object for caching KEGG KGML files.
+
+- file_name:
+
+  Optional file name to save the KGML file directly.
 
 ## Value
 

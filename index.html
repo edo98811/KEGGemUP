@@ -76,7 +76,7 @@
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span>, return_type <span class="op">=</span> <span class="st">"visnetwork"</span><span class="op">)</span></span></code></pre></div>
-<p>After that you can use the function map_results_to_nodes to map your differential expression results to the nodes of the graph. You can provide either a single data frame or a list of data frames containing your differential expression results. Each data frame should have a column for the feature IDs (e.g., ENTREZID) and a column for the values you want to map (e.g., logFC or log2FoldChange).</p>
+<p>After that you can use the function <code><a href="reference/map_results_to_nodes.html">map_results_to_nodes()</a></code> to map your differential expression results to the nodes of the graph. You can provide either a single <code>data.frame</code> or a list of <code>data.frame</code>s containing your differential expression results. Each data frame should have a column for the feature IDs (e.g., ENTREZID) and a column for the values you want to map (e.g., logFC or log2FoldChange).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
 <span></span>
@@ -105,7 +105,7 @@
 <span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
 <span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_nodes.html">map_results_to_nodes</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">)</span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_nodes.html">map_results_to_nodes</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">res_macrophage_IFNg_vs_naive_limma</span>, feature_column <span class="op">=</span> <span class="st">"ENTREZID"</span>, value_column <span class="op">=</span> <span class="st">"logFC"</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span></code></pre></div>
 </div>
 </div>

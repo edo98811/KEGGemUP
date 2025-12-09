@@ -30,12 +30,13 @@ graph <- kegg_to_graph(pathway)
 kegg_to_graph(pathway, return_type = "visnetwork")
 ```
 
-After that you can use the function map_results_to_nodes to map your
-differential expression results to the nodes of the graph. You can
-provide either a single data frame or a list of data frames containing
-your differential expression results. Each data frame should have a
-column for the feature IDs (e.g., ENTREZID) and a column for the values
-you want to map (e.g., logFC or log2FoldChange).
+After that you can use the function
+[`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md)
+to map your differential expression results to the nodes of the graph.
+You can provide either a single `data.frame` or a list of `data.frame`s
+containing your differential expression results. Each data frame should
+have a column for the feature IDs (e.g., ENTREZID) and a column for the
+values you want to map (e.g., logFC or log2FoldChange).
 
 ``` r
 library(KEGGemUP)
@@ -68,6 +69,6 @@ library(KEGGemUP)
 pathway <- "hsa04110"  # Example pathway ID
 
 graph <- kegg_to_graph(pathway)
-graph <- map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma)
+graph <- map_results_to_nodes(graph, res_macrophage_IFNg_vs_naive_limma, feature_column = "ENTREZID", value_column = "logFC")
 graph
 ```
