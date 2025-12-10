@@ -69,6 +69,8 @@ parse_kgml_relations <- function(file) {
     )
   }
 
+  message("Parsed ", nrow(edges_df), " edges from KGML file.")
+
   return(edges_df)
 }
 
@@ -171,6 +173,7 @@ parse_kgml_entries <- function(file) {
     node_row
   })
   nodes_df <- do.call(rbind, nodes_list)
+  message("Parsed ", nrow(nodes_df), " nodes from KGML file.")
   return(nodes_df)
 }
 
