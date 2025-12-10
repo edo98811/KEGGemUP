@@ -155,14 +155,6 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
   (!is.na(res_macrophage_IFNg_vs_naive_dds$padj)) &
     (res_macrophage_IFNg_vs_naive_dds$padj <= 0.05)
 ]
-
-res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
-  gene = de_entrez_IFNg_vs_naive_genes,
-  organism = "hsa",
-  pvalueCutoff = 0.05
-)@result
-#> Reading KEGG annotation online: "https://rest.kegg.jp/link/hsa/pathway"...
-#> Reading KEGG annotation online: "https://rest.kegg.jp/list/pathway/hsa"...
 ```
 
 ## Functions to parse KGML files
@@ -172,11 +164,22 @@ is what this package interfaces itself with.
 
 You can use these functions to parse KGML files directly. From these you
 can build a graph object if you wish to do so and you have expertise
-with graph analysis in R.
+with graph analysis in R. The first thing you can do is download a KGML
+file from KEGG. You can do this using the function
+`download_kegg_kgml()`. The only parameter that needs to be provided is
+the destination directory where to save the file. The function will
+return the path to the downloaded file.
 
 ``` r
-nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
-edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
+kgml_file <- get_and_cache_kgml("hsa04010", file_name = tempfile(fileext = "xml"))
+#> Downloading KGML for hsa04010 ...
+```
+
+``` r
+nodes_df <- parse_kgml_entries(kgml_file)
+#> Parsed 134 nodes from KGML file.
+edges_df <- parse_kgml_relations(kgml_file)
+#> Parsed 193 edges from KGML file.
 ```
 
 ### The output data.frame frame for nodes
@@ -223,14 +226,14 @@ knitr::kable(head(edges_df))
 
 To map the differential expression results to the nodes of a KEGG
 pathway graph you can use
-[`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md).
+[`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md).
 The input of this function is a graph object built with
 [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
 and a list of differential expression results tables or a single
 differential expression results table.
 
 You can also pass as input to
-[`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md)
+[`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
 a single `data.frame` with the differential expression results. This
 dataframe must contain at least two columns: one with the KEGG feature
 IDs (without organism prefix) and another with the values to map to the
@@ -283,17 +286,19 @@ can see you simply need to pass to the function the graph object and the
 list of differential expression results tables that we defined before.
 
 ``` r
-pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
-graph <- kegg_to_graph(pathway)
+pathway <- "hsa00563"
+graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Downloading KGML for hsa00563 ...
 #> Downloaded & cached: hsa00563
+#> Parsed 126 nodes from KGML file.
+#> Parsed 35 edges from KGML file.
 #> Downloading KEGG compounds...
 #> Downloading KEGG glycans...
-graph <- map_results_to_nodes(graph, de_results_list)
+graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 #> Warning in add_results_nodes(nodes_df, results_combined): Some nodes had
 #> multiple matching KEGG IDs; only the first match was assigned a value.
-graph
+graph_visnetwork
 ```
 
 ### Example of usage with a single DE results table
@@ -310,13 +315,15 @@ Then we will call the function with this table as input. The parameter
 our differential expression results table.
 
 ``` r
-graph <- kegg_to_graph(pathway)
+graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Using cached KEGG KGML for hsa00563
+#> Parsed 126 nodes from KGML file.
+#> Parsed 35 edges from KGML file.
 #> Loading KEGG compounds from cache...
 #> Loading KEGG glycans from cache...
-graph <- map_results_to_nodes(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
+graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
-graph
+graph_visnetwork
 ```
 
 ``` r

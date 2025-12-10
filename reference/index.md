@@ -41,7 +41,7 @@
   : Create an igraph graph from nodes and edges data frames
 - [`make_vis_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_vis_graph.md)
   : Create a visNetwork graph from nodes and edges data frames
-- [`map_results_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_nodes.md)
+- [`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
   : Map differential expression results to nodes
 - [`parse_kgml_entries()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_entries.md)
   : Parse KEGG KGML files to extract nodes data frame.
