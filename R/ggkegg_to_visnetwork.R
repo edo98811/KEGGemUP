@@ -1,7 +1,6 @@
 #' Transform a ggkegg graph to igraph or visNetwork
 #'
 #' @param path_id KEGG pathway ID (e.g., "hsa:04110" or "04110").
-#' @param de_results Named list of differential expression results. Each entry should be a list with elements: de_table (data.frame), value_column (character), feature_column (character), threshold (numeric).
 #' @param return_type Output type: "igraph" or "visNetwork".
 #' @param scaling_factor Numeric factor to scale node sizes.
 #' @return An igraph or visNetwork object representing the pathway.
@@ -16,7 +15,6 @@
 #'
 #' @export
 kegg_to_graph <- function(path_id,
-                          de_results = NULL,
                           return_type = "igraph",
                           scaling_factor = 1.5) {
   # Check arguments
