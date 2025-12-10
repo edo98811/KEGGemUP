@@ -43,6 +43,7 @@ A very important part of bioinformatics analyses is both data integration and vi
 These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` or a result object from `limma` or `DESeq2`. To reproduce this situation we will now build a examplary differential expression results using the macrophage dataset from the macrophage package.
 
 <details>
+
 <summary> Setting up the data </summary>
 
 ```{r load-fake-results}
@@ -133,12 +134,6 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
     (res_macrophage_IFNg_vs_naive_dds$padj <= 0.05)
 ]
 
-res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
-  gene = de_entrez_IFNg_vs_naive_genes,
-  organism = "hsa",
-  pvalueCutoff = 0.05
-)@result
-
 ```
 
 </details>
@@ -148,11 +143,15 @@ res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertise with graph analysis in R.
+The first thing you can do is download a KGML file from KEGG. You can do this using the function `download_kegg_kgml()`. The only parameter that needs to be provided is the destination directory where to save the file. The function will return the path to the downloaded file.
 
+```{r kgml-downloading}
+kgml_file <- get_and_cache_kgml("hsa04010", file_name = "test.xml")
+```
 
 ```{r kgml-parsing}
-nodes_df <- parse_kgml_entries(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
-edges_df <- parse_kgml_relations(system.file("extdata", "hsa04010.xml", package = "KEGGemUP"))
+nodes_df <- parse_kgml_entries(kgml_file)
+edges_df <- parse_kgml_relations(kgml_file)
 ```
 
 ### The output data.frame frame for nodes
@@ -210,10 +209,10 @@ de_results_list <-list(
 We will now take a KEGG pathway from the enrichment results we built earlier and map the differential expression results to its nodes. As you can see you simply need to pass to the function the graph object and the list of differential expression results tables that we defined before.
 
 ```{r use-package}
-pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
-graph <- kegg_to_graph(pathway)
-graph <- map_results_to_graph(graph, de_results_list)
-graph
+pathway <- "hsa00563"
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
+graph_visnetwork
 ```
 
 
@@ -228,9 +227,9 @@ de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
 ```{r use-package-2}
-graph <- kegg_to_graph(pathway)
-graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
-graph
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
+graph_visnetwork
 ```
 
 ```{r}
