@@ -25,7 +25,7 @@ test_that("parse_kgml_edges load relationsps correctly", {
 })
 
 test_that("parse_kgml_entries loads empty edges  correctly", {
-  expect_warning(edges_df <-parse_kgml_relations(kgml_path_empty), "No relations found in KGML file.")
+  expect_warning(edges_df <- parse_kgml_relations(kgml_path_empty), "No relations found in KGML file.")
 
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
@@ -42,14 +42,14 @@ test_that("parse_kgml_entries load nodes correctly", {
 
 test_that("combine_results_in_dataframe correctly merges DE results across all test lists", {
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
-
     # Run the function for this test list
     result <- combine_results_in_dataframe(de_list)
 
     # Structure checks
     expect_true(is.data.frame(result), info = test_name)
     expect_equal(colnames(result), c("KEGG", "plot_value", "source"),
-                 info = paste0(test_name, "unexpected column names"))
+      info = paste0(test_name, "unexpected column names")
+    )
 
     # Source tracking
     expect_setequal(unique(result$source), names(de_list))
@@ -66,12 +66,12 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
     # Row count check
     expected_nrows <- sum(vapply(de_list, function(x) nrow(x$de_table), numeric(1)))
     expect_equal(nrow(result), expected_nrows,
-                 info = paste0(test_name, "unexpected number of merged rows"))
+      info = paste0(test_name, "unexpected number of merged rows")
+    )
   })
 })
 
 test_that("add_compound_names caches and assigns glycan and compounds names", {
-
   bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   with_mocked_bindings(
@@ -81,7 +81,7 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
       res <- add_compound_names(nodes_df_basic, bfc)
     }
   )
-  
+
   # gene node unchanged
   expect_equal(res$label[1], NA_character_)
 

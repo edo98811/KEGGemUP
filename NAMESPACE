@@ -2,7 +2,7 @@
 
 export(get_and_cache_kgml)
 export(kegg_to_graph)
-export(map_results_to_nodes)
+export(map_results_to_graph)
 export(parse_kgml_entries)
 export(parse_kgml_relations)
 importFrom(BiocFileCache,BiocFileCache)

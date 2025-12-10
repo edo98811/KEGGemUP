@@ -172,9 +172,9 @@ knitr::kable(head(edges_df))
 ```
 
 ## Build a graph from a pathway ID and map results to nodes
-To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_nodes()`. The input of this function is a graph object built with `kegg_to_graph()` and a list of differential expression results tables or a single differential expression results table.
+To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_graph()`. The input of this function is a graph object built with `kegg_to_graph()` and a list of differential expression results tables or a single differential expression results table.
 
-You can also pass as input to `map_results_to_nodes()` a single `data.frame` with the differential expression results. This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix) and another with the values to map to the nodes (e.g., log2 fold changes). You can pass to the function the names of these columns if they differ from the default ones with the parameters `feature_column` and `value_column`.
+You can also pass as input to `map_results_to_graph()` a single `data.frame` with the differential expression results. This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix) and another with the values to map to the nodes (e.g., log2 fold changes). You can pass to the function the names of these columns if they differ from the default ones with the parameters `feature_column` and `value_column`.
 
 Note that the KEGG IDs without organism prefix are the the ENTREZ IDs for genes. For other feature types (e.g., compounds) you will need to make sure that the IDs in your differential expression results table match the KEGG IDs used in the graph.
 
@@ -212,7 +212,7 @@ We will now take a KEGG pathway from the enrichment results we built earlier and
 ```{r use-package}
 pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
 graph <- kegg_to_graph(pathway)
-graph <- map_results_to_nodes(graph, de_results_list)
+graph <- map_results_to_graph(graph, de_results_list)
 graph
 ```
 
@@ -229,7 +229,7 @@ Then we will call the function with this table as input. The parameter `feature_
 
 ```{r use-package-2}
 graph <- kegg_to_graph(pathway)
-graph <- map_results_to_nodes(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
+graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
 graph
 ```
 
