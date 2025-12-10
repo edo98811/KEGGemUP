@@ -19,6 +19,7 @@ nodes_A_df <- data.frame(
   KEGGID = nodes_A,
   log2FoldChange = rnorm(length(nodes_A), mean = 0, sd = 1)
 )
+rownames(nodes_A_df) <- nodes_A_df$KEGGID
 nodes_B_df <- data.frame(
   KEGG = nodes_B,
   log2FC = rnorm(length(nodes_B), mean = 0, sd = 1)
@@ -51,6 +52,20 @@ de_results_list_1 <- list(
     feature_column = "KEGG"
   )
 )
+
+de_results_list_rownames <- list(
+  genes = list(
+    de_table = nodes_A_df,
+    value_column = "log2FoldChange",
+    feature_column = "rownames"
+  ),
+  metabolites = list(
+    de_table = nodes_B_df,
+    value_column = "log2FC",
+    feature_column = "KEGG"
+  )
+)
+
 
 # Mixed column names and redundant identifiers
 de_results_list_2 <- list(
@@ -111,12 +126,13 @@ de_results_list_4 <- list(
 
 all_de_test_lists <- list(
   genes_metabolites     = de_results_list_1, # Basic and consistent
+  using_rownames        = de_results_list_rownames, # Basic and consistent with rownames as feature_column
   mixed_omics           = de_results_list_2, # Mixed omics, column name variations
   duplicates_overlap    = de_results_list_3, # Duplicate / overlapping feature IDs
   all                   = de_results_list_4 # Large mixed test case
 )
 
-throw_warning <- names(all_de_test_lists)[c(2, 3, 4)]
+throw_warning <- names(all_de_test_lists)[c(3, 4, 5)]
 expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 
 kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")

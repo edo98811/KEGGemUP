@@ -428,10 +428,17 @@ combine_results_in_dataframe <- function(results_list) {
 
   # Combine all results into a single data frame
   results <- lapply(names(results_list), function(de_entry_name) {
+
+    # Extract individual entry
     de_entry <- results_list[[de_entry_name]]
     de_table <- de_entry$de_table
     value_column <- de_entry$value_column
     feature_column <- de_entry$feature_column
+
+    # Handle rownames as feature column
+    if(feature_column == "rownames"){
+      de_table[[feature_column]] <- rownames(de_table)
+    }
 
     de_table[[feature_column]] <- remove_kegg_prefix(de_table[[feature_column]])
 
