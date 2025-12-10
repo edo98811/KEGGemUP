@@ -190,6 +190,7 @@ add_columns_nodes_df <- function(nodes_df) {
   nodes_df$widthConstraint <- NA_real_
   nodes_df$heightConstraint <- NA_real_
   nodes_df$size <- NA_real_
+  nodes_df$shape <- NA_character_
 
   return(nodes_df)
 }

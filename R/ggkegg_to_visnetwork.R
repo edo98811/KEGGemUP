@@ -163,6 +163,13 @@ map_results_to_graph <- function(g,
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
+
+  # Shapes conversion for visNetwork
+  nodes_df$shape <- ifelse(
+    nodes_df$shape %in% c("rectangle", "vrectangle"), "box",
+    "dot"
+  )
+
   # Different handling if no edges
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
@@ -191,6 +198,13 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return An igraph object representing the graph.
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
+
+  # Shapes conversion for igraph
+  nodes_df$shape <- ifelse(
+    nodes_df$shape == "box", "rectangle",
+    "circle"
+  )
+
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])

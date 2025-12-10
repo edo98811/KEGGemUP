@@ -146,8 +146,8 @@ test_that("tooltip is formatted correctly", {
 })
 
 test_that("make igraph works", {
-  nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-  edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+  nodes_df_expected <- expected_nodes_cols
+  edges_df_expected <- expected_edges
 
   title <- "Test Pathway"
 
@@ -166,9 +166,8 @@ test_that("make igraph works", {
 })
 
 test_that("make visnetwork graph works", {
-  nodes_df_expected <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-  nodes_df_expected <- add_columns_nodes_df(nodes_df_expected)
-  edges_df_expected <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+  nodes_df_expected <- expected_nodes_cols
+  edges_df_expected <- expected_edges
 
   title <- "Test Pathway"
 
