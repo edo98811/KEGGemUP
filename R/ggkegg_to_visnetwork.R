@@ -4,10 +4,9 @@
 #' @param return_type Output type: "igraph" or "visNetwork".
 #' @param scaling_factor Numeric factor to scale node sizes.
 #' @return An igraph or visNetwork object representing the pathway.
-#' 
 #' @details This function downloads the KGML file for the specified KEGG pathway, then parses it to generate a graph representation using either the igraph or visNetwork package. It styles nodes and edges based on their types the output can be used for visualization or further analysis. If differential expression results are provided, they can be mapped to the nodes using the function \code{map_results_to_graph}.
-#' @examples 
-#' pathway <- "hsa04110"  # Example pathway ID
+#' @examples
+#' pathway <- "hsa04110" # Example pathway ID
 #' graph <- kegg_to_graph(pathway)
 #' kegg_to_graph(pathway, return_type = "visNetwork")
 #'
@@ -86,11 +85,11 @@ kegg_to_graph <- function(path_id,
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}. 
+#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
 #' @export
 map_results_to_graph <- function(g,
                                  de_results,
-                                 return_type = "visNetwork", 
+                                 return_type = "visNetwork",
                                  feature_column = NULL,
                                  value_column = NULL) {
   # Check arguments
@@ -108,8 +107,8 @@ map_results_to_graph <- function(g,
     if (inherits(de_results, "data.frame")) {
       de_results <- list(de_input = list(
         de_table = de_results,
-        value_column = ifelse(is.null(value_column), "log2FoldChange", value_column) ,
-        feature_column = ifelse(is.null(feature_column), "KEGG_ids", feature_column) 
+        value_column = ifelse(is.null(value_column), "log2FoldChange", value_column),
+        feature_column = ifelse(is.null(feature_column), "KEGG_ids", feature_column)
       ))
     }
 
@@ -223,7 +222,6 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
 #' @return nodes_df with updated 'group' column.
 add_group <- function(nodes_df) {
-
   # The nodes that have as kegg name "undefined" are group nodes
   undefined_idx <- which(!is.na(nodes_df$kegg_name) & nodes_df$kegg_name == "undefined")
 
@@ -237,7 +235,6 @@ add_group <- function(nodes_df) {
 
   # Iterate over undefined nodes using indeces
   for (i in seq_len(nrow(undefined_nodes))) {
-
     # If no components in group (empty), skip
     if (is.na(undefined_nodes$components[i]) || undefined_nodes$components[i] == "") next # If group is NA
 
@@ -245,9 +242,9 @@ add_group <- function(nodes_df) {
     ids <- strsplit(undefined_nodes$components[i], ";", fixed = TRUE)[[1]]
     ids <- append(ids, undefined_nodes$id[i])
 
-    # Make group label 
+    # Make group label
     # group_label <- paste0("group_", undefined_nodes$id[i])
-    group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";" )
+    group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";")
 
     # Assign group label to nodes_df
     nodes_df[nodes_df$id %in% ids, "group"] <- group_label
@@ -301,7 +298,7 @@ add_tooltip <- function(nodes_df) {
     safe(nodes_df$kegg_name) == "undefined",
     paste0("Group Node Placeholder: ", nodes_df$group, "<br>"),
     paste0(
-      "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50,nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
+      "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50, nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
       "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
       button_html
@@ -316,8 +313,6 @@ add_tooltip <- function(nodes_df) {
 #' @return nodes_df with added visual styling columns: shape, fixed, widthConstraint, heightConstraint, size.
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
   # Base visual settings
-
-  # nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "rectangle")
   nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "box")
 
   # Set size constraints for non-compound nodes (compute numeric vectors first)
@@ -440,7 +435,6 @@ combine_results_in_dataframe <- function(results_list) {
 
   # Combine all results into a single data frame
   results <- lapply(names(results_list), function(de_entry_name) {
-
     # Extract individual entry
     de_entry <- results_list[[de_entry_name]]
     de_table <- de_entry$de_table
@@ -448,7 +442,7 @@ combine_results_in_dataframe <- function(results_list) {
     feature_column <- de_entry$feature_column
 
     # Handle rownames as feature column
-    if(feature_column == "rownames"){
+    if (feature_column == "rownames") {
       de_table[[feature_column]] <- rownames(de_table)
     }
 
