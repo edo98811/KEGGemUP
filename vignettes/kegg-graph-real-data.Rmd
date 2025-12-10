@@ -146,7 +146,7 @@ You can use these functions to parse KGML files directly. From these you can bui
 The first thing you can do is download a KGML file from KEGG. You can do this using the function `download_kegg_kgml()`. The only parameter that needs to be provided is the destination directory where to save the file. The function will return the path to the downloaded file.
 
 ```{r kgml-downloading}
-kgml_file <- get_and_cache_kgml("hsa04010", file_name = "test.xml")
+kgml_file <- get_and_cache_kgml("hsa04010", file_name = tempfile(fileext = "xml"))
 ```
 
 ```{r kgml-parsing}

@@ -19,13 +19,14 @@ test_that("remove_kegg_prefix_str removes prefixes and handles multiple IDs", {
 })
 
 test_that("parse_kgml_edges load relationsps correctly", {
-  edges_df <- parse_kgml_relations(kgml_path)
+  edges_df <- suppressMessages(parse_kgml_relations(kgml_path))
 
   expect_equal(edges_df, expected_edges)
 })
 
 test_that("parse_kgml_entries loads empty edges  correctly", {
-  expect_warning(edges_df <- parse_kgml_relations(kgml_path_empty), "No relations found in KGML file.")
+
+  expect_warning(edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty)), "No relations found in KGML file.")
 
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
@@ -33,12 +34,10 @@ test_that("parse_kgml_entries loads empty edges  correctly", {
 })
 
 test_that("parse_kgml_entries load nodes correctly", {
-  nodes_df <- parse_kgml_entries(kgml_path)
+  nodes_df <- suppressMessages(parse_kgml_entries(kgml_path))
 
   expect_equal(nodes_df, expected_nodes)
 })
-
-
 
 test_that("combine_results_in_dataframe correctly merges DE results across all test lists", {
   purrr::imap(all_de_test_lists, function(de_list, test_name) {
