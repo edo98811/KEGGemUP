@@ -20,8 +20,7 @@ If you dont have the package installed you can do so by running:
 
 ```{r install-package, eval=FALSE}
 install.packages("remotes")     
-remotes::install_github("edo98811/KEGGemUP", 
-                        dependencies = TRUE, build_vignettes = TRUE)
+remotes::install_github("edo98811/KEGGemUP")
 ```
 
 The load it.
@@ -159,7 +158,7 @@ edges_df <- parse_kgml_relations(kgml_file)
 
 Here you can see the first 5 columns of the dataframe that you get by parsing the nodes from a KGML file. It is a `data.frame` where each row represents a node in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
 
-```{r show-nodes}
+```{r}
 knitr::kable(head(nodes_df))
 ```
 
@@ -167,7 +166,7 @@ knitr::kable(head(nodes_df))
 
 Here you can see the first 5 columns of the dataframe that you get by parsing the edges from a KGML file. It is a `data.frame` where each row represents an edge in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
 
-```{r show-edges}
+```{r}
 knitr::kable(head(edges_df))
 ```
 
@@ -189,7 +188,7 @@ If you have multiple differential expression results tables (for example if you 
 - `value_column`: the name of the column in de_table containing the values to map to the nodes.
 - `feature_column`: the name of the column in de_table containing the feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the graph (without organism prefix).
 
-```{r make-res-list}
+```{r}
 de_results_list <-list(
   trans_limma = list(
     de_table = data.frame(res_macrophage_IFNg_vs_naive_limma),
@@ -216,7 +215,14 @@ graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "
 graph_visnetwork
 ```
 
+
 ### Example of usage with a single DE results table
+
+Let's first build a filtered differential expression results table with only the significant results.
+
+```{r}
+de_results_limma <- res_macrophage_IFNg_vs_naive_limma
+```
 
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
