@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE pathway SYSTEM "https://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd">
+<!-- Minimal test KGML for parser validation -->
+<pathway name="path:test00001" org="tst" number="00001"
+         title="Test pathway"
+         image="https://www.kegg.jp/test/pathway.png"
+         link="https://www.kegg.jp/test/pathway">
+
+    <!-- Single gene -->
+    <entry id="1" name="tst:1111" type="gene"
+        link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111">
+        <graphics name="GENE1, aliasA" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="100" y="100" width="46" height="17"/>
+    </entry>
+
+    <!-- Multiple genes -->
+    <entry id="2" name="tst:2222 tst:3333" type="gene"
+        link="https://www.kegg.jp/dbget-bin/www_bget?tst:2222+tst:3333">
+        <graphics name="GENE2, GENE3" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="200" y="100" width="46" height="17"/>
+    </entry>
+
+    <!-- Ortholog -->
+    <entry id="3" name="ko:K00001" type="ortholog"
+        link="https://www.kegg.jp/dbget-bin/www_bget?K00001">
+        <graphics name="K00001" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="rectangle" x="300" y="100" width="46" height="17"/>
+    </entry>
+
+    <!-- Map (reference pathway) -->
+    <entry id="4" name="path:tst00002" type="map"
+        link="https://www.kegg.jp/dbget-bin/www_bget?tst00002">
+        <graphics name="TITLE:Test map" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="400" y="100" width="100" height="25"/>
+    </entry>
+
+    <!-- Group combining multiple genes -->
+    <entry id="5" name="undefined" type="group">
+        <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+             type="rectangle" x="150" y="200" width="80" height="17"/>
+        <component id="1"/>
+        <component id="2"/>
+    </entry>
+
+    <!-- Gene repeated elsewhere -->
+    <entry id="6" name="tst:1111" type="gene"
+        link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111">
+        <graphics name="GENE1_DUPLICATE" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="100" y="300" width="46" height="17"/>
+    </entry>
+</pathway>

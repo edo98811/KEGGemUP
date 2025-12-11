@@ -18,7 +18,9 @@ docs
 
 !inst/extdata/hsa04010.xml
 !inst/extdata/test01.xml
+!inst/extdata/empty_edges.xml
 
 Users:.fileloc
 /doc/
 /Meta/
+
