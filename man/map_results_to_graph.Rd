@@ -33,3 +33,14 @@ Map differential expression results to nodes
 This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
 The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
 }
+\examples{
+pathway <- "hsa04110" # Example pathway ID
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+# Example differential expression results
+de_results <- data.frame(
+ KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+log2FoldChange = c(1.5, -2.0, 0.5)
+)
+vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
+
+}

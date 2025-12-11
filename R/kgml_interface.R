@@ -20,11 +20,7 @@
 #' contain one or more `<subtype>` elements that provide additional details about
 #' the interaction. The result is a tidy data.frame suitable for network analysis or
 #' visualization, where each row represents one relation–subtype pair.
-#' @examples
-#' \dontrun{
-#' relations_df <- parse_kgml_relations("pathway.xml")
-#' head(relations_df)
-#' }
+#' 
 #' @export
 parse_kgml_relations <- function(file) {
   doc <- read_xml(file)
@@ -110,11 +106,6 @@ parse_kgml_relations <- function(file) {
 #' for integration with relational data models or network visualization frameworks
 #' (e.g., `igraph`or `visNetwork`).
 #'
-#' @examples
-#' \dontrun{
-#' nodes_df <- parse_kgml_entries("pathway.xml")
-#' head(nodes_df)
-#' }
 #' @export
 parse_kgml_entries <- function(file) {
   # Read the KGML file

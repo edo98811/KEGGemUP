@@ -76,6 +76,9 @@ kegg_to_graph <- function(path_id,
 
 #' Map differential expression results to nodes
 #'
+#' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
+#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
+#' 
 #' @param g An igraph object representing the pathway.
 #' @param de_results Named list of differential expression results.
 #' @param return_type Output type: "igraph" or "visNetwork".
@@ -84,8 +87,16 @@ kegg_to_graph <- function(path_id,
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
-#' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
+#' @examples
+#' pathway <- "hsa04110" # Example pathway ID
+#' graph <- kegg_to_graph(pathway, return_type = "igraph")
+#' # Example differential expression results
+#' de_results <- data.frame(
+#'  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+#' log2FoldChange = c(1.5, -2.0, 0.5)
+#' )
+#' vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
+#' 
 #' @export
 map_results_to_graph <- function(g,
                                  de_results,

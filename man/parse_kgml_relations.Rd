@@ -30,9 +30,3 @@ contain one or more \verb{<subtype>} elements that provide additional details ab
 the interaction. The result is a tidy data.frame suitable for network analysis or
 visualization, where each row represents one relation–subtype pair.
 }
-\examples{
-\dontrun{
-relations_df <- parse_kgml_relations("pathway.xml")
-head(relations_df)
-}
-}

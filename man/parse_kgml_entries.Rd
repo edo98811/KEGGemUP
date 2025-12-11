@@ -42,9 +42,3 @@ The resulting data provides a tidy, one-row-per-entry representation suitable
 for integration with relational data models or network visualization frameworks
 (e.g., \code{igraph}or \code{visNetwork}).
 }
-\examples{
-\dontrun{
-nodes_df <- parse_kgml_entries("pathway.xml")
-head(nodes_df)
-}
-}
