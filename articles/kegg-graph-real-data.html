@@ -551,7 +551,7 @@ before.</p>
 <p>Let’s first build a filtered differential expression results table
 with only the significant results.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">de_results_limma</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">de_results_limma</span> <span class="op">&lt;-</span> <span class="va">res_macrophage_IFNg_vs_naive_limma</span></span></code></pre></div>
 <p>Then we will call the function with this table as input. The
 parameter <code>feature_column</code> and <code>value_column</code> are
 set to match the column names in our differential expression results
@@ -634,7 +634,7 @@ table.</p>
 <span><span class="co">#&gt;  [88] Biostrings_2.78.0       knitr_1.50              fontBitstreamVera_0.1.1</span></span>
 <span><span class="co">#&gt;  [91] xfun_0.54               statmod_1.5.1           visNetwork_2.1.4       </span></span>
 <span><span class="co">#&gt;  [94] stringi_1.8.7           lazyeval_0.2.2          ggfun_0.2.0            </span></span>
-<span><span class="co">#&gt;  [97] yaml_2.3.11             evaluate_1.0.5          codetools_0.2-20       </span></span>
+<span><span class="co">#&gt;  [97] yaml_2.3.12             evaluate_1.0.5          codetools_0.2-20       </span></span>
 <span><span class="co">#&gt; [100] gdtools_0.4.4           tibble_3.3.0            qvalue_2.42.0          </span></span>
 <span><span class="co">#&gt; [103] ggplotify_0.1.3         cli_3.6.5               systemfonts_1.3.1      </span></span>
 <span><span class="co">#&gt; [106] jquerylib_0.1.4         Rcpp_1.1.0              dbplyr_2.5.1           </span></span>

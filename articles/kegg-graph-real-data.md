@@ -307,7 +307,7 @@ Let’s first build a filtered differential expression results table with
 only the significant results.
 
 ``` r
-de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
+de_results_limma <- res_macrophage_IFNg_vs_naive_limma
 ```
 
 Then we will call the function with this table as input. The parameter
@@ -393,7 +393,7 @@ sessionInfo()
 #>  [88] Biostrings_2.78.0       knitr_1.50              fontBitstreamVera_0.1.1
 #>  [91] xfun_0.54               statmod_1.5.1           visNetwork_2.1.4       
 #>  [94] stringi_1.8.7           lazyeval_0.2.2          ggfun_0.2.0            
-#>  [97] yaml_2.3.11             evaluate_1.0.5          codetools_0.2-20       
+#>  [97] yaml_2.3.12             evaluate_1.0.5          codetools_0.2-20       
 #> [100] gdtools_0.4.4           tibble_3.3.0            qvalue_2.42.0          
 #> [103] ggplotify_0.1.3         cli_3.6.5               systemfonts_1.3.1      
 #> [106] jquerylib_0.1.4         Rcpp_1.1.0              dbplyr_2.5.1           
