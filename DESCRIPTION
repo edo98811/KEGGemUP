@@ -15,8 +15,11 @@ Authors@R:
 Description: TODO Simplify the analysis of multiomics datasets.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 VignetteBuilder: knitr
+biocViews: 
+    Pathways,
+    Network,
+    Visualization
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/edo98811/KEGGemUP, https://edo98811.github.io/KEGGemUP/
@@ -36,7 +39,6 @@ Suggests:
     mockery,
     spelling,
     testthat (>= 3.0.0),
-    glue,
     knitr,
     macrophage,
     org.Hs.eg.db,
