@@ -312,6 +312,7 @@ add_tooltip <- function(nodes_df) {
       "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50, nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
       "Source: ", safe(nodes_df$source), "<br>",
       "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
+      ifelse(safe(nodes_df$group) != "", paste0("Group: ", safe(nodes_df$group), "<br>"), "Not belonging to any group<br>"),
       button_html
     )
   )
