@@ -7,7 +7,7 @@
 is_valid_pathway(pathway_id)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., "hsa04110")}
+\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110')}
 }
 \value{
 TRUE if valid format, FALSE otherwise

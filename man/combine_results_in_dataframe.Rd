@@ -7,7 +7,8 @@
 combine_results_in_dataframe(results_list)
 }
 \arguments{
-\item{results_list}{A named list where each element is a differential expression result containing a data frame (de_table), value column name (value_column), and feature column name (feature_column)}
+\item{results_list}{A named list where each element is a differential expression result containing a \code{data.frame}
+(de_table), value column name (value_column), and feature column name (feature_column)}
 }
 \value{
 A combined data frame with columns: KEGG, value, source

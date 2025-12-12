@@ -7,7 +7,7 @@
 download_kgml(pathway_id, bfc = NULL, file_name = NULL)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., "hsa04110").}
+\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110').}
 
 \item{bfc}{BiocFileCache object for caching KEGG KGML files.}
 

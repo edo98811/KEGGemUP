@@ -1,10 +1,15 @@
 #' Transform a ggkegg graph to igraph or visNetwork
 #'
-#' @param path_id KEGG pathway ID (e.g., "hsa:04110" or "04110").
-#' @param return_type Output type: "igraph" or "visNetwork".
+#' @param path_id KEGG pathway ID (e.g., 'hsa:04110' or '04110').
+#' @param return_type Output type: 'igraph' or 'visNetwork'.
 #' @param scaling_factor Numeric factor to scale node sizes.
 #' @return An igraph or visNetwork object representing the pathway.
-#' @details This function downloads the KGML file for the specified KEGG pathway, then parses it to generate a graph representation using either the igraph or visNetwork package. It styles nodes and edges based on their types the output can be used for visualization or further analysis. If differential expression results are provided, they can be mapped to the nodes using the function \code{map_results_to_graph}.
+#' @details This function downloads the KGML file for the specified KEGG pathway,
+#' then parses it to generate a graph representation using either the igraph or visNetwork package.
+#' It styles nodes and edges based on their types the output can be used for
+#' visualization or further analysis.
+#' If differential expression results are provided,
+#' they can be mapped to the nodes using the function \code{map_results_to_graph}.
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
 #' graph <- kegg_to_graph(pathway)
@@ -13,18 +18,14 @@
 #' @importFrom igraph graph_from_data_frame graph_attr make_empty_graph add_vertices delete_edges E V
 #'
 #' @export
-kegg_to_graph <- function(path_id,
-                          return_type = "igraph",
-                          scaling_factor = 1.5) {
+kegg_to_graph <- function(path_id, return_type = "igraph", scaling_factor = 1.5) {
   # Check arguments
-  return_type <- match.arg(
-    return_type,
-    choices = c("igraph", "visNetwork"),
-    several.ok = FALSE
-  )
+  return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
   # --- 0. Validate inputs ---
-  if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
+  if (!is_valid_pathway(path_id)) {
+    stop("Invalid KEGG pathway ID format.")
+  }
 
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
@@ -54,7 +55,9 @@ kegg_to_graph <- function(path_id,
   nodes_df <- add_group(nodes_df)
   nodes_df <- nodes_df[order(nodes_df$label), ]
 
-  if (nrow(edges_df)) edges_df <- style_edges(edges_df)
+  if (nrow(edges_df)) {
+    edges_df <- style_edges(edges_df)
+  }
 
   # --- 5. Build pathway name ---
   pathway_name <- paste0("(", path_id, ") ", get_pathway_name(path_id))
@@ -77,12 +80,14 @@ kegg_to_graph <- function(path_id,
 #'
 #' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
 #' The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
-#' 
+#'
 #' @param g An igraph object representing the pathway.
 #' @param de_results Named list of differential expression results.
-#' @param return_type Output type: "igraph" or "visNetwork".
-#' @param feature_column Column name in de_table containing KEGG IDs (if de_results is a single data.frame).
-#' @param value_column Column name in de_table containing values to map (if de_results is a single data.frame).
+#' @param return_type Output type: 'igraph' or 'visNetwork'.
+#' @param feature_column Column name in de_table containing KEGG IDs
+#' (if de_results is a single data.frame).
+#' @param value_column Column name in de_table containing values to map
+#' (if de_results is a single data.frame).
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
@@ -91,23 +96,17 @@ kegg_to_graph <- function(path_id,
 #' graph <- kegg_to_graph(pathway, return_type = "igraph")
 #' # Example differential expression results
 #' de_results <- data.frame(
-#'  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
-#' log2FoldChange = c(1.5, -2.0, 0.5)
+#'   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+#'   log2FoldChange = c(1.5, -2.0, 0.5)
 #' )
 #' vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
-#' 
+#'
 #' @export
-map_results_to_graph <- function(g,
-                                 de_results,
-                                 return_type = "visNetwork",
-                                 feature_column = NULL,
-                                 value_column = NULL) {
+map_results_to_graph <- function(
+    g, de_results, return_type = "visNetwork", feature_column = NULL,
+    value_column = NULL) {
   # Check arguments
-  return_type <- match.arg(
-    return_type,
-    choices = c("igraph", "visNetwork"),
-    several.ok = FALSE
-  )
+  return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
   message("Mapping differential expression results to nodes...")
 
@@ -115,21 +114,27 @@ map_results_to_graph <- function(g,
   if (!is.null(de_results)) {
     # If input is a data.frame, convert to default named list
     if (inherits(de_results, "data.frame")) {
-      de_results <- list(de_input = list(
-        de_table = de_results,
-        value_column = ifelse(is.null(value_column), "log2FoldChange", value_column),
-        feature_column = ifelse(is.null(feature_column), "KEGG_ids", feature_column)
-      ))
+      de_results <- list(de_input = list(de_table = de_results, value_column = ifelse(is.null(value_column),
+        "log2FoldChange", value_column
+      ), feature_column = ifelse(is.null(feature_column),
+        "KEGG_ids", feature_column
+      )))
     }
 
     # Check that de_results is a named list
-    if (!is.list(de_results) || is.null(names(de_results)) || any(names(de_results) == "")) {
+    if (!is.list(de_results) || is.null(names(de_results)) || any(names(de_results) ==
+      "")) {
       warning("de_results must be a named list or NULL. Ignoring de_results.")
       de_results <- NULL
     }
 
     # Keep only valid entries
-    de_results <- de_results[vapply(names(de_results), function(name) is_valid_de_entry(de_results[[name]], name), logical(1))]
+    de_results <- de_results[vapply(names(de_results), function(name) {
+      is_valid_de_entry(
+        de_results[[name]],
+        name
+      )
+    }, logical(1))]
   }
 
   # --- 1. Extract nodes and edges from igraph ---
@@ -172,10 +177,8 @@ map_results_to_graph <- function(g,
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
-
   # Shapes conversion for visNetwork
-  nodes_df$shape <- ifelse(
-    nodes_df$shape %in% c("rectangle", "vrectangle"), "box",
+  nodes_df$shape <- ifelse(nodes_df$shape %in% c("rectangle", "vrectangle"), "box",
     "dot"
   )
 
@@ -189,12 +192,10 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
 
-  v <- visNetwork::visOptions(
-    v,
-    highlightNearest = list(enabled = TRUE, degree = 2, hover = TRUE),
-    selectedBy = "group",
-    nodesIdSelection = TRUE
-  )
+  v <- visNetwork::visOptions(v, highlightNearest = list(
+    enabled = TRUE, degree = 2,
+    hover = TRUE
+  ), selectedBy = "group", nodesIdSelection = TRUE)
 
   v <- visNetwork::visInteraction(v, dragNodes = TRUE)
 
@@ -207,12 +208,8 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return An igraph object representing the graph.
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
-
   # Shapes conversion for igraph
-  nodes_df$shape <- ifelse(
-    nodes_df$shape == "box", "rectangle",
-    "circle"
-  )
+  nodes_df$shape <- ifelse(nodes_df$shape == "box", "rectangle", "circle")
 
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
@@ -232,7 +229,7 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
 #' @return nodes_df with updated 'group' column.
 add_group <- function(nodes_df) {
-  # The nodes that have as kegg name "undefined" are group nodes
+  # The nodes that have as kegg name 'undefined' are group nodes
   undefined_idx <- which(!is.na(nodes_df$kegg_name) & nodes_df$kegg_name == "undefined")
 
   # If there are no undefined nodes, return original df
@@ -246,14 +243,18 @@ add_group <- function(nodes_df) {
   # Iterate over undefined nodes using indeces
   for (i in seq_len(nrow(undefined_nodes))) {
     # If no components in group (empty), skip
-    if (is.na(undefined_nodes$components[i]) || undefined_nodes$components[i] == "") next # If group is NA
+    if (is.na(undefined_nodes$components[i]) || undefined_nodes$components[i] ==
+      "") {
+      next
+    } # If group is NA
 
-    # Get component ids and add the group label to them, add the group node itself to this list
+    # Get component ids and add the group label to them, add the group node
+    # itself to this list
     ids <- strsplit(undefined_nodes$components[i], ";", fixed = TRUE)[[1]]
     ids <- append(ids, undefined_nodes$id[i])
 
-    # Make group label
-    # group_label <- paste0("group_", undefined_nodes$id[i])
+    # Make group label group_label <- paste0('group_',
+    # undefined_nodes$id[i])
     group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";")
 
     # Assign group label to nodes_df
@@ -279,54 +280,52 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' Add tooltips to nodes for visNetwork visualization.
 #' @param nodes_df Data frame of nodes with columns: KEGG, label, source, value.
 #' @return nodes_df with added 'title' column for tooltips.
-#' @details The tooltip includes a button to the specific KEGG entry page. If multiple KEGG IDs are present, they are concatenated with '+' in the URL. It also adds information about the node name, source of differential expression data, and value.
+#' @details The tooltip includes a button to the specific KEGG entry page.
+#' If multiple KEGG IDs are present, they are concatenated with '+' in the URL.
+#' It also adds information about the node name, source of differential
+#' expression data, and value.
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
 
-  button_html <- ifelse(
-    is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "",
-    "",
+  button_html <- ifelse(is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "", "",
     paste0(
-      '<div style="text-align:center; margin-top:5px;">',
-      '<a href="', ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_),
-      '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">',
-      '<button type="button" style="',
-      "background-color:#4CAF50;",
-      "color:white;",
-      "border:none;",
-      "padding:5px 12px;",
-      "border-radius:5px;",
-      "cursor:pointer;",
-      'font-size:12px;">',
-      "KEGG entry</button></a></div>"
+      "<div style=\"text-align:center; margin-top:5px;\">", "<a href=\"",
+      ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_), "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"text-decoration:none;\">",
+      "<button type=\"button\" style=\"", "background-color:#4CAF50;", "color:white;",
+      "border:none;", "padding:5px 12px;", "border-radius:5px;", "cursor:pointer;",
+      "font-size:12px;\">", "KEGG entry</button></a></div>"
     )
   )
 
-  # Ensure no "NA" strings in tooltip
+  # Ensure no 'NA' strings in tooltip
   safe <- function(x) ifelse(is.na(x), "", as.character(x))
-  nodes_df$title <- ifelse(
-    safe(nodes_df$kegg_name) == "undefined",
-    paste0("Group Node Placeholder: ", nodes_df$group, "<br>"),
-    paste0(
-      "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) > 50, nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>",
-      "Source: ", safe(nodes_df$source), "<br>",
-      "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)), "<br>",
-      ifelse(safe(nodes_df$group) != "", paste0("Group: ", safe(nodes_df$group), "<br>"), "Not belonging to any group<br>"),
-      button_html
-    )
-  )
+  nodes_df$title <- ifelse(safe(nodes_df$kegg_name) == "undefined", paste0(
+    "Group Node Placeholder: ",
+    nodes_df$group, "<br>"
+  ), paste0(
+    "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) >
+      50, nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>", "Source: ", safe(nodes_df$source),
+    "<br>", "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3),
+      nsmall = 3
+    )), "<br>", ifelse(safe(nodes_df$group) != "", paste0(
+      "Group: ",
+      safe(nodes_df$group), "<br>"
+    ), "Not belonging to any group<br>"), button_html
+  ))
   return(nodes_df)
 }
 
 #' Style nodes based on their type for visNetwork visualization.
 #' @param nodes_df Data frame of nodes with a column 'type'.
 #' @param node_size_multiplier Numeric factor to scale node sizes (default: 1.2).
-#' @return nodes_df with added visual styling columns: shape, fixed, widthConstraint, heightConstraint, size.
+#' @return nodes_df with added visual styling columns:
+#' shape, fixed, widthConstraint, heightConstraint, size.
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
   # Base visual settings
   nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "box")
 
-  # Set size constraints for non-compound nodes (compute numeric vectors first)
+  # Set size constraints for non-compound nodes (compute numeric vectors
+  # first)
   widths_num <- as.numeric(nodes_df$width) * node_size_multiplier
   heights_num <- as.numeric(nodes_df$height) * node_size_multiplier
   non_comp_idx <- which(!is.na(nodes_df$type) & nodes_df$type != "compound")
@@ -355,33 +354,83 @@ style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
 #' @return edges_df with added visual styling columns: color, dashes, arrows, label.
 style_edges <- function(edges_df) {
   edge_style_map <- list(
-    compound = list(color = "black", dashes = FALSE, arrows = "to", label = ""),
-    hidden_compound = list(color = "lightgray", dashes = FALSE, arrows = "to", label = ""),
-    activation = list(color = "red", dashes = FALSE, arrows = "to", label = ""),
-    inhibition = list(color = "blue", dashes = FALSE, arrows = "tee", label = ""),
-    expression = list(color = "red", dashes = TRUE, arrows = "to", label = ""),
-    repression = list(color = "blue", dashes = TRUE, arrows = "tee", label = ""),
-    indirect_effect = list(color = "gray", dashes = TRUE, arrows = "to", label = ""),
-    state_change = list(color = "gray", dashes = TRUE, arrows = "", label = ""),
-    binding_association = list(color = "black", dashes = TRUE, arrows = "", label = ""),
-    dissociation = list(color = "gray", dashes = TRUE, arrows = "to", label = ""),
-    phosphorylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+p"),
-    dephosphorylation = list(color = "black", dashes = FALSE, arrows = "to", label = "-p"),
-    glycosylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+g"),
-    ubiquitination = list(color = "black", dashes = FALSE, arrows = "to", label = "+u"),
-    methylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+m"),
-    others_unknown = list(color = "black", dashes = TRUE, arrows = "to", label = "?"),
-    group_relation = list(color = "transparent", dashes = TRUE, arrows = "", label = "") # Invisible edges for group relations (only functional)
+    compound = list(
+      color = "black", dashes = FALSE, arrows = "to",
+      label = ""
+    ), hidden_compound = list(
+      color = "lightgray", dashes = FALSE,
+      arrows = "to", label = ""
+    ), activation = list(
+      color = "red", dashes = FALSE,
+      arrows = "to", label = ""
+    ), inhibition = list(
+      color = "blue", dashes = FALSE,
+      arrows = "tee", label = ""
+    ), expression = list(
+      color = "red", dashes = TRUE,
+      arrows = "to", label = ""
+    ), repression = list(
+      color = "blue", dashes = TRUE,
+      arrows = "tee", label = ""
+    ), indirect_effect = list(
+      color = "gray", dashes = TRUE,
+      arrows = "to", label = ""
+    ), state_change = list(
+      color = "gray", dashes = TRUE,
+      arrows = "", label = ""
+    ), binding_association = list(
+      color = "black", dashes = TRUE,
+      arrows = "", label = ""
+    ), dissociation = list(
+      color = "gray", dashes = TRUE,
+      arrows = "to", label = ""
+    ), phosphorylation = list(
+      color = "black", dashes = FALSE,
+      arrows = "to", label = "+p"
+    ), dephosphorylation = list(
+      color = "black", dashes = FALSE,
+      arrows = "to", label = "-p"
+    ), glycosylation = list(
+      color = "black", dashes = FALSE,
+      arrows = "to", label = "+g"
+    ), ubiquitination = list(
+      color = "black", dashes = FALSE,
+      arrows = "to", label = "+u"
+    ), methylation = list(
+      color = "black", dashes = FALSE,
+      arrows = "to", label = "+m"
+    ), others_unknown = list(
+      color = "black", dashes = TRUE,
+      arrows = "to", label = "?"
+    ), group_relation = list(
+      color = "transparent",
+      dashes = TRUE, arrows = "", label = ""
+    ) # Invisible edges for group relations
   )
 
   # https://builtin.com/data-science/and-in-r#:~:text=The%20single%20sign%20version%20%7C%20returns,first%20element%20of%20each%20vector.
   edges_df$subtype <- gsub("/", "_", edges_df$subtype)
-  edges_df$subtype[is.na(edges_df$subtype) | !(edges_df$subtype %in% names(edge_style_map))] <- "others_unknown"
+  edges_df$subtype[
+    is.na(edges_df$subtype) |
+      !(edges_df$subtype %in% names(edge_style_map))
+  ] <- "others_unknown"
 
-  edges_df$color <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$color, character(1))
-  edges_df$dashes <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$dashes, logical(1))
-  edges_df$arrows <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$arrows, character(1))
-  edges_df$label <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$label, character(1))
+  edges_df$color <- vapply(
+    edges_df$subtype, function(x) edge_style_map[[x]]$color,
+    character(1)
+  )
+  edges_df$dashes <- vapply(
+    edges_df$subtype, function(x) edge_style_map[[x]]$dashes,
+    logical(1)
+  )
+  edges_df$arrows <- vapply(
+    edges_df$subtype, function(x) edge_style_map[[x]]$arrows,
+    character(1)
+  )
+  edges_df$label <- vapply(
+    edges_df$subtype, function(x) edge_style_map[[x]]$label,
+    character(1)
+  )
 
   return(edges_df)
 }
@@ -398,31 +447,34 @@ add_results_nodes <- function(nodes_df, results_combined) {
   }
 
   warn <- FALSE
-  # Iterate through nodes_df and results_combined to map values
-  # For each node iterate over all results_combined
+  # Iterate through nodes_df and results_combined to map values For each node
+  # iterate over all results_combined
   for (i in seq_len(nrow(nodes_df))) {
     for (j in seq_len(nrow(results_combined))) {
       pattern <- results_combined$KEGG[j]
-      if (is.na(pattern) || pattern == "" || is.na(nodes_df$KEGG[i]) || nodes_df$KEGG[i] == "") next
+      if (is.na(pattern) || pattern == "" || is.na(nodes_df$KEGG[i]) || nodes_df$KEGG[i] ==
+        "") {
+        next
+      }
       node_ids <- strsplit(nodes_df$KEGG[i], ";", fixed = TRUE)[[1]]
 
-      if (pattern %in% node_ids) { # KEGG ids match (substring)
-        # If no value assigned to the node, assign the one from results_combined
+      if (pattern %in% node_ids) {
+        # KEGG ids match (substring) If no value assigned to the node,
+        # assign the one from results_combined
         if (is.na(nodes_df$plot_value[i])) {
           nodes_df$plot_value[i] <- results_combined$plot_value[j]
           nodes_df$source[i] <- results_combined$source[j]
-          # nodes_df$text[i] <- list()
-        } else { # If value warn
+          # nodes_df$text[i] <- list() If value warn
+        } else {
           warn <- TRUE
         }
 
         # This will be added in any case
         sep <- ","
         nodes_df$text[i] <- paste0(
-          nodes_df$text[i],
-          "Source: ", results_combined$source[j], sep,
-          "Value: ", results_combined$plot_value[j], sep,
-          "Id: ", results_combined$KEGG[j], ";"
+          nodes_df$text[i], "Source: ", results_combined$source[j],
+          sep, "Value: ", results_combined$plot_value[j], sep, "Id: ", results_combined$KEGG[j],
+          ";"
         )
       }
     }
@@ -436,7 +488,8 @@ add_results_nodes <- function(nodes_df, results_combined) {
 }
 
 #' Combine multiple differential expression results into a single data frame
-#' @param results_list A named list where each element is a differential expression result containing a data frame (de_table), value column name (value_column), and feature column name (feature_column)
+#' @param results_list A named list where each element is a differential expression result containing a `data.frame` 
+#' (de_table), value column name (value_column), and feature column name (feature_column)
 #' @return A combined data frame with columns: KEGG, value, source
 combine_results_in_dataframe <- function(results_list) {
   # If no results provided, return NULL
@@ -460,10 +513,8 @@ combine_results_in_dataframe <- function(results_list) {
     de_table[[feature_column]] <- remove_kegg_prefix(de_table[[feature_column]])
 
     data.frame(
-      KEGG = de_table[[feature_column]],
-      plot_value = de_table[[value_column]],
-      source = rep(de_entry_name, nrow(de_table)),
-      stringsAsFactors = FALSE
+      KEGG = de_table[[feature_column]], plot_value = de_table[[value_column]],
+      source = rep(de_entry_name, nrow(de_table)), stringsAsFactors = FALSE
     )
   })
 
@@ -478,14 +529,7 @@ combine_results_in_dataframe <- function(results_list) {
 #' @importFrom stats na.omit
 #' @importFrom grDevices colorRampPalette
 add_colors_to_nodes <- function(nodes_df) {
-  palettes <- c(
-    "RdBu"
-    # "PuOr",
-    # "RdGy",
-    # "PRGn",
-    # "PiYG",
-    # "BrBG"
-  )
+  palettes <- c("RdBu")
 
   # Get unique sources
   sources <- unique(na.omit(nodes_df$source))
@@ -496,7 +540,9 @@ add_colors_to_nodes <- function(nodes_df) {
     palette <- palettes[[((source_index - 1) %% length(palettes)) + 1]]
     palette_colors <- rev(brewer.pal(n = 11, name = palette)) # reverse the palette BuRe
     palette_ramp <- colorRampPalette(palette_colors)
-    nodes_to_color <- valid_nodes[valid_nodes$source == sources[source_index], , drop = FALSE]
+    nodes_to_color <- valid_nodes[valid_nodes$source == sources[source_index], ,
+      drop = FALSE
+    ]
 
     if (nrow(nodes_to_color) > 1) {
       range_val <- max(abs(as.numeric(nodes_to_color$plot_value)))
@@ -505,18 +551,21 @@ add_colors_to_nodes <- function(nodes_df) {
     } else {
       next
     }
-    # For ggplot: https://stackoverflow.com/questions/79132520/symmetric-colorbar-for-values-but-print-colorbar-for-actual-observed-values
+    # For ggplot:
+    # https://stackoverflow.com/questions/79132520/symmetric-colorbar-for-values-but-print-colorbar-for-actual-observed-values
 
     # Cut values using real numeric range (from -range_val to +range_val)
     # Generate breaks
     breaks_seq <- seq(-range_val, range_val, length.out = 101)
 
-    # Use the cut function to assign colors based on the breaks (cut retrieves the index of the corresponding bin)
-    # cut: https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut
-    # may be useful to add general info in the dataframe: https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
-    nodes_to_color$color <- palette_ramp(100)[
-      as.numeric(cut(as.numeric(nodes_to_color$plot_value), breaks = breaks_seq, include.lowest = TRUE))
-    ]
+    # Use the cut function to assign colors based on the breaks (cut
+    # retrieves the index of the corresponding bin) cut:
+    # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut
+    # may be useful to add general info in the dataframe:
+    # https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
+    nodes_to_color$color <- palette_ramp(100)[as.numeric(cut(as.numeric(nodes_to_color$plot_value),
+      breaks = breaks_seq, include.lowest = TRUE
+    ))]
 
     # Update main data frame
     valid_nodes$color[valid_nodes$source == sources[source_index]] <- nodes_to_color$color

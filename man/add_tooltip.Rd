@@ -16,5 +16,8 @@ nodes_df with added 'title' column for tooltips.
 Add tooltips to nodes for visNetwork visualization.
 }
 \details{
-The tooltip includes a button to the specific KEGG entry page. If multiple KEGG IDs are present, they are concatenated with '+' in the URL. It also adds information about the node name, source of differential expression data, and value.
+The tooltip includes a button to the specific KEGG entry page.
+If multiple KEGG IDs are present, they are concatenated with '+' in the URL.
+It also adds information about the node name, source of differential
+expression data, and value.
 }

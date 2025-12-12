@@ -17,11 +17,13 @@ map_results_to_graph(
 
 \item{de_results}{Named list of differential expression results.}
 
-\item{return_type}{Output type: "igraph" or "visNetwork".}
+\item{return_type}{Output type: 'igraph' or 'visNetwork'.}
 
-\item{feature_column}{Column name in de_table containing KEGG IDs (if de_results is a single data.frame).}
+\item{feature_column}{Column name in de_table containing KEGG IDs
+(if de_results is a single data.frame).}
 
-\item{value_column}{Column name in de_table containing values to map (if de_results is a single data.frame).}
+\item{value_column}{Column name in de_table containing values to map
+(if de_results is a single data.frame).}
 }
 \value{
 An igraph or visNetwork object with mapped results.
@@ -38,8 +40,8 @@ pathway <- "hsa04110" # Example pathway ID
 graph <- kegg_to_graph(pathway, return_type = "igraph")
 # Example differential expression results
 de_results <- data.frame(
- KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
-log2FoldChange = c(1.5, -2.0, 0.5)
+  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+  log2FoldChange = c(1.5, -2.0, 0.5)
 )
 vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
 

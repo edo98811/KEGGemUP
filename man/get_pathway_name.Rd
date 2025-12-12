@@ -7,7 +7,7 @@
 get_pathway_name(id)
 }
 \arguments{
-\item{id}{KEGG pathway ID (e.g., "hsa04110")}
+\item{id}{KEGG pathway ID (e.g., 'hsa04110')}
 }
 \value{
 A character string with the readable pathway name

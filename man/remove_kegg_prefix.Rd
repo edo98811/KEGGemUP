@@ -7,7 +7,8 @@
 remove_kegg_prefix(kegg_ids)
 }
 \arguments{
-\item{kegg_ids}{Character vector of KEGG IDs with prefixes (e.g., "cpd:C00022", "mmu:1234", "ko:K00001 ko:K00002")}
+\item{kegg_ids}{Character vector of KEGG IDs with prefixes
+(e.g., 'cpd:C00022', 'mmu:1234', 'ko:K00001 ko:K00002')}
 }
 \value{
 List of character vectors with KEGG IDs without prefixes

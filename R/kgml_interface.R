@@ -6,8 +6,8 @@
 #' \describe{
 #'   \item{from}{The ID of the source entry (node) in the pathway, corresponding to the `entry1` attribute in the KGML `<relation>` tag.}
 #'   \item{to}{The ID of the target entry (node) in the pathway, corresponding to the `entry2` attribute in the KGML `<relation>` tag.}
-#'   \item{type}{The general type of relationship between the two entries (e.g., `"ECrel"`, `"PPrel"`, `"GErel"`, `"PCrel"`, `"maplink"`). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.}
-#'   \item{subtype}{A more specific subtype of the relation, derived from the `<subtype>` child elements of the `<relation>` node (e.g., `"activation"`, `"inhibition"`, `"expression"`, `"compound"`). If no subtype is defined, this will be `NA`.}
+#'   \item{type}{The general type of relationship between the two entries (e.g., `'ECrel'`, `'PPrel'`, `'GErel'`, `'PCrel'`, `'maplink'`). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.}
+#'   \item{subtype}{A more specific subtype of the relation, derived from the `<subtype>` child elements of the `<relation>` node (e.g., `'activation'`, `'inhibition'`, `'expression'`, `'compound'`). If no subtype is defined, this will be `NA`.}
 #'   \item{rel_value}{A categorical value associated with the subtype, which encodes the apearence of the arrow (from the `value` attribute of `<subtype>`). If not present, this will be `NA`.}
 #' }
 #'
@@ -20,7 +20,7 @@
 #' contain one or more `<subtype>` elements that provide additional details about
 #' the interaction. The result is a tidy data.frame suitable for network analysis or
 #' visualization, where each row represents one relation–subtype pair.
-#' 
+#'
 #' @export
 parse_kgml_relations <- function(file) {
   doc <- read_xml(file)
@@ -35,20 +35,14 @@ parse_kgml_relations <- function(file) {
 
     if (length(subnodes) == 0) {
       data.frame(
-        from = entry1,
-        to = entry2,
-        type = type,
-        subtype = NA_character_,
+        from = entry1, to = entry2, type = type, subtype = NA_character_,
         rel_value = NA_character_ # value controls the vidth of edges
       )
     } else {
-      data.frame(
-        from = entry1,
-        to = entry2,
-        type = type,
-        subtype = xml_attr(subnodes, "name"),
-        rel_value = xml_attr(subnodes, "value")
-      )
+      data.frame(from = entry1, to = entry2, type = type, subtype = xml_attr(
+        subnodes,
+        "name"
+      ), rel_value = xml_attr(subnodes, "value"))
     }
   })
   edges_df <- do.call(rbind, rels_list)
@@ -57,11 +51,8 @@ parse_kgml_relations <- function(file) {
   if (is.null(edges_df)) {
     warning("No relations found in KGML file.")
     edges_df <- data.frame(
-      from = character(0),
-      to = character(0),
-      type = character(0),
-      subtype = character(0),
-      rel_value = character(0)
+      from = character(0), to = character(0), type = character(0),
+      subtype = character(0), rel_value = character(0)
     )
   }
 
@@ -77,18 +68,31 @@ parse_kgml_relations <- function(file) {
 #'
 #' @return A data.frame with the following columns:
 #' \describe{
-#'   \item{id}{Unique identifier of the entry within the KGML pathway (from the `id` attribute).}
-#'   \item{kegg_name}{The KEGG-specific name or identifier of the entity (from the `name` attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
-#'   \item{type}{Type of the node (from the `type` attribute), indicating the biological entity class such as `"gene"`, `"enzyme"`, `"compound"`, `"map"`, `"ortholog"`, or `"group"`.}
-#'   \item{link}{URL linking to the KEGG resource for this entry, if available (from the `link` attribute).}
-#'   \item{reaction}{Associated reaction ID(s), if any (from the `reaction` attribute). Typically present for enzyme entries.}
-#'   \item{graphics_name}{Display name for the entry, taken from the `name` attribute of the `<graphics>` node.}
+#'   \item{id}{Unique identifier of the entry within the KGML pathway 
+#' (from the `id` attribute).}
+#'   \item{kegg_name}{The KEGG-specific name or identifier of the entity 
+#' (from the `name` attribute). 
+#' This may include one or more KEGG identifiers such as gene IDs, 
+#' compound IDs, or enzyme EC numbers. Preceded by organism ID}
+#'   \item{type}{Type of the node (from the `type` attribute), indicating the biological 
+#' entity class such as `'gene'`, `'enzyme'`, `'compound'`, `'map'`, `'ortholog'`, or `'group'`.}
+#'   \item{link}{URL linking to the KEGG resource for this entry, if available 
+#' (from the `link` attribute).}
+#'   \item{reaction}{Associated reaction ID(s), if any (from the `reaction` attribute). 
+#' Typically present for enzyme entries.}
+#'   \item{graphics_name}{Display name for the entry, taken from the `name`
+#'  attribute of the `<graphics>` node.}
 #'   \item{label}{Text label for visualization purposes.}
-#'   \item{fgcolor}{Foreground color of the graphical element (from the `fgcolor` attribute of `<graphics>`).}
-#'   \item{bgcolor}{Background color of the graphical element (from the `bgcolor` attribute of `<graphics>`).}
-#'   \item{graphics_type}{Shape or representation type of the graphical element (from the `type` attribute of `<graphics>`), such as `"rectangle"`, `"circle"`, or `"line"`.}
-#'   \item{x}{X-coordinate of the node’s position in the pathway diagram (from the `x` attribute of `<graphics>`).}
-#'   \item{y}{Y-coordinate of the node’s position in the pathway diagram (from the `y` attribute of `<graphics>`).}
+#'   \item{fgcolor}{Foreground color of the graphical element
+#'  (from the `fgcolor` attribute of `<graphics>`).}
+#'   \item{bgcolor}{Background color of the graphical element 
+#' (from the `bgcolor` attribute of `<graphics>`).}
+#'   \item{graphics_type}{Shape or representation type of the graphical element 
+#' (from the `type` attribute of `<graphics>`), such as `'rectangle'`, `'circle'`, or `'line'`.}
+#'   \item{x}{X-coordinate of the node’s position in the pathway diagram 
+#' (from the `x` attribute of `<graphics>`).}
+#'   \item{y}{Y-coordinate of the node’s position in the pathway diagram 
+#' (from the `y` attribute of `<graphics>`).}
 #'   \item{width}{Width of the graphical element (from the `width` attribute of `<graphics>`).}
 #'   \item{height}{Height of the graphical element (from the `height` attribute of `<graphics>`).}
 #' }
@@ -116,27 +120,23 @@ parse_kgml_entries <- function(file) {
 
   # Map over each entry (can then have do.call but do.call returns dataframe)
   nodes_list <- lapply(entries, function(entry) {
-  graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
+    graphics_nodes <- xml2::xml_find_all(entry, ".//graphics")
     group_components <- xml2::xml_find_all(entry, ".//component")
 
     # Base row with initialized attributes
     node_row <- data.frame(
-      name = xml2::xml_attr(entry, "id"), # set name because thats how igraph builds connections
-      id = xml2::xml_attr(entry, "id"),
-      kegg_name = xml2::xml_attr(entry, "name"),
-      type = xml2::xml_attr(entry, "type"),
-      link = xml2::xml_attr(entry, "link"),
-      reaction = xml2::xml_attr(entry, "reaction"),
-      graphics_name = NA_character_,
-      label = NA_character_,
-      fgcolor = NA_character_,
-      bgcolor = NA_character_,
-      graphics_type = NA_character_,
-      x = NA_character_,
-      y = NA_character_,
-      width = NA_character_,
-      height = NA_character_,
-      components = NA_character_
+      name = xml2::xml_attr(entry, "id"), id = xml2::xml_attr(
+        entry,
+        "id"
+      ), kegg_name = xml2::xml_attr(entry, "name"), type = xml2::xml_attr(
+        entry,
+        "type"
+      ), link = xml2::xml_attr(entry, "link"), reaction = xml2::xml_attr(
+        entry,
+        "reaction"
+      ), graphics_name = NA_character_, label = NA_character_, fgcolor = NA_character_,
+      bgcolor = NA_character_, graphics_type = NA_character_, x = NA_character_,
+      y = NA_character_, width = NA_character_, height = NA_character_, components = NA_character_
     )
 
     # Extract graphics attributes (only first graphics node is used)
@@ -158,7 +158,9 @@ parse_kgml_entries <- function(file) {
 
     # Extract group components
     if (length(group_components) > 0) {
-      node_row$components <- paste(xml2::xml_attr(group_components, "id"), collapse = ";")
+      node_row$components <- paste(xml2::xml_attr(group_components, "id"),
+        collapse = ";"
+      )
     }
 
     node_row

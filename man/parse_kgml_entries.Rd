@@ -12,18 +12,31 @@ parse_kgml_entries(file)
 \value{
 A data.frame with the following columns:
 \describe{
-\item{id}{Unique identifier of the entry within the KGML pathway (from the \code{id} attribute).}
-\item{kegg_name}{The KEGG-specific name or identifier of the entity (from the \code{name} attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID}
-\item{type}{Type of the node (from the \code{type} attribute), indicating the biological entity class such as \code{"gene"}, \code{"enzyme"}, \code{"compound"}, \code{"map"}, \code{"ortholog"}, or \code{"group"}.}
-\item{link}{URL linking to the KEGG resource for this entry, if available (from the \code{link} attribute).}
-\item{reaction}{Associated reaction ID(s), if any (from the \code{reaction} attribute). Typically present for enzyme entries.}
-\item{graphics_name}{Display name for the entry, taken from the \code{name} attribute of the \verb{<graphics>} node.}
+\item{id}{Unique identifier of the entry within the KGML pathway
+(from the \code{id} attribute).}
+\item{kegg_name}{The KEGG-specific name or identifier of the entity
+(from the \code{name} attribute).
+This may include one or more KEGG identifiers such as gene IDs,
+compound IDs, or enzyme EC numbers. Preceded by organism ID}
+\item{type}{Type of the node (from the \code{type} attribute), indicating the biological
+entity class such as \code{'gene'}, \code{'enzyme'}, \code{'compound'}, \code{'map'}, \code{'ortholog'}, or \code{'group'}.}
+\item{link}{URL linking to the KEGG resource for this entry, if available
+(from the \code{link} attribute).}
+\item{reaction}{Associated reaction ID(s), if any (from the \code{reaction} attribute).
+Typically present for enzyme entries.}
+\item{graphics_name}{Display name for the entry, taken from the \code{name}
+attribute of the \verb{<graphics>} node.}
 \item{label}{Text label for visualization purposes.}
-\item{fgcolor}{Foreground color of the graphical element (from the \code{fgcolor} attribute of \verb{<graphics>}).}
-\item{bgcolor}{Background color of the graphical element (from the \code{bgcolor} attribute of \verb{<graphics>}).}
-\item{graphics_type}{Shape or representation type of the graphical element (from the \code{type} attribute of \verb{<graphics>}), such as \code{"rectangle"}, \code{"circle"}, or \code{"line"}.}
-\item{x}{X-coordinate of the node’s position in the pathway diagram (from the \code{x} attribute of \verb{<graphics>}).}
-\item{y}{Y-coordinate of the node’s position in the pathway diagram (from the \code{y} attribute of \verb{<graphics>}).}
+\item{fgcolor}{Foreground color of the graphical element
+(from the \code{fgcolor} attribute of \verb{<graphics>}).}
+\item{bgcolor}{Background color of the graphical element
+(from the \code{bgcolor} attribute of \verb{<graphics>}).}
+\item{graphics_type}{Shape or representation type of the graphical element
+(from the \code{type} attribute of \verb{<graphics>}), such as \code{'rectangle'}, \code{'circle'}, or \code{'line'}.}
+\item{x}{X-coordinate of the node’s position in the pathway diagram
+(from the \code{x} attribute of \verb{<graphics>}).}
+\item{y}{Y-coordinate of the node’s position in the pathway diagram
+(from the \code{y} attribute of \verb{<graphics>}).}
 \item{width}{Width of the graphical element (from the \code{width} attribute of \verb{<graphics>}).}
 \item{height}{Height of the graphical element (from the \code{height} attribute of \verb{<graphics>}).}
 }

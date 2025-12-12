@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{expand_keggs}
 \alias{expand_keggs}
-\title{Handle multiple KEGG IDs in a single string separated by ";"}
+\title{Handle multiple KEGG IDs in a single string separated by ';'}
 \usage{
 expand_keggs(kegg_df)
 }
@@ -13,5 +13,5 @@ expand_keggs(kegg_df)
 Data frame with a single column 'KEGG' containing individual KEGG IDs
 }
 \description{
-Handle multiple KEGG IDs in a single string separated by ";"
+Handle multiple KEGG IDs in a single string separated by ';'
 }

@@ -1,6 +1,6 @@
 #' Convert KEGG pathway ID to readable pathway name
 #'
-#' @param id KEGG pathway ID (e.g., "hsa04110")
+#' @param id KEGG pathway ID (e.g., 'hsa04110')
 #' @return A character string with the readable pathway name
 get_pathway_name <- function(id) {
   tryCatch(
@@ -16,7 +16,7 @@ get_pathway_name <- function(id) {
 }
 
 #' Download and cache KEGG KGML files.
-#' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
+#' @param pathway_id KEGG pathway ID (e.g., 'hsa04110').
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
 #' @param file_name Optional file name to save the KGML file directly.
 #' @return Path to the cached KGML file.
@@ -24,10 +24,10 @@ get_pathway_name <- function(id) {
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
-#' @export 
+#' @export
 download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
-  # TODO: check pathway_id and file_name validity
-  # Determine mode: cache or file
+  # TODO: check pathway_id and file_name validity Determine mode: cache or
+  # file
   if (!is.null(bfc) && !is.null(file_name)) {
     stop("Provide either bfc OR file_name, not both.")
   } else if (!is.null(bfc)) {
@@ -50,10 +50,12 @@ download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
     if (nrow(qr) > 0) {
       cached_path <- bfcpath(bfc, qr$rid[1])
 
-      if (file.exists(cached_path)) { # if file exists return path
+      if (file.exists(cached_path)) {
+        # if file exists return path
         message("Using cached KEGG KGML for ", pathway_id)
         return(invisible(cached_path))
-      } else { # file missing, re-download
+      } else {
+        # file missing, re-download
         message("Cache entry found but file missing. Re-downloading.")
       }
     }
@@ -75,8 +77,8 @@ download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
   # Check success
   if (resp_is_error(resp)) {
     warning(
-      "Failed to download KGML from URL: ", url,
-      " (HTTP status ", resp_status(resp), ")"
+      "Failed to download KGML from URL: ", url, " (HTTP status ", resp_status(resp),
+      ")"
     )
     return(NULL)
   }
@@ -86,12 +88,14 @@ download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
 
   write_xml(kgml_xml, file_name)
 
-  if (mode == "cache") { # add to BiocFileCache
+  if (mode == "cache") {
+    # add to BiocFileCache
     res <- bfcadd(bfc, rname = rname, fpath = file_name, action = "copy")
     rid <- names(res)
     message("Downloaded & cached: ", pathway_id)
     return(bfcpath(bfc, rid))
-  } else { # else return path
+  } else {
+    # else return path
     return(file_name)
   }
 }
