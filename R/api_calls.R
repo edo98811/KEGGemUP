@@ -25,7 +25,7 @@ get_pathway_name <- function(id) {
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
 #' @export 
-get_and_cache_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
+download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
   # TODO: check pathway_id and file_name validity
   # Determine mode: cache or file
   if (!is.null(bfc) && !is.null(file_name)) {

@@ -26,13 +26,12 @@ kegg_to_graph <- function(path_id,
   # --- 0. Validate inputs ---
   if (!is_valid_pathway(path_id)) stop("Invalid KEGG pathway ID format.")
 
-
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
 
   # --- 1. Download KGML ---
-  kgml_file <- get_and_cache_kgml(path_id, bfc_kegg)
+  kgml_file <- download_kgml(path_id, bfc_kegg)
   if (is.null(kgml_file)) {
     warning("Failed to download KGML file for pathway ID: ", path_id)
     return(NULL)

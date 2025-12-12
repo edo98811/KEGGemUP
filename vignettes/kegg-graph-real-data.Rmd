@@ -143,10 +143,10 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
 
 You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertise with graph analysis in R.
-The first thing you can do is download a KGML file from KEGG. You can do this using the function `download_kegg_kgml()`. The only parameter that needs to be provided is the destination directory where to save the file. The function will return the path to the downloaded file.
+The first thing you can do is download a KGML file from KEGG. You can do this using the function `download_kgml()`. The only parameter that needs to be provided is the destination directory where to save the file. The function will return the path to the downloaded file.
 
 ```{r kgml-downloading}
-kgml_file <- get_and_cache_kgml("hsa04010", file_name = tempfile(fileext = "xml"))
+kgml_file <- download_kgml("hsa04010", file_name = tempfile(fileext = "xml"))
 ```
 
 ```{r kgml-parsing}
