@@ -108,6 +108,11 @@ map_results_to_graph <- function(
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
+  # Check that g is an igraph object
+  if (!inherits(g, "igraph")) {
+    stop("Input graph 'g' must be an igraph object.")
+  }
+
   message("Mapping differential expression results to nodes...")
 
   # --- 0. Validate each entry in de_results ---

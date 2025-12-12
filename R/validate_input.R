@@ -16,8 +16,7 @@ is_valid_de_entry <- function(de_entry, name) {
     )
     return(FALSE)
   }
-  if (!inherits(de_entry$de_table, "data.frame")) {
-    warning("de_results[['", name, "']]$de_table must be a data frame")
+  if (!is_valid_dataframe(de_entry$de_table)) {
     return(FALSE)
   }
   # Check that value_column is character and present in de_table
@@ -104,4 +103,40 @@ is_valid_pathway <- function(pathway_id) {
     return(FALSE)
   }
   grepl("^[a-z]{2,3}\\d{5}$", pathway_id)
+}
+
+
+is_valid_dataframe <- function(obj, name = "object") {
+  # Non-null
+  if (is.null(obj)) {
+    warning(name, " is NULL")
+    return(FALSE)
+  }
+
+  # Single object (length 1 for atomic, for list/data.frame it’s rows > 0)
+  if (is.atomic(obj) && length(obj) != 1) {
+    warning(name, " is not a single object, make sure you are not providing the results directly from MArrayLM if using limma")
+    return(FALSE)
+  }
+
+  # Must inherit from data.frame
+  if (!inherits(obj, "data.frame")) {
+    warning(name, " must be a data frame, but is of class: ", paste(class(obj), collapse = "/"))
+    return(FALSE)
+  }
+
+  # Non-empty (has rows and columns)
+  if (nrow(obj) == 0 || ncol(obj) == 0) {
+    warning(name, " is empty (0 rows or 0 columns)")
+    return(FALSE)
+  }
+
+  # Column names exist
+  if (is.null(colnames(obj)) || any(colnames(obj) == "")) {
+    warning(name, " has missing or empty column names")
+    return(FALSE)
+  }
+
+  # Passed all checks
+  return(TRUE)
 }
