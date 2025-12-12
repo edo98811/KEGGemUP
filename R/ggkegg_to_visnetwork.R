@@ -1,6 +1,6 @@
 #' Transform a ggkegg graph to igraph or visNetwork
 #'
-#' @param path_id KEGG pathway ID (e.g., 'hsa:04110' or '04110').
+#' @param pathway_id KEGG pathway ID (e.g., 'hsa:04110' or '04110').
 #' @param return_type Output type: 'igraph' or 'visNetwork'.
 #' @param scaling_factor Numeric factor to scale node sizes.
 #' @return An igraph or visNetwork object representing the pathway.
@@ -18,12 +18,12 @@
 #' @importFrom igraph graph_from_data_frame graph_attr make_empty_graph add_vertices delete_edges E V
 #'
 #' @export
-kegg_to_graph <- function(path_id, return_type = "igraph", scaling_factor = 1.5) {
+kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1.5) {
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
   # --- 0. Validate inputs ---
-  if (!is_valid_pathway(path_id)) {
+  if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
   }
 
@@ -32,9 +32,9 @@ kegg_to_graph <- function(path_id, return_type = "igraph", scaling_factor = 1.5)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
 
   # --- 1. Download KGML ---
-  kgml_file <- download_kgml(path_id, bfc_kegg)
+  kgml_file <- download_kgml(pathway_id, bfc_kegg)
   if (is.null(kgml_file)) {
-    warning("Failed to download KGML file for pathway ID: ", path_id)
+    warning("Failed to download KGML file for pathway ID: ", pathway_id)
     return(NULL)
   }
 
@@ -60,7 +60,7 @@ kegg_to_graph <- function(path_id, return_type = "igraph", scaling_factor = 1.5)
   }
 
   # --- 5. Build pathway name ---
-  pathway_name <- paste0("(", path_id, ") ", get_pathway_name(path_id))
+  pathway_name <- paste0("(", pathway_id, ") ", get_pathway_name(pathway_id))
 
   # --- 5. Build ---
   result <- switch(return_type,

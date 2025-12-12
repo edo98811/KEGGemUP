@@ -1,12 +1,11 @@
 test_that("is_valid_de_entry works as expected", {
-
   # ---- Valid input ----
   de_table <- data.frame(
     gene = c("A", "B"),
     logFC = c(1.2, -0.5),
     p_val = c(0.01, 0.2)
   )
-  
+
   valid_entry <- list(
     de_table = de_table,
     value_column = "logFC",
@@ -52,5 +51,21 @@ test_that("is_valid_de_entry works as expected", {
 
   # This checks logic– if 'rownames' allowed, expect TRUE
   expect_true(is_valid_de_entry(rowname_entry, "rowname_entry"))
+})
 
+
+test_that("is_valid_pathway correctly identifies valid and invalid KEGG IDs", {
+  # Valid KEGG IDs
+  expect_true(is_valid_pathway("hsa04110"))
+  expect_true(is_valid_pathway("mmu00010"))
+
+  # Invalid KEGG IDs
+  expect_false(is_valid_pathway("04110")) # numeric-only 5-digit
+  expect_false(is_valid_pathway("hsa0411a")) # letters in numeric part
+  expect_false(is_valid_pathway("0411a")) # letters in numeric-only
+  expect_false(is_valid_pathway(4110)) # numeric input, not character
+  expect_false(is_valid_pathway(c("hsa04110", "mmu00010"))) # length > 1
+  expect_false(is_valid_pathway("")) # empty string
+  expect_false(is_valid_pathway(NULL)) # NULL input
+  expect_false(is_valid_pathway(NA)) # NA input
 })

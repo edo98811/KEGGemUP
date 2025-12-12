@@ -57,6 +57,11 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
     stop("Either 'directory' or 'bfc' must be provided.")
   }
 
+  # Validate pathway ID format
+  if (!is_valid_pathway(pathway_id)) {
+    stop("Invalid KEGG pathway ID format.")
+  }
+
   # Cache key / name
   rname <- paste0(pathway_id, ".xml")
 
