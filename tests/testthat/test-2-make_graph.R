@@ -25,7 +25,6 @@ test_that("parse_kgml_edges load relationsps correctly", {
 })
 
 test_that("parse_kgml_entries loads empty edges  correctly", {
-
   expect_warning(edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty)), "No relations found in KGML file.")
 
   expect_true(nrow(edges_df) == 0)
@@ -90,4 +89,76 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
 
   # unknown compound keeps original ID
   expect_equal(res$label[3], "C99999")
+})
+
+
+# Example test using mockery
+test_that("download_kgml works without hitting KEGG API", {
+  
+  # Create temporary BiocFileCache and directory
+  bfc <- BiocFileCache(tempdir(), ask = FALSE)
+  temp_dir <- tempdir()
+  valid_pathway <- "hsa04110"
+
+  # Create a fake XML response
+  fake_xml <- read_xml("<pathway name='fake_pathway'></pathway>")
+
+  # Create mocks for httr2 functions
+  mock_req_retry <- function(req, max_tries = 1) req
+  mock_req_perform <- function(req, error_call = FALSE) structure(list(), class = "response")
+  mock_resp_is_error <- function(resp) FALSE
+  mock_resp_body_xml <- function(resp) fake_xml
+  mock_resp_status <- function(resp) 200
+
+  # Use with_mocked_bindings to replace httr2 functions within this scope
+  kgml_path <- suppressMessages(with_mocked_bindings(
+    download_kgml(
+      valid_pathway,
+      directory = temp_dir
+    ),
+    request = function(url) list(url = url),
+    req_retry = mock_req_retry,
+    req_perform = mock_req_perform,
+    resp_is_error = mock_resp_is_error,
+    resp_body_xml = mock_resp_body_xml,
+    resp_status = mock_resp_status
+  ))
+
+  # Directory mode checks
+  expect_true(file.exists(kgml_path))
+  expect_true(grepl("\\.xml$", kgml_path))
+
+  # Cache mode with same mocks
+  kgml_cache <- suppressMessages(with_mocked_bindings(
+    download_kgml(
+      valid_pathway,
+      bfc = bfc
+    ),
+    request = function(url) list(url = url),
+    req_retry = mock_req_retry,
+    req_perform = mock_req_perform,
+    resp_is_error = mock_resp_is_error,
+    resp_body_xml = mock_resp_body_xml,
+    resp_status = mock_resp_status
+  ))
+
+  expect_true(file.exists(kgml_cache))
+  expect_true(grepl("\\.xml$", kgml_cache))
+
+  # Second download (should reuse cache)
+  expect_message(
+    kgml_cache2 <- with_mocked_bindings(
+      download_kgml(valid_pathway, bfc = bfc),
+      request = function(url) list(url = url),
+      req_retry = mock_req_retry,
+      req_perform = mock_req_perform,
+      resp_is_error = mock_resp_is_error,
+      resp_body_xml = mock_resp_body_xml,
+      resp_status = mock_resp_status
+    ),
+    "Using cached KEGG KGML"
+  )
+
+  # Test that cached path is reused
+  expect_equal(kgml_cache, kgml_cache2)
 })

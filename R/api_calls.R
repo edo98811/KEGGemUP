@@ -3,7 +3,7 @@
 #' @param id KEGG pathway ID (e.g., 'hsa04110')
 #' @return A character string with the readable pathway name
 #' @importFrom KEGGREST keggGet
-#' @noRd 
+#' @noRd
 get_pathway_name <- function(id) {
   tryCatch(
     {
@@ -26,40 +26,52 @@ get_pathway_name <- function(id) {
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
-#' 
+#'
 #' @examples
 #' data_dir <- tempdir()
 #' kgml_path <- download_kgml("hsa04110", file_path = data_dir)
 #' @export
 download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
-  # TODO: check pathway_id and file_name validity Determine mode: cache or
-  # file
+
+  # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
-    stop("Provide either bfc OR file_name, not both.")
+    stop("Provide either 'bfc' OR 'directory', not both.")
   } else if (!is.null(bfc)) {
+    # Check that bfc is a BiocFileCache object
+    if (!inherits(bfc, "BiocFileCache")) {
+      stop("'bfc' must be a valid BiocFileCache object.")
+    }
     mode <- "cache"
   } else if (!is.null(directory)) {
-    mode <- "file"
+    # Check that directory is a single string
+    if (!is.character(directory) || length(directory) != 1) {
+      stop("'directory' must be a single string specifying a valid path.")
+    }
+    # Optionally, create the directory if it does not exist
+    if (!dir.exists(directory)) {
+      dir.create(directory, recursive = TRUE)
+      message("Created directory: ", directory)
+    }
+    mode <- "dir"
   } else {
-    stop("file_name or bfc must be provided.")
+    stop("Either 'directory' or 'bfc' must be provided.")
   }
 
-  if (mode == "cache") {
-    # Cache key / name
-    rname <- paste0(pathway_id, ".xml")
+  # Cache key / name
+  rname <- paste0(pathway_id, ".xml")
 
+  if (mode == "cache") {
     # Check cache
     qr <- bfcquery(bfc, rname, field = "rname")
 
     # Check if file exists
-
     if (nrow(qr) > 0) {
       cached_path <- bfcpath(bfc, qr$rid[1])
 
       if (file.exists(cached_path)) {
         # if file exists return path
         message("Using cached KEGG KGML for ", pathway_id)
-        return(invisible(cached_path))
+        return(cached_path)
       } else {
         # file missing, re-download
         message("Cache entry found but file missing. Re-downloading.")
@@ -69,7 +81,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
     # Temporary file to store KGML
     file_name <- tempfile(fileext = ".xml")
   } else {
-    file_name <- path.expand(file_name) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+    file_name <- path.expand(file.path(directory, rname)) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
   }
 
 
