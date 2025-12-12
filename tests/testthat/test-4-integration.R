@@ -2,8 +2,15 @@ test_that("test graph is correctly generated", {
   fake_bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   with_mocked_bindings(
-    get_kegg_compounds = function(...) real_compounds,
-    get_kegg_glycans = function(...) real_glycans,
+    get_kegg_db = function(bfc_arg, db_type) {
+      if (db_type == "compound") {
+        return(real_compounds)
+      } else if (db_type == "glycan") {
+        return(real_glycans)
+      } else {
+        stop("Unexpected db_type")
+      }
+    },
     download_kgml = function(...) kgml_path,
     parse_kgml_entries = function(...) expected_nodes,
     parse_kgml_relations = function(...) expected_edges,
@@ -20,8 +27,15 @@ test_that("test graph is correctly generated", {
 
 
   with_mocked_bindings(
-    get_kegg_compounds = function(...) real_compounds,
-    get_kegg_glycans = function(...) real_glycans,
+    get_kegg_db = function(bfc_arg, db_type) {
+      if (db_type == "compound") {
+        return(real_compounds)
+      } else if (db_type == "glycan") {
+        return(real_glycans)
+      } else {
+        stop("Unexpected db_type")
+      }
+    },
     download_kgml = function(...) kgml_path,
     parse_kgml_entries = function(...) expected_nodes,
     parse_kgml_relations = function(...) expected_edges,
@@ -40,8 +54,15 @@ test_that("results are mapped on test graph", {
   fake_bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   with_mocked_bindings(
-    get_kegg_compounds = function(...) real_compounds,
-    get_kegg_glycans = function(...) real_glycans,
+    get_kegg_db = function(bfc_arg, db_type) {
+      if (db_type == "compound") {
+        return(real_compounds)
+      } else if (db_type == "glycan") {
+        return(real_glycans)
+      } else {
+        stop("Unexpected db_type")
+      }
+    },
     download_kgml = function(...) kgml_path,
     parse_kgml_entries = function(...) expected_nodes,
     parse_kgml_relations = function(...) expected_edges,

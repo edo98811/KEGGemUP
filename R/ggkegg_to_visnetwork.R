@@ -626,8 +626,8 @@ add_compound_names <- function(nodes_df, bfc) {
   compounds_in_graph[is.na(compounds_in_graph)] <- ""
   compounds_in_graph <- compounds_in_graph[idx]
 
-  compounds <- get_kegg_compounds(bfc) # expect named vector mapping KEGG id -> name
-  glycan <- get_kegg_glycans(bfc) # expect named vector mapping KEGG id -> name
+  compounds <- get_kegg_db(bfc, "compound") # expect named vector mapping KEGG id -> name
+  glycan <- get_kegg_db(bfc, "glycan") # expect named vector mapping KEGG id -> name
 
   # safe lookup: if not found, use original id or empty string
   labels <- vapply(compounds_in_graph, function(id) {

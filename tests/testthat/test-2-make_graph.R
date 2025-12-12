@@ -73,8 +73,15 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
   bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   with_mocked_bindings(
-    get_kegg_compounds = mock(real_compounds),
-    get_kegg_glycans = mock(real_glycans),
+    get_kegg_db = function(bfc_arg, db_type) {
+      if (db_type == "compound") {
+        return(real_compounds)
+      } else if (db_type == "glycan") {
+        return(real_glycans)
+      } else {
+        stop("Unexpected db_type")
+      }
+    },
     {
       res <- add_compound_names(nodes_df_basic, bfc)
     }
@@ -94,7 +101,6 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
 
 # Example test using mockery
 test_that("download_kgml works without hitting KEGG API", {
-  
   # Create temporary BiocFileCache and directory
   bfc <- BiocFileCache(tempdir(), ask = FALSE)
   temp_dir <- tempdir()

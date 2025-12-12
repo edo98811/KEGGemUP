@@ -123,44 +123,16 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   }
 }
 
-#' Get KEGG compounds with caching.
-#' @param bfc A BiocFileCache object for caching.
-#' @return A named character vector of KEGG compounds.
-#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
-#' @importFrom KEGGREST keggList
-#' @noRd
-get_kegg_compounds <- function(bfc) {
-  cache_name <- "kegg_compounds.rds"
-
-  # Check if cache exists
-  qr <- bfcquery(bfc, cache_name, field = "rname")
-
-  if (nrow(qr) > 0) {
-    message("Loading KEGG compounds from cache...")
-    compounds <- readRDS(bfcpath(bfc, qr$rid[1]))
-    return(compounds)
-  }
-
-  # Otherwise download from KEGG
-  message("Downloading KEGG compounds...")
-  kegg_compounds <- KEGGREST::keggList("compound")
-
-  # Save to cache
-  path <- bfcnew(bfc, rname = cache_name, ext = ".rds")
-  saveRDS(kegg_compounds, file = path)
-
-  return(kegg_compounds)
-}
-
-#' Get KEGG glycans with caching.
+#' Get KEGG db with caching.
 #'
 #' @param bfc A BiocFileCache object for caching.
-#' @return A data frame with KEGG glycan IDs and names.
+#' @param db_name KEGG database name (e.g., 'compound', 'glycan').
+#' @return A data frame with KEGG IDs and names.
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
 #' @importFrom KEGGREST keggList
 #' @noRd
-get_kegg_glycans <- function(bfc) {
-  cache_name <- "kegg_glycans.rds"
+get_kegg_db <- function(bfc, db_name = "compound") {
+  cache_name <- paste0(db_name, ".rds")
 
   # Check if cache exists
   qr <- BiocFileCache::bfcquery(bfc, cache_name, field = "rname")
@@ -172,8 +144,8 @@ get_kegg_glycans <- function(bfc) {
   }
 
   # Otherwise download from KEGG
-  message("Downloading KEGG glycans...")
-  kegg_glycans <- KEGGREST::keggList("glycan")
+  message("Downloading KEGG ", db_name, "...")
+  kegg_glycans <- KEGGREST::keggList(db_name)
 
   # Save to cache
   path <- BiocFileCache::bfcnew(bfc, rname = cache_name, ext = ".rds")
