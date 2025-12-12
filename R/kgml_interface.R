@@ -173,6 +173,7 @@ parse_kgml_entries <- function(file) {
 #' Add columns to nodes_df with default values
 #' @param nodes_df Data frame of nodes parsed from KGML
 #' @return Data frame with additional columns for styling and DE results
+#' @noRd
 add_columns_nodes_df <- function(nodes_df) {
   nodes_df$plot_value <- NA_real_
   nodes_df$source <- NA_character_

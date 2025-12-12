@@ -2,6 +2,7 @@
 #' @param kegg_ids Character string of KEGG IDs with prefixes 
 #' (e.g., 'cpd:C00022 mmu:1234 ko:K00001 ko:K00002')
 #' @return Character string of KEGG IDs without prefixes, separated by ';'
+#' @noRd
 remove_kegg_prefix_str <- function(kegg_ids) {
   # Remove prefix (e.g., 'cpd:', 'mmu:', 'ko:', 'path:')
   separated_elements <- strsplit(kegg_ids, " ")
@@ -14,6 +15,7 @@ remove_kegg_prefix_str <- function(kegg_ids) {
 #' @param kegg_ids Character vector of KEGG IDs with prefixes 
 #' (e.g., 'cpd:C00022', 'mmu:1234', 'ko:K00001 ko:K00002')
 #' @return List of character vectors with KEGG IDs without prefixes
+#' @noRd
 remove_kegg_prefix <- function(kegg_ids) {
   # Remove prefix (e.g., 'cpd:', 'mmu:', 'ko:', 'path:')
   ids <- vapply(kegg_ids, function(x) sub("^[a-z]+:", "", x), FUN.VALUE = character(1))
@@ -23,6 +25,7 @@ remove_kegg_prefix <- function(kegg_ids) {
 #' Handle multiple KEGG IDs in a single string separated by ';'
 #' @param kegg_df Data frame with at least two columns: 'name' and 'KEGG'
 #' @return Data frame with a single column 'KEGG' containing individual KEGG IDs
+#' @noRd
 expand_keggs <- function(kegg_df) {
   # Initialize empty vectors to store results
   ids_out <- c()

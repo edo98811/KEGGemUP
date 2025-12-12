@@ -2,6 +2,8 @@
 #'
 #' @param id KEGG pathway ID (e.g., 'hsa04110')
 #' @return A character string with the readable pathway name
+#' @importFrom KEGGREST keggGet
+#' @noRd 
 get_pathway_name <- function(id) {
   tryCatch(
     {
@@ -18,21 +20,25 @@ get_pathway_name <- function(id) {
 #' Download and cache KEGG KGML files.
 #' @param pathway_id KEGG pathway ID (e.g., 'hsa04110').
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
-#' @param file_name Optional file name to save the KGML file directly.
+#' @param directory Optional directory to save the KGML file if not using cache.
 #' @return Path to the cached KGML file.
 #'
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
+#' 
+#' @examples
+#' data_dir <- tempdir()
+#' kgml_path <- download_kgml("hsa04110", file_path = data_dir)
 #' @export
-download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
+download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   # TODO: check pathway_id and file_name validity Determine mode: cache or
   # file
-  if (!is.null(bfc) && !is.null(file_name)) {
+  if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either bfc OR file_name, not both.")
   } else if (!is.null(bfc)) {
     mode <- "cache"
-  } else if (!is.null(file_name)) {
+  } else if (!is.null(directory)) {
     mode <- "file"
   } else {
     stop("file_name or bfc must be provided.")
@@ -105,6 +111,7 @@ download_kgml <- function(pathway_id, bfc = NULL, file_name = NULL) {
 #' @return A named character vector of KEGG compounds.
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
 #' @importFrom KEGGREST keggList
+#' @noRd
 get_kegg_compounds <- function(bfc) {
   cache_name <- "kegg_compounds.rds"
 
@@ -134,6 +141,7 @@ get_kegg_compounds <- function(bfc) {
 #' @return A data frame with KEGG glycan IDs and names.
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
 #' @importFrom KEGGREST keggList
+#' @noRd
 get_kegg_glycans <- function(bfc) {
   cache_name <- "kegg_glycans.rds"
 

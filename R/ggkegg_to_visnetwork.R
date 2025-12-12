@@ -176,6 +176,7 @@ map_results_to_graph <- function(
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
+#' @noRd
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for visNetwork
   nodes_df$shape <- ifelse(nodes_df$shape %in% c("rectangle", "vrectangle"), "box",
@@ -207,6 +208,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return An igraph object representing the graph.
+#' @noRd 
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for igraph
   nodes_df$shape <- ifelse(nodes_df$shape == "box", "rectangle", "circle")
@@ -228,6 +230,7 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
 #' Add group information to nodes based on 'undefined' groups.
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
 #' @return nodes_df with updated 'group' column.
+#' @noRd
 add_group <- function(nodes_df) {
   # The nodes that have as kegg name 'undefined' are group nodes
   undefined_idx <- which(!is.na(nodes_df$kegg_name) & nodes_df$kegg_name == "undefined")
@@ -269,6 +272,7 @@ add_group <- function(nodes_df) {
 #' @param factor Scaling factor (default: 2).
 #'
 #' @return nodes_df with scaled x and y coordinates.
+#' @noRd
 scale_dimensions <- function(nodes_df, factor = 2) {
   # Scale x and y coordinates to make the graph look nicer
   nodes_df$x <- as.numeric(nodes_df$x) * factor
@@ -284,6 +288,7 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' If multiple KEGG IDs are present, they are concatenated with '+' in the URL.
 #' It also adds information about the node name, source of differential
 #' expression data, and value.
+#' @noRd
 add_tooltip <- function(nodes_df) {
   base_link <- "https://www.kegg.jp/entry/"
 
@@ -320,6 +325,7 @@ add_tooltip <- function(nodes_df) {
 #' @param node_size_multiplier Numeric factor to scale node sizes (default: 1.2).
 #' @return nodes_df with added visual styling columns:
 #' shape, fixed, widthConstraint, heightConstraint, size.
+#' @noRd
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
   # Base visual settings
   nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "box")
@@ -352,6 +358,7 @@ style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
 #' Style edges based on their subtype for visNetwork visualization.
 #' @param edges_df Data frame of edges with a column 'subtype'.
 #' @return edges_df with added visual styling columns: color, dashes, arrows, label.
+#' @noRd
 style_edges <- function(edges_df) {
   edge_style_map <- list(
     compound = list(
@@ -438,8 +445,10 @@ style_edges <- function(edges_df) {
 
 #' Add results from combined results data frame to nodes data frame
 #' @param nodes_df Data frame of nodes with a column 'KEGG'
-#' @param results_combined Data frame with combined results containing columns: KEGG, value, source
+#' @param results_combined Data frame with combined results containing columns: 
+#' KEGG, value, source
 #' @return Updated nodes data frame with added columns: value, color, source, text
+#' @noRd
 add_results_nodes <- function(nodes_df, results_combined) {
   # If results is empty then return the original df
   if (is.null(results_combined)) {
@@ -488,9 +497,11 @@ add_results_nodes <- function(nodes_df, results_combined) {
 }
 
 #' Combine multiple differential expression results into a single data frame
-#' @param results_list A named list where each element is a differential expression result containing a `data.frame` 
+#' @param results_list A named list where each element is a differential 
+#' expression result containing a `data.frame` 
 #' (de_table), value column name (value_column), and feature column name (feature_column)
 #' @return A combined data frame with columns: KEGG, value, source
+#' @noRd
 combine_results_in_dataframe <- function(results_list) {
   # If no results provided, return NULL
   if (is.null(results_list) || length(results_list) == 0) {
@@ -528,6 +539,7 @@ combine_results_in_dataframe <- function(results_list) {
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stats na.omit
 #' @importFrom grDevices colorRampPalette
+#' @noRd
 add_colors_to_nodes <- function(nodes_df) {
   palettes <- c("RdBu")
 
@@ -579,6 +591,7 @@ add_colors_to_nodes <- function(nodes_df) {
 #' Add gene names to gene nodes in the nodes data frame.
 #' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
 #' @return Updated nodes data frame with gene names added to gene nodes.
+#' @noRd
 add_gene_names <- function(nodes_df) {
   # find rows that are genes (logical index)
   idx <- which(!is.na(nodes_df$type) & nodes_df$type == "gene")
@@ -601,6 +614,7 @@ add_gene_names <- function(nodes_df) {
 #' @param bfc BiocFileCache object for caching KEGG compound mappings.
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
+#' @noRd
 add_compound_names <- function(nodes_df, bfc) {
   idx <- which(!is.na(nodes_df$type) & nodes_df$type == "compound")
 

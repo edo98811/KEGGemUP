@@ -4,18 +4,22 @@
 \alias{download_kgml}
 \title{Download and cache KEGG KGML files.}
 \usage{
-download_kgml(pathway_id, bfc = NULL, file_name = NULL)
+download_kgml(pathway_id, bfc = NULL, directory = NULL)
 }
 \arguments{
 \item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110').}
 
 \item{bfc}{BiocFileCache object for caching KEGG KGML files.}
 
-\item{file_name}{Optional file name to save the KGML file directly.}
+\item{directory}{Optional directory to save the KGML file if not using cache.}
 }
 \value{
 Path to the cached KGML file.
 }
 \description{
 Download and cache KEGG KGML files.
+}
+\examples{
+data_dir <- tempdir()
+kgml_path <- download_kgml("hsa04110", file_path = data_dir)
 }

@@ -37,15 +37,6 @@ These vignette assumes you have already performed a differential expression anal
 <details>
 <summary> Setting up the data </summary>
 
-KEGG pathways are used in many bioinformatics contexts, this package package can make it very easy to implement these in the analysis of real data.
-A very important part of bioinformatics analyses is both data integration and visiazionation. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them thre results of differential expression analyses.
-
-These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` or a result object from `limma` or `DESeq2`. To reproduce this situation we will now build a examplary differential expression results using the macrophage dataset from the macrophage package.
-
-<details>
-
-<summary> Setting up the data </summary>
-
 ```{r load-fake-results}
 message("--- Loading packages...")
 
@@ -134,25 +125,28 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
     (res_macrophage_IFNg_vs_naive_dds$padj <= 0.05)
 ]
 
+res_enrich_IFNg_vs_naive_dds <- enrichKEGG(
+  gene = de_entrez_IFNg_vs_naive_genes,
+  organism = "hsa",
+  pvalueCutoff = 0.05
+)@result
+
 ```
-
-</details>
-
 ## Functions to parse KGML files
 
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. 
 
-You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertise with graph analysis in R.
-The first thing you can do is download a KGML file from KEGG. You can do this using the function `download_kgml()`. The only parameter that needs to be provided is the destination directory where to save the file. The function will return the path to the downloaded file.
+You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so and you have expertese with graph analysis in R.
 
-```{r kgml-downloading}
-kgml_file <- download_kgml("hsa04010", file_name = tempfile(fileext = "xml"))
-```
-
+You can use these functions to parse KGML files directly. From these you can build a graph object if you wish to do so.
 ```{r kgml-parsing}
 nodes_df <- parse_kgml_entries(kgml_file)
 edges_df <- parse_kgml_relations(kgml_file)
 ```
+
+### The output data.frame frame for nodes
+
+Here you can see the first 5 columns of the dataframe that you get by parsing the nodes from a KGML file. It is a `data.frame` where each row represents a node in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
 
 ### The output data.frame frame for nodes
 
@@ -165,15 +159,18 @@ knitr::kable(head(nodes_df))
 ### The output data.frame frame for edges
 
 Here you can see the first 5 columns of the dataframe that you get by parsing the edges from a KGML file. It is a `data.frame` where each row represents an edge in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
+### The output data.frame frame for edges
+
+Here you can see the first 5 columns of the dataframe that you get by parsing the edges from a KGML file. It is a `data.frame` where each row represents an edge in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
 
 ```{r}
 knitr::kable(head(edges_df))
 ```
 
 ## Build a graph from a pathway ID and map results to nodes
-To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_graph()`. The input of this function is a graph object built with `kegg_to_graph()` and a list of differential expression results tables or a single differential expression results table.
+To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_nodes()`. The input of this function is a graph object built with `kegg_to_graph()` and a list of differential expression results tables or a single differential expression results table.
 
-You can also pass as input to `map_results_to_graph()` a single `data.frame` with the differential expression results. This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix) and another with the values to map to the nodes (e.g., log2 fold changes). You can pass to the function the names of these columns if they differ from the default ones with the parameters `feature_column` and `value_column`.
+You can also pass as input to `map_results_to_nodes()` a single `data.frame` with the differential expression results. This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix) and another with the values to map to the nodes (e.g., log2 fold changes). You can pass to the function the names of these columns if they differ from the default ones with the parameters `feature_column` and `value_column`.
 
 Note that the KEGG IDs without organism prefix are the the ENTREZ IDs for genes. For other feature types (e.g., compounds) you will need to make sure that the IDs in your differential expression results table match the KEGG IDs used in the graph.
 
@@ -184,6 +181,9 @@ The defualt parameters are:
 
 If you have multiple differential expression results tables (for example if you have one metabolomics and one transcriptomics) to map to the nodes you can pass a list of lists. Each sublist must contain the following elements:
 
+- `de_table`: a data.frame with the differential expression results.
+- `value_column`: the name of the column in de_table containing the values to map to the nodes.
+- `feature_column`: the name of the column in de_table containing the feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the graph (without organism prefix).
 - `de_table`: a data.frame with the differential expression results.
 - `value_column`: the name of the column in de_table containing the values to map to the nodes.
 - `feature_column`: the name of the column in de_table containing the feature IDs (e.g., ENTREZ IDs) that correspond to the KEGG ids in the graph (without organism prefix).
@@ -209,10 +209,10 @@ de_results_list <-list(
 We will now take a KEGG pathway from the enrichment results we built earlier and map the differential expression results to its nodes. As you can see you simply need to pass to the function the graph object and the list of differential expression results tables that we defined before.
 
 ```{r use-package}
-pathway <- "hsa00563"
-graph <- kegg_to_graph(pathway, return_type = "igraph")
-graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
-graph_visnetwork
+pathway <- rownames(res_enrich_IFNg_vs_naive_dds)[6]
+graph <- kegg_to_graph(pathway)
+graph <- map_results_to_nodes(graph, de_results_list)
+graph
 ```
 
 
@@ -221,17 +221,20 @@ graph_visnetwork
 Let's first build a filtered differential expression results table with only the significant results.
 
 ```{r}
-de_results_limma <- res_macrophage_IFNg_vs_naive_limma
+de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 ```
 
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
 ```{r use-package-2}
-graph <- kegg_to_graph(pathway, return_type = "igraph")
-graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
-graph_visnetwork
+graph <- kegg_to_graph(pathway)
+graph <- map_results_to_nodes(graph, de_results_limma)
+graph
 ```
 
+```{r}
+sessionInfo()
+```
 ```{r}
 sessionInfo()
 ```

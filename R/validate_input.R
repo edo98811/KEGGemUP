@@ -3,7 +3,8 @@
 #' @param de_entry An entry from the de_results list
 #' @param name The name of the entry in the de_results list (for error messages)
 #'
-#' @return Invisible TRUE if all checks pass, otherwise stops with an error
+#' @return TRUE if all checks pass, otherwise stops with an error
+#' @noRd
 is_valid_de_entry <- function(de_entry, name) {
   # --- Structure checks ---
   if (!is.list(de_entry) || !all(c("de_table", "value_column", "feature_column") %in%
@@ -63,6 +64,7 @@ is_valid_de_entry <- function(de_entry, name) {
 #' Validate KGML file structure
 #' @param file_path Path to the KGML file
 #' @return TRUE if valid KGML, FALSE otherwise
+#' @noRd
 is_valid_kgml <- function(file_path) {
   # Try to read the XML file
   xml_content <- tryCatch(
@@ -92,9 +94,10 @@ is_valid_kgml <- function(file_path) {
   return(TRUE)
 }
 
-#' Validate KEGG pathway ID format
+#' Validate KEGG pathway ID format  
 #' @param pathway_id KEGG pathway ID (e.g., 'hsa04110')
 #' @return TRUE if valid format, FALSE otherwise
+#' @noRd
 is_valid_pathway <- function(pathway_id) {
   # Check if pathway_id matches KEGG pathway formats: 'hsa04110' or '04110'
   if (!is.character(pathway_id) || length(pathway_id) != 1) {
