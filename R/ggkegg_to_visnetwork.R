@@ -213,7 +213,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return An igraph object representing the graph.
-#' @noRd 
+#' @noRd
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for igraph
   nodes_df$shape <- ifelse(nodes_df$shape == "box", "rectangle", "circle")
@@ -450,7 +450,7 @@ style_edges <- function(edges_df) {
 
 #' Add results from combined results data frame to nodes data frame
 #' @param nodes_df Data frame of nodes with a column 'KEGG'
-#' @param results_combined Data frame with combined results containing columns: 
+#' @param results_combined Data frame with combined results containing columns:
 #' KEGG, value, source
 #' @return Updated nodes data frame with added columns: value, color, source, text
 #' @noRd
@@ -502,8 +502,8 @@ add_results_nodes <- function(nodes_df, results_combined) {
 }
 
 #' Combine multiple differential expression results into a single data frame
-#' @param results_list A named list where each element is a differential 
-#' expression result containing a `data.frame` 
+#' @param results_list A named list where each element is a differential
+#' expression result containing a `data.frame`
 #' (de_table), value column name (value_column), and feature column name (feature_column)
 #' @return A combined data frame with columns: KEGG, value, source
 #' @noRd
@@ -638,11 +638,13 @@ add_compound_names <- function(nodes_df, bfc) {
   labels <- vapply(compounds_in_graph, function(id) {
     val <- NA_character_
     if (grepl("^C", id)) {
-      val <- compounds[id]
+      tmp <- compounds[compounds[[1]] == id, 2]
+      val <- if (length(tmp) > 0) tmp[1] else NA_character_
     } else if (grepl("^G", id)) {
-      val <- glycan[id]
+      tmp <- glycan[glycan[1] == id, 2]
+      val <- if (length(tmp) > 0) tmp[1] else NA_character_
     }
-    if (is.null(val) || is.na(val)) {
+    if (is.na(val)) {
       return(id)
     }
 

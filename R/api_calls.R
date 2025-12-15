@@ -128,30 +128,41 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @param bfc A BiocFileCache object for caching.
 #' @param db_name KEGG database name (e.g., 'compound', 'glycan').
 #' @return A data frame with KEGG IDs and names.
-#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew
+#' @details The valid KEGG database names are:  
+#' kegg | pathway | brite | module | ko | genes | <org> | vg | vp | ag |
+#' genome | ligand | compound | glycan | reaction | rclass | enzyme |
+#' network | variant | disease | drug | dgroup
 #' @importFrom KEGGREST keggList
+#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @noRd
 get_kegg_db <- function(bfc, db_name = "compound") {
+
+  url <- paste0("https://rest.kegg.jp/list/", db_name)
+
   cache_name <- paste0(db_name, ".rds")
+  
+  path <- BiocFileCache::bfcrpath(bfc, url)
+  kegg_db <- read.table(path, sep = "\t") |> data.frame()    
 
-  # Check if cache exists
-  qr <- BiocFileCache::bfcquery(bfc, cache_name, field = "rname")
+  # # Check if cache exists
+  # qr <- BiocFileCache::bfcquery(bfc, cache_name, field = "rname")
+  # url <- paste0("https://rest.kegg.jp/list/", db_name)
 
-  if (nrow(qr) > 0) {
-    message("Loading KEGG ", db_name, " from cache...")
-    kegg_db <- readRDS(BiocFileCache::bfcpath(bfc, qr$rid[1]))
-    return(kegg_db)
-  }
+  # if (nrow(qr) > 0) {
+  #   message("Loading KEGG ", db_name, " from cache...")
+  #   kegg_db <- readRDS(BiocFileCache::bfcpath(bfc, qr$rid[1]))
+  #   return(kegg_db)
+  # }
 
-  # Otherwise download from KEGG
-  message("Downloading KEGG ", db_name, "...")
-  kegg_db <- KEGGREST::keggList(db_name)
+  # # Otherwise download from KEGG
+  # message("Downloading KEGG ", db_name, "...")
+  # kegg_db <- KEGGREST::keggList(db_name)
 
-  temp_file_path <- tempfile(fileext = ".rds")
-  saveRDS(kegg_db, file = temp_file_path)
+  # temp_file_path <- tempfile(fileext = ".rds")
+  # saveRDS(kegg_db, file = temp_file_path)
 
-  # Save to cache
-  res <- bfcadd(bfc, rname = cache_name, fpath = temp_file_path, action = "copy")
+  # # Save to cache
+  # res <- bfcadd(bfc, rname = cache_name, fpath = temp_file_path, action = "copy")
 
   return(kegg_db)
 }

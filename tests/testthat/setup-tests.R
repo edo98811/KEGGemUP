@@ -184,6 +184,6 @@ glycan_file <- system.file(
 )
 
 # Load mapping and mock get_compounds to return it
-real_compounds <- readRDS(compounds_file)
+real_compounds <- data.frame(readRDS(compounds_file))
 
-real_glycans <- readRDS(glycan_file)
+real_glycans <- data.frame(readRDS(glycan_file))

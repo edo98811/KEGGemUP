@@ -75,9 +75,17 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
   with_mocked_bindings(
     get_kegg_db = function(bfc_arg, db_type) {
       if (db_type == "compound") {
-        return(real_compounds)
+        return(data.frame(
+          name = rownames(real_compounds),
+          value = real_compounds[[1]],
+          stringsAsFactors = FALSE
+        ))
       } else if (db_type == "glycan") {
-        return(real_glycans)
+        return(data.frame(
+          name = rownames(real_glycans),
+          value = real_glycans[[1]],
+          stringsAsFactors = FALSE
+        ))
       } else {
         stop("Unexpected db_type")
       }
@@ -86,13 +94,14 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
       res <- add_compound_names(nodes_df_basic, bfc)
     }
   )
-
+  # res <- add_compound_names(nodes_df_basic, bfc)
   # gene node unchanged
   expect_equal(res$label[1], NA_character_)
 
   # known compound gets correct label
-  expect_equal(res$label[2], gsub(";.*", "", as.character(real_compounds[["C00001"]])))
-  expect_equal(res$label[4], gsub(";.*", "", as.character(real_glycans[["G00001"]])))
+
+  expect_equal(res$label[2], gsub(";.*", "", as.character(real_compounds["C00001", 1])))
+  expect_equal(res$label[4], gsub(";.*", "", as.character(real_glycans["G00001", 1])))
 
   # unknown compound keeps original ID
   expect_equal(res$label[3], "C99999")
