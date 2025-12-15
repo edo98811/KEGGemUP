@@ -29,7 +29,7 @@ get_pathway_name <- function(id) {
 #'
 #' @examples
 #' data_dir <- tempdir()
-#' kgml_path <- download_kgml("hsa04110", file_path = data_dir)
+#' kgml_path <- download_kgml("hsa04110", directory = data_dir)
 #' @export
 download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 

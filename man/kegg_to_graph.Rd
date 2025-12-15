@@ -4,10 +4,10 @@
 \alias{kegg_to_graph}
 \title{Transform a ggkegg graph to igraph or visNetwork}
 \usage{
-kegg_to_graph(path_id, return_type = "igraph", scaling_factor = 1.5)
+kegg_to_graph(pathway_id, return_type = "igraph", scaling_factor = 1.5)
 }
 \arguments{
-\item{path_id}{KEGG pathway ID (e.g., 'hsa:04110' or '04110').}
+\item{pathway_id}{KEGG pathway ID (e.g., 'hsa:04110' or '04110').}
 
 \item{return_type}{Output type: 'igraph' or 'visNetwork'.}
 
