@@ -1,5 +1,18 @@
 ---
-title: "kegg-graph"
+title: >
+  The `GeneTonic` User's Guide
+author:
+  - name: Edoardo Filippi
+    affiliation: 
+    - Institute of Medical Biostatistics, Epidemiology and Informatics (IMBEI), Mainz
+    - Deparment of Nephrology, Mainz University Medical Center
+    email: edoardo.filippi@uni-mainz.de
+  - name: Federico Marini
+    affiliation: 
+    - Institute of Medical Biostatistics, Epidemiology and Informatics (IMBEI), Mainz
+    email: federico.marini@uni-mainz.de
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('KEGGemUP')`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{kegg-graph}
@@ -8,6 +21,12 @@ vignette: >
 editor_options: 
   chunk_output_type: console
 ---
+
+**Compiled date**: `r Sys.Date()`
+
+**Last edited**: 15-12-2025
+
+**License**: `r packageDescription("KEGGemUP")[["License"]]`
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -23,34 +42,33 @@ install.packages("remotes")
 remotes::install_github("edo98811/KEGGemUP")
 ```
 
-The load it.
+Then load it.
 
 ```{r}
 library("KEGGemUP")
 ```
 
 KEGG pathways are used in many bioinformatics contexts, this package package can make it very easy to implement these in the analysis of real data.
+
 A very important part of bioinformatics analyses is both data integration and visiazionation. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them thre results of differential expression analyses. 
 
 KEGG database uses pathway ids to identify each pathway, for example "hsa00563" is the KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis" in humans. You can use these pathway IDs to download the KGML files for each pathway and then parse them to build graph objects. The id must have the organism prefix, for example "hsa" for human pathways, "mmu" for mouse pathways, etc.
 
-These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` (whihc you can easily obtain from edgeR or limma by running `as.data.frame()` on the table of the results for each object). To reproduce this situation we will now build a examplary differential expression results using the macrophage dataset from the macrophage package.
+These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` (which you can easily obtain from edgeR or limma by running `as.data.frame()` on the table of the results for each object). To reproduce this situation we will now build an example of a differential expression result using the macrophage dataset from the macrophage package: [bioconductor page](https://www.bioconductor.org/packages/release/data/experiment/html/macrophage.html)
 
 To learn more about graph manipulation you can refer to the igraph and visNetwork documentation: 
 
-- [igraph](https://r.igraph.org)
-- [visNetwork](https://datastorm-open.github.io/visNetwork/)
+- [igraph](https://r.igraph.org) Is a pacakge for creating and manipulating graphs in R.
+- [visNetwork](https://datastorm-open.github.io/visNetwork/) Is a package for interactive visualization of graphs in R, an R interface to the javascript library vis.js.
 
-<details>
-<summary> Setting up the data </summary>
 
-```{r load-fake-results}
+```{r load-example-results}
 message("--- Loading packages...")
 
 suppressPackageStartupMessages({
   library("macrophage")
-  library("DESeq2")
   library("org.Hs.eg.db")
+  library("SummarizedExperiment")
   library("AnnotationDbi")
   library("clusterProfiler")
   library("limma")
@@ -61,15 +79,6 @@ message("- Done!")
 # Load the macrophage dataset ---------------------------------------------------
 data(gse)
 rownames(gse) <- substr(rownames(gse), 1, 15)  # truncate rownames at 15 characters
-
-# DESeq2 analysis ---------------------------------------------------------------
-dds <- DESeqDataSet(gse, design = ~ condition)
-
-# Filter low counts
-keep <- rowSums(counts(dds) >= 10) >= 6
-dds <- dds[keep, ]
-
-dds <- DESeq(dds)
 
 # limma analysis ---------------------------------------------------------------
 condition <- factor(colData(gse)[, "condition_name"])
@@ -96,24 +105,11 @@ fit2 <- eBayes(fit2)  # Empirical Bayes moderation
 
 anns <- AnnotationDbi::select(
   org.Hs.eg.db,
-  keys = rownames(dds),
+  keys = rownames(gse),
   columns = c("SYMBOL", "ENTREZID"),
   keytype = "ENSEMBL",
   multiVals = "first"
 )
-
-# DESeq2 results ---------------------------------------------------------------
-res_macrophage_IFNg_vs_naive_dds <- results(
-  dds,
-  contrast = c("condition", "IFNg", "naive"),
-  lfcThreshold = 1,
-  alpha = 0.05
-)
-
-summary(res_macrophage_IFNg_vs_naive_dds) 
-
-res_macrophage_IFNg_vs_naive_dds$SYMBOL <- rowData(dds)$SYMBOL
-res_macrophage_IFNg_vs_naive_dds$ENTREZID <- anns$ENTREZID[match(rownames(res_macrophage_IFNg_vs_naive_dds), anns$ENSEMBL)]
 
 # limma results ---------------------------------------------------------------
 res_macrophage_IFNg_vs_naive_limma <- topTable(
@@ -128,17 +124,18 @@ res_macrophage_IFNg_vs_naive_limma$ENTREZID <- anns$ENTREZID[match(rownames(res_
 
 # Enrichment analysis ----------------------------------------------------------
 de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
-  (!is.na(res_macrophage_IFNg_vs_naive_dds$padj)) &
-    (res_macrophage_IFNg_vs_naive_dds$padj <= 0.05)
+  (!is.na(res_macrophage_IFNg_vs_naive_limma$adj.P.Val)) &
+    (res_macrophage_IFNg_vs_naive_limma$adj.P.Valj <= 0.05)
 ]
 
 ```
 
-</details>
 
 ## Functions to parse KGML files
 
 KGML is the format that KEGG uses to save the pathway structure and it is what this package interfaces itself with. There is an exported function to download KGML files from KEGG, `download_kgml()`, which you can use to get the KGML file for a given pathway ID. You can pass to the function the KEGG pathway ID and the directory where to save the file.
+
+As an example we will download the KGML file for the KEGG pathway "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis" in humans, which has the KEGG pathway ID "hsa00563".
 
 ```{r download-kgml}
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
@@ -165,7 +162,7 @@ knitr::kable(head(nodes_df))
 
 ### The output data.frame frame for edges
 
-Here you can see the first 5 columns of the dataframe that you get by parsing the edges from a KGML file. It is a `data.frame` where each row represents an edge in the KEGG pathway graph. No operations are done on the data, it is just a direct parsing of the KGML file.
+Here you can see the first 5 columns of the dataframe that you get by parsing the edges from a KGML file. It is a `data.frame` where each row represents an edge in the KEGG pathway graph. No operations are done on the data, it is just parsing of the KGML file while keeping all the information from it.
 
 ```{r}
 knitr::kable(head(edges_df))
@@ -213,10 +210,11 @@ The output of the second function will be a visNetwork object with the different
 ```{r use-package}
 pathway <- "hsa00563"  
 graph <- kegg_to_graph(pathway, return_type = "igraph")
-graph <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
-graph
+graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
+graph_visnetwork
 ```
 
+We could also have the first function return a visNetwork object directly by setting `return_type = "visNetwork"` in `kegg_to_graph()`. In this case we can immediately visualize the graph but to perfom the mapping of the differential expression results to the nodes we need an igraph object as input to `map_results_to_graph()`.
 
 ### Example of usage with a single DE results table
 

@@ -42,7 +42,7 @@ Suggests:
     knitr,
     macrophage,
     org.Hs.eg.db,
-    DESeq2,
+    SummarizedExperiment,
     AnnotationDbi,
     clusterProfiler,
     limma,
