@@ -138,18 +138,20 @@ get_kegg_db <- function(bfc, db_name = "compound") {
   qr <- BiocFileCache::bfcquery(bfc, cache_name, field = "rname")
 
   if (nrow(qr) > 0) {
-    message("Loading KEGG glycans from cache...")
-    glycans <- readRDS(BiocFileCache::bfcpath(bfc, qr$rid[1]))
-    return(glycans)
+    message("Loading KEGG ", db_name, " from cache...")
+    kegg_db <- readRDS(BiocFileCache::bfcpath(bfc, qr$rid[1]))
+    return(kegg_db)
   }
 
   # Otherwise download from KEGG
   message("Downloading KEGG ", db_name, "...")
-  kegg_glycans <- KEGGREST::keggList(db_name)
+  kegg_db <- KEGGREST::keggList(db_name)
+
+  temp_file_path <- tempfile(fileext = ".rds")
+  saveRDS(kegg_db, file = temp_file_path)
 
   # Save to cache
-  path <- BiocFileCache::bfcnew(bfc, rname = cache_name, ext = ".rds")
-  saveRDS(kegg_glycans, file = path)
+  res <- bfcadd(bfc, rname = cache_name, fpath = temp_file_path, action = "copy")
 
-  return(kegg_glycans)
+  return(kegg_db)
 }
