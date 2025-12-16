@@ -63,62 +63,39 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   }
 
   # Cache key / name
-  rname <- paste0(pathway_id, ".xml")
-
-  if (mode == "cache") {
-    # Check cache
-    qr <- bfcquery(bfc, rname, field = "rname")
-
-    # Check if file exists
-    if (nrow(qr) > 0) {
-      cached_path <- bfcpath(bfc, qr$rid[1])
-
-      if (file.exists(cached_path)) {
-        # if file exists return path
-        message("Using cached KEGG KGML for ", pathway_id)
-        return(cached_path)
-      } else {
-        # file missing, re-download
-        message("Cache entry found but file missing. Re-downloading.")
-      }
-    }
-
-    # Temporary file to store KGML
-    file_name <- tempfile(fileext = ".xml")
-  } else {
-    file_name <- path.expand(file.path(directory, rname)) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
-  }
-
-
-  # Download KGML
   message("Downloading KGML for ", pathway_id, " ...")
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
-  resp <- request(url) |>
-    req_retry(max_tries = 3) |>
-    req_perform(error_call = FALSE)
-
-  # Check success
-  if (resp_is_error(resp)) {
-    warning(
-      "Failed to download KGML from URL: ", url, " (HTTP status ", resp_status(resp),
-      ")"
-    )
-    return(NULL)
-  }
-
-  # Get content as raw vector and check
-  kgml_xml <- resp_body_xml(resp)
-
-  write_xml(kgml_xml, file_name)
 
   if (mode == "cache") {
-    # add to BiocFileCache
-    res <- bfcadd(bfc, rname = rname, fpath = file_name, action = "copy")
-    rid <- names(res)
+
+    path <- BiocFileCache::bfcrpath(bfc, url)
+
     message("Downloaded & cached: ", pathway_id)
-    return(bfcpath(bfc, rid))
+    return(path)
   } else {
-    # else return path
+    
+    rname <- paste0(pathway_id, ".xml")
+    file_name <- path.expand(file.path(directory, rname)) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+
+    resp <- request(url) |>
+      req_retry(max_tries = 3) |>
+      req_perform(error_call = FALSE)
+
+    # Check success
+    if (resp_is_error(resp)) {
+      warning(
+        "Failed to download KGML from URL: ", url, " (HTTP status ", resp_status(resp),
+        ")"
+      )
+      return(NULL)
+    }
+
+    # Get content as raw vector and check
+    kgml_xml <- resp_body_xml(resp)
+
+    write_xml(kgml_xml, file_name)
+    message("Downloaded & saved in: ", file_name)
+
     return(file_name)
   }
 }
@@ -128,7 +105,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @param bfc A BiocFileCache object for caching.
 #' @param db_name KEGG database name (e.g., 'compound', 'glycan').
 #' @return A data frame with KEGG IDs and names.
-#' @details The valid KEGG database names are:  
+#' @details The valid KEGG database names are:
 #' kegg | pathway | brite | module | ko | genes | <org> | vg | vp | ag |
 #' genome | ligand | compound | glycan | reaction | rclass | enzyme |
 #' network | variant | disease | drug | dgroup
@@ -136,13 +113,12 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @noRd
 get_kegg_db <- function(bfc, db_name = "compound") {
-
   url <- paste0("https://rest.kegg.jp/list/", db_name)
 
   cache_name <- paste0(db_name, ".rds")
-  
+
   path <- BiocFileCache::bfcrpath(bfc, url)
-  kegg_db <- read.table(path, sep = "\t") |> data.frame()    
+  kegg_db <- read.table(path, sep = "\t") |> data.frame()
 
   return(kegg_db)
 }

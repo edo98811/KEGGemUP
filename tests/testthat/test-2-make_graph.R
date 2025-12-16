@@ -108,72 +108,44 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
 })
 
 
-# Example test using mockery
-test_that("download_kgml works without hitting KEGG API", {
-  # Create temporary BiocFileCache and directory
-  bfc <- BiocFileCache(tempdir(), ask = FALSE)
-  temp_dir <- tempdir()
-  valid_pathway <- "hsa04110"
-
-  # Create a fake XML response
-  fake_xml <- read_xml("<pathway name='fake_pathway'></pathway>")
-
-  # Create mocks for httr2 functions
-  mock_req_retry <- function(req, max_tries = 1) req
-  mock_req_perform <- function(req, error_call = FALSE) structure(list(), class = "response")
-  mock_resp_is_error <- function(resp) FALSE
-  mock_resp_body_xml <- function(resp) fake_xml
-  mock_resp_status <- function(resp) 200
-
-  # Use with_mocked_bindings to replace httr2 functions within this scope
-  kgml_path <- suppressMessages(with_mocked_bindings(
-    download_kgml(
-      valid_pathway,
-      directory = temp_dir
-    ),
-    request = function(url) list(url = url),
-    req_retry = mock_req_retry,
-    req_perform = mock_req_perform,
-    resp_is_error = mock_resp_is_error,
-    resp_body_xml = mock_resp_body_xml,
-    resp_status = mock_resp_status
-  ))
-
-  # Directory mode checks
-  expect_true(file.exists(kgml_path))
-  expect_true(grepl("\\.xml$", kgml_path))
-
-  # Cache mode with same mocks
-  kgml_cache <- suppressMessages(with_mocked_bindings(
-    download_kgml(
-      valid_pathway,
-      bfc = bfc
-    ),
-    request = function(url) list(url = url),
-    req_retry = mock_req_retry,
-    req_perform = mock_req_perform,
-    resp_is_error = mock_resp_is_error,
-    resp_body_xml = mock_resp_body_xml,
-    resp_status = mock_resp_status
-  ))
-
-  expect_true(file.exists(kgml_cache))
-  expect_true(grepl("\\.xml$", kgml_cache))
-
-  # Second download (should reuse cache)
-  expect_message(
-    kgml_cache2 <- with_mocked_bindings(
-      download_kgml(valid_pathway, bfc = bfc),
-      request = function(url) list(url = url),
-      req_retry = mock_req_retry,
-      req_perform = mock_req_perform,
-      resp_is_error = mock_resp_is_error,
-      resp_body_xml = mock_resp_body_xml,
-      resp_status = mock_resp_status
-    ),
-    "Using cached KEGG KGML"
+test_that("download_kgml rejects invalid inputs", {
+  expect_error(
+    download_kgml("hsa00010"),
+    "Either 'directory' or 'bfc' must be provided"
   )
 
-  # Test that cached path is reused
-  expect_equal(kgml_cache, kgml_cache2)
+  expect_error(
+    download_kgml("hsa00010", bfc = 1),
+    "BiocFileCache"
+  )
+
+  expect_error(
+    download_kgml("hsa00010", directory = c("a", "b")),
+    "single string"
+  )
+})
+
+test_that("download_kgml works in directory mode", {
+  tmpdir <- tempdir()
+  expected_file <- file.path(tmpdir, "hsa00010.xml")
+
+  result <- suppressMessages(download_kgml(
+    pathway_id = "hsa00010",
+    directory = tmpdir
+  ))
+
+  expect_equal(result, expected_file)
+  expect_true(file.exists(result))
+})
+
+test_that("download_kgml works in cache mode", {
+  fake_bfc <- BiocFileCache(tempdir(), ask = FALSE)
+
+  result <- suppressMessages(download_kgml(
+    pathway_id = "hsa00010",
+    bfc = fake_bfc
+  ))
+
+  fake_path <- BiocFileCache::bfcrpath(fake_bfc, "https://rest.kegg.jp/get/hsa00010/kgml")
+  expect_equal(result, fake_path)
 })
