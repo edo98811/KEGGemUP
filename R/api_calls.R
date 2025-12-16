@@ -32,7 +32,6 @@ get_pathway_name <- function(id) {
 #' kgml_path <- download_kgml("hsa04110", directory = data_dir)
 #' @export
 download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
-
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either 'bfc' OR 'directory', not both.")
@@ -67,13 +66,11 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
 
   if (mode == "cache") {
-
-    path <- BiocFileCache::bfcrpath(bfc, url)
+    path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
 
     message("Downloaded & cached: ", pathway_id)
     return(path)
   } else {
-    
     rname <- paste0(pathway_id, ".xml")
     file_name <- path.expand(file.path(directory, rname)) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
 
@@ -115,9 +112,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 get_kegg_db <- function(bfc, db_name = "compound") {
   url <- paste0("https://rest.kegg.jp/list/", db_name)
 
-  cache_name <- paste0(db_name, ".rds")
-
-  path <- BiocFileCache::bfcrpath(bfc, url)
+  path <- BiocFileCache::bfcrpath(bfc, url, ext = ".csv")
   kegg_db <- read.table(path, sep = "\t") |> data.frame()
 
   return(kegg_db)
