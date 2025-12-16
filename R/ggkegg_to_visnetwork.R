@@ -88,7 +88,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #' (if de_results is a single data.frame).
 #' @param value_column Column name in de_table containing values to map
 #' (if de_results is a single data.frame).
-#' @return An igraph or visNetwork object with mapped results.
+#' @return An igraph or visNetwork object with mapped results.  
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @examples
@@ -103,8 +103,13 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #'
 #' @export
 map_results_to_graph <- function(
-    g, de_results, return_type = "visNetwork", feature_column = NULL,
-    value_column = NULL) {
+    g,
+    de_results,
+    return_type = "visNetwork",
+    feature_column = NULL,
+    value_column = NULL,
+    palette = "RdBu") {
+
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
@@ -158,7 +163,7 @@ map_results_to_graph <- function(
     nodes_df <- add_results_nodes(nodes_df, results_combined)
 
     # --- 3. Color and style nodes and edges ---
-    nodes_df <- add_colors_to_nodes(nodes_df)
+    nodes_df <- add_colors_to_nodes(nodes_df, palette = palette)
     nodes_df <- add_tooltip(nodes_df)
   }
 
@@ -540,13 +545,13 @@ combine_results_in_dataframe <- function(results_list) {
 
 #' Add color palettes
 #' @param nodes_df Data frame of nodes with 'value' and 'source' columns.
+#' @param palettes A vector of color palette names from RColorBrewer.
 #' @return nodes_df with colored nodes based on their values.
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stats na.omit
 #' @importFrom grDevices colorRampPalette
 #' @noRd
-add_colors_to_nodes <- function(nodes_df) {
-  palettes <- c("RdBu")
+add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
 
   # Get unique sources
   sources <- unique(na.omit(nodes_df$source))
