@@ -1,5 +1,5 @@
 #' Convert KEGG IDs with prefixes to a single string of IDs without prefixes
-#' @param kegg_ids Character string of KEGG IDs with prefixes 
+#' @param kegg_ids Character string of KEGG IDs with prefixes
 #' (e.g., 'cpd:C00022 mmu:1234 ko:K00001 ko:K00002')
 #' @return Character string of KEGG IDs without prefixes, separated by ';'
 #' @noRd
@@ -12,7 +12,7 @@ remove_kegg_prefix_str <- function(kegg_ids) {
 }
 
 #' Convert KEGG IDs with prefixes to IDs without prefixes
-#' @param kegg_ids Character vector of KEGG IDs with prefixes 
+#' @param kegg_ids Character vector of KEGG IDs with prefixes
 #' (e.g., 'cpd:C00022', 'mmu:1234', 'ko:K00001 ko:K00002')
 #' @return List of character vectors with KEGG IDs without prefixes
 #' @noRd
@@ -44,4 +44,43 @@ expand_keggs <- function(kegg_df) {
 
   # Return the expanded data frame
   return(data.frame(name = ids_out, KEGG = kegg_out, stringsAsFactors = FALSE))
+}
+
+#' Return all cached KEGG and mapping files from BiocFileCache
+#' @return A list containing data frames of cached KEGG and mapping files
+#' @importFrom BiocFileCache BiocFileCache bfcinfo
+#' @export
+return_all_cached <- function() {
+  path <- tools::R_user_dir("BiocFileCache", which = "cache")
+  bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
+  bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
+  cache_info <- list(
+    kegg = BiocFileCache::bfcinfo(bfc_kegg),
+    mappings = BiocFileCache::bfcinfo(bfc_map)
+  )
+  return(cache_info)
+}
+
+#' Reset KEGG and mapping caches by deleting all cached files
+#' @return None
+#' @importFrom BiocFileCache BiocFileCache bfcinfo bfcremove
+#' @export
+reset_cache <- function() {
+  path <- tools::R_user_dir("BiocFileCache", which = "cache")
+  bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
+  bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
+  if (nrow(BiocFileCache::bfcinfo(bfc_kegg)) == 0 && nrow(BiocFileCache::bfcinfo(bfc_map)) == 0) {
+    message("No cached files found. Nothing to delete.")
+    return()
+  }
+  message("Deleting all cached KEGG files...")
+  message("total kegg pathways files to delete: ", nrow(BiocFileCache::bfcinfo(bfc_kegg)))
+  message("total other files to delete: ", nrow(BiocFileCache::bfcinfo(bfc_map)))
+  askYesNo("Are you sure you want to delete all cached files?") -> answer
+  if (!answer) {
+    message("Cache reset aborted.")
+    return()
+  }
+  BiocFileCache::bfcremove(bfc_kegg, BiocFileCache::bfcinfo(bfc_kegg)$rid)
+  BiocFileCache::bfcremove(bfc_map, BiocFileCache::bfcinfo(bfc_map)$rid)
 }
