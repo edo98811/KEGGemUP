@@ -74,12 +74,12 @@ reset_cache <- function() {
     return()
   }
   message("Deleting all cached KEGG files...")
-  message("total kegg pathways files to delete: ", nrow(BiocFileCache::bfcinfo(bfc_kegg)))
-  message("total other files to delete: ", nrow(BiocFileCache::bfcinfo(bfc_map)))
+  message("total kegg pathways files to delete: ", paste(BiocFileCache::bfcinfo(bfc_kegg)$rname, sep = ", "))
+  message("total other files to delete: ", paste(BiocFileCache::bfcinfo(bfc_map)$rname, sep = ", "))
   askYesNo("Are you sure you want to delete all cached files?") -> answer
   if (!answer) {
     message("Cache reset aborted.")
-    return()
+    return(invisible(NULL))
   }
   BiocFileCache::bfcremove(bfc_kegg, BiocFileCache::bfcinfo(bfc_kegg)$rid)
   BiocFileCache::bfcremove(bfc_map, BiocFileCache::bfcinfo(bfc_map)$rid)
