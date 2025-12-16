@@ -117,3 +117,26 @@ get_kegg_db <- function(bfc, db_name = "compound") {
 
   return(kegg_db)
 }
+
+#' Download all KEGG pathways for a given organism.
+#' @param org KEGG organism code (e.g., 'hsa' for human).
+#' @return None
+#' @importFrom BiocFileCache BiocFileCache  
+#' @export
+download_all_pathways <- function(org) {
+  path <- tools::R_user_dir("BiocFileCache", which = "cache")
+  bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
+  bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
+
+  all_pathways <- get_kegg_db(bfc_map, paste0("pathway/", org))
+
+  askYesNo("Download all ", nrows(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.") -> answer
+  if (!answer) {
+    message("Aborting download of all pathways.")
+    return(NULL)
+  }
+
+  for (pathway_id in all_pathways[, 1]) {
+    download_kgml(pathway_id, bfc = bfc_kegg)
+  }
+}
