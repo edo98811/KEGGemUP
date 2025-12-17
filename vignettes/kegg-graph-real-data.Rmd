@@ -61,7 +61,7 @@ These vignette assumes you have already performed a differential expression anal
 
 To learn more about graph manipulation you can refer to the igraph and visNetwork documentation: 
 
-- [igraph](https://r.igraph.org) Is a pacakge for creating and manipulating graphs in R.
+- [igraph](https://r.igraph.org) Is a package for creating and manipulating graphs in R.
 - [visNetwork](https://datastorm-open.github.io/visNetwork/) Is a package for interactive visualization of graphs in R, an R interface to the javascript library vis.js.
 
 
