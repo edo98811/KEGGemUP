@@ -268,7 +268,9 @@ add_group <- function(nodes_df) {
 
     # Make group label group_label <- paste0('group_',
     # undefined_nodes$id[i])
-    group_label <- paste(nodes_df$label[nodes_df$id %in% ids], collapse = ";")
+    
+    group_elements <- nodes_df$label[nodes_df$id %in% ids]
+    group_label <- paste(group_elements[1:length(group_elements)-1], collapse = ";")
 
     # Assign group label to nodes_df
     nodes_df[nodes_df$id %in% ids, "group"] <- group_label
