@@ -31,6 +31,5 @@ Path to the cached KGML file.
 ``` r
 data_dir <- tempdir()
 kgml_path <- download_kgml("hsa04110", directory = data_dir)
-#> Downloading KGML for hsa04110 ...
-#> Downloaded & saved in: /tmp/RtmpZUGLzX/hsa04110.xml
+#> Downloaded & saved in: /tmp/RtmpR0RmET/hsa04110.xml
 ```

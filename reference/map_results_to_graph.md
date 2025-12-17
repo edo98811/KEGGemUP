@@ -54,7 +54,6 @@ the function `kegg_to_graph`.
 ``` r
 pathway <- "hsa04110" # Example pathway ID
 graph <- kegg_to_graph(pathway, return_type = "igraph")
-#> Downloading KGML for hsa04110 ...
 #> Downloaded & cached: hsa04110
 #> Parsed 134 nodes from KGML file.
 #> Parsed 119 edges from KGML file.
