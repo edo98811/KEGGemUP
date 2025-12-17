@@ -88,7 +88,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #' (if de_results is a single data.frame).
 #' @param value_column Column name in de_table containing values to map
 #' (if de_results is a single data.frame).
-#' @return An igraph or visNetwork object with mapped results.  
+#' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
 #' @examples
@@ -109,7 +109,6 @@ map_results_to_graph <- function(
     feature_column = NULL,
     value_column = NULL,
     palette = "RdBu") {
-
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
@@ -460,47 +459,112 @@ style_edges <- function(edges_df) {
 #' @return Updated nodes data frame with added columns: value, color, source, text
 #' @noRd
 add_results_nodes <- function(nodes_df, results_combined) {
+
   # If results is empty then return the original df
   if (is.null(results_combined)) {
     return(nodes_df)
   }
 
   warn <- FALSE
-  # Iterate through nodes_df and results_combined to map values For each node
-  # iterate over all results_combined
-  for (i in seq_len(nrow(nodes_df))) {
-    for (j in seq_len(nrow(results_combined))) {
-      pattern <- results_combined$KEGG[j]
-      if (is.na(pattern) || pattern == "" || is.na(nodes_df$KEGG[i]) || nodes_df$KEGG[i] ==
-        "") {
-        next
-      }
-      node_ids <- strsplit(nodes_df$KEGG[i], ";", fixed = TRUE)[[1]]
+  # Node mapping has this structure:
+  # id   | KEGG (id is the node id)
+  # 1      1111
+  # 2      2222
+  # 2      3333
+  # 3    K00001
+  # 4  tst00002
+  # 5 undefined
+  # 6      1111
 
-      if (pattern %in% node_ids) {
-        # KEGG ids match (substring) If no value assigned to the node,
-        # assign the one from results_combined
-        if (is.na(nodes_df$plot_value[i])) {
-          nodes_df$plot_value[i] <- results_combined$plot_value[j]
-          nodes_df$source[i] <- results_combined$source[j]
-          # nodes_df$text[i] <- list() If value warn
-        } else {
-          warn <- TRUE
-        }
+  # results_combined has this structure:
+  # KEGG     | plot_value | source
+  # 1111        2.5        de1
+  # 2222       -1.2        de2
+  # 3333        0.5        de1
 
-        # This will be added in any case
-        sep <- ","
-        nodes_df$text[i] <- paste0(
-          nodes_df$text[i], "Source: ", results_combined$source[j],
-          sep, "Value: ", results_combined$plot_value[j], sep, "Id: ", results_combined$KEGG[j],
-          ";"
-        )
-      }
-    }
+  # Ensure required columns exist
+  required_nodes <- c("id", "KEGG", "plot_value", "source", "text")
+  required_results <- c("KEGG", "plot_value", "source")
+
+  stopifnot(
+    all(required_nodes %in% names(nodes_df)),
+    all(required_results %in% names(results_combined))
+  )
+
+  # Explode KEGG IDs per node -------------------------------------------
+  mapping <- do.call(
+    rbind,
+    lapply(seq_len(nrow(nodes_df)), function(i) {
+      data.frame(
+        id = nodes_df$id[i],
+        KEGG = strsplit(nodes_df$KEGG[i], ";", fixed = TRUE)[[1]],
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  # Join results onto exploded mapping ----------------------------------
+  mapping <- merge(
+    mapping,
+    results_combined,
+    by = "KEGG",
+    all.x = FALSE,
+    sort = FALSE
+  )
+
+  if (nrow(mapping) == 0) {
+    return(nodes_df)
   }
 
+  # Detect multiple matches per node ------------------------------------
+  match_counts <- table(mapping$id)
+  warn_nodes <- names(match_counts[match_counts > 1])
+  warn <- length(warn_nodes) > 0
+
+  # Assign first match only -----------------------------
+  first_hits <- mapping[!duplicated(mapping$id), ]
+  idx <- match(first_hits$id, nodes_df$id)
+
+  nodes_df$plot_value[idx] <- ifelse(
+    is.na(nodes_df$plot_value[idx]),
+    first_hits$plot_value,
+    nodes_df$plot_value[idx]
+  )
+
+  nodes_df$source[idx] <- ifelse(
+    is.na(nodes_df$source[idx]),
+    first_hits$source,
+    nodes_df$source[idx]
+  )
+
+  # Append text for all matches -----------------------------------------
+  sep <- ","
+  mapping$text_append <- paste0(
+    "Source: ", mapping$source,
+    sep, "Value: ", mapping$plot_value,
+    sep, "Id: ", mapping$KEGG,
+    ";"
+  )
+
+  text_by_node <- tapply(
+    mapping$text_append,
+    mapping$id,
+    paste0,
+    collapse = ""
+  )
+
+  text_idx <- match(names(text_by_node), nodes_df$id)
+  nodes_df$text[text_idx] <- paste0(
+    nodes_df$text[text_idx],
+    text_by_node
+  )
+
+  # --- 6. Warn if necessary ----------------------------------------------------
   if (warn) {
-    warning("Some nodes had multiple matching KEGG IDs; only the first match was assigned a value.")
+    warning(
+      "Some nodes had multiple matching KEGG IDs; ",
+      "only the first match was used for plot_value/source."
+    )
   }
 
   return(nodes_df)
@@ -552,7 +616,6 @@ combine_results_in_dataframe <- function(results_list) {
 #' @importFrom grDevices colorRampPalette
 #' @noRd
 add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
-
   # Get unique sources
   sources <- unique(na.omit(nodes_df$source))
   valid_nodes <- nodes_df[!is.na(nodes_df$source), , drop = FALSE]
