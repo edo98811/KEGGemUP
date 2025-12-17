@@ -9,7 +9,8 @@ map_results_to_graph(
   de_results,
   return_type = "visNetwork",
   feature_column = NULL,
-  value_column = NULL
+  value_column = NULL,
+  palette = "RdBu"
 )
 }
 \arguments{
