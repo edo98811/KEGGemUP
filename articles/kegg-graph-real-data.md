@@ -1,10 +1,12 @@
-# The \`KEGGemUP\` package: building KEGG pathway graphs with real data
+# The \`KEGGemUP\` package: building KEGG pathway graphs and mapping real data results
 
 **Compiled date**: 2025-12-17
 
 **Last edited**: 15-12-2025
 
 **License**: MIT + file LICENSE
+
+## Installation
 
 The first step is installing the package. If you dont have the package
 installed you can do so by running:
@@ -50,7 +52,7 @@ page](https://www.bioconductor.org/packages/release/data/experiment/html/macroph
 To learn more about graph manipulation you can refer to the igraph and
 visNetwork documentation:
 
-- [igraph](https://r.igraph.org) Is a pacakge for creating and
+- [igraph](https://r.igraph.org) Is a package for creating and
   manipulating graphs in R.
 - [visNetwork](https://datastorm-open.github.io/visNetwork/) Is a
   package for interactive visualization of graphs in R, an R interface
@@ -126,7 +128,7 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
 ]
 ```
 
-## Functions to parse KGML files
+### Functions to parse KGML files
 
 KGML is the format that KEGG uses to save the pathway structure and it
 is what this package interfaces itself with. There is an exported
@@ -143,9 +145,9 @@ which has the KEGG pathway ID “hsa00563”.
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
 #> Downloading KGML for hsa00563 ...
-#> Downloaded & saved in: /tmp/RtmpPl6Jwv/hsa00563.xml
+#> Downloaded & saved in: /tmp/RtmplE22Cf/hsa00563.xml
 kgml_file
-#> [1] "/tmp/RtmpPl6Jwv/hsa00563.xml"
+#> [1] "/tmp/RtmplE22Cf/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -164,7 +166,7 @@ edges_df <- parse_kgml_relations(kgml_file)
 #> Parsed 35 edges from KGML file.
 ```
 
-### The output data.frame frame for nodes
+#### The output data.frame frame for nodes
 
 Here you can see the first 5 columns of the dataframe that you get by
 parsing the nodes from a KGML file. It is a `data.frame` where each row
@@ -184,7 +186,7 @@ knitr::kable(head(nodes_df))
 | 17   | 17  | hsa:5283  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5283>  | rn:R05916 | PIGH, GPI-H                                           | PIGH, GPI-H                                           | \#000000 | \#BFFFBF | rectangle     | 187 | 189 | 46    | 17     | NA         |
 | 18   | 18  | hsa:5279  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5279>  | rn:R05916 | PIGC, GPI2, GPIBD16, MRT62                            | PIGC, GPI2, GPIBD16, MRT62                            | \#000000 | \#BFFFBF | rectangle     | 233 | 172 | 46    | 17     | NA         |
 
-### The output data.frame frame for edges
+#### The output data.frame frame for edges
 
 Here you can see the first 5 columns of the dataframe that you get by
 parsing the edges from a KGML file. It is a `data.frame` where each row
@@ -205,7 +207,7 @@ knitr::kable(head(edges_df))
 | 42   | 47  | ECrel | compound | 31        |
 | 39   | 192 | ECrel | compound | 34        |
 
-## Build a graph from a pathway ID and map results to nodes
+### Build a graph from a pathway ID and map results to nodes
 
 To map the differential expression results to the nodes of a KEGG
 pathway graph you can use `map_results_to_nodes()`. The input of this
@@ -259,7 +261,7 @@ de_results_list <-list(
 )
 ```
 
-### Example of usage with the list of DE results tables
+#### Example of usage with the list of DE results tables
 
 We will now take a KEGG pathway from the enrichment results we built
 earlier and map the differential expression results to its nodes. As you
@@ -301,7 +303,7 @@ mapping of the differential expression results to the nodes we need an
 igraph object as input to
 [`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md).
 
-### Example of usage with a single DE results table
+#### Example of usage with a single DE results table
 
 Let’s first build a filtered differential expression results table with
 only the significant results.
@@ -326,6 +328,29 @@ graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column
 #> Mapping differential expression results to nodes...
 graph_visnetwork
 ```
+
+You can also control the palette that is used to map the values to
+colors on the nodes with the parameter `palette`. The default is “RdBu”
+from RColorBrewer, but you can use any palette supported by
+RColorBrewer. To see the available palettes you can run
+[`RColorBrewer::display.brewer.all()`](https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html).
+You can also visit this page: [RColorBrewer
+palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
+
+``` r
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+#> Downloading KGML for hsa00563 ...
+#> Downloaded & cached: hsa00563
+#> Parsed 126 nodes from KGML file.
+#> Parsed 35 edges from KGML file.
+#> Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,
+#> : EOF within quoted string
+graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork", palette = "PiYG")
+#> Mapping differential expression results to nodes...
+graph_visnetwork
+```
+
+### Session info
 
 ``` r
 sessionInfo()
