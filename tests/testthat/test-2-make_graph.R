@@ -29,7 +29,7 @@ test_that("parse_kgml_entries loads empty edges  correctly", {
 
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
-  expect_equal(colnames(edges_df), c("from", "to", "type", "subtype", "rel_value"))
+  expect_equal(colnames(edges_df), c("from", "to", "type", "subtype", "rel_value", "title"))
 })
 
 test_that("parse_kgml_entries load nodes correctly", {

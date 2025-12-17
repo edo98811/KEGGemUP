@@ -129,7 +129,7 @@ test_that("adds visual styling columns correctly", {
   expect_true(is.logical(styled$fixed))
 })
 
-test_that("tooltip is formatted correctly", {
+test_that("tooltip is added correctly", {
   nodes <- data.frame(
     label = "TP53",
     KEGG = "04115",

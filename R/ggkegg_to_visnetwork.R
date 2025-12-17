@@ -57,6 +57,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 
   if (nrow(edges_df)) {
     edges_df <- style_edges(edges_df)
+    edges_df <- add_edge_tooltip(edges_df)
   }
 
   # --- 5. Build pathway name ---
@@ -299,33 +300,69 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' expression data, and value.
 #' @noRd
 add_tooltip <- function(nodes_df) {
-  base_link <- "https://www.kegg.jp/entry/"
 
-  button_html <- ifelse(is.na(nodes_df$kegg_name) | nodes_df$kegg_name == "", "",
+  button_html <- ifelse(
+    is.na(nodes_df$kegg_name) | is.na(nodes_df$link) | nodes_df$kegg_name == "",
+    "",
     paste0(
-      "<div style=\"text-align:center; margin-top:5px;\">", "<a href=\"",
-      ifelse(!is.na(nodes_df$link), nodes_df$link, NA_character_), "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"text-decoration:none;\">",
-      "<button type=\"button\" style=\"", "background-color:#4CAF50;", "color:white;",
-      "border:none;", "padding:5px 12px;", "border-radius:5px;", "cursor:pointer;",
-      "font-size:12px;\">", "KEGG entry</button></a></div>"
+      "<div style='text-align:center; margin-top:5px;'>",
+      "<a href='", nodes_df$link, "' target='_blank'>",
+      "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
+      "KEGG entry",
+      "</button></a></div>"
+    )
+  )
+  nodes_df$title <- ifelse(
+    nodes_df$kegg_name == "undefined",
+
+    # Group placeholder node
+    paste0(
+      "<table>",
+      "<tr><th align='left'>Group</th><td>",
+      ifelse(
+        is.na(nodes_df$group) | nodes_df$group == "",
+        "Not part of any group",
+        nodes_df$group
+      ),
+      "</td></tr>",
+      "</table>"
+    ),
+
+    # Regular node
+    paste0(
+      "<table>",
+      "<tr><th align='left'>KEGG Name</th><td>",
+      ifelse(
+        nchar(nodes_df$kegg_name) > 50,
+        substr(nodes_df$kegg_name, 1, 50),
+        nodes_df$kegg_name
+      ),
+      "</td></tr>",
+      "<tr><th align='left'>Name</th><td>",
+      ifelse(is.na(nodes_df$graphics_name), "", nodes_df$graphics_name),
+      "</td></tr>",
+      "<tr><th align='left'>Source</th><td>",
+      ifelse(is.na(nodes_df$source), "", nodes_df$source),
+      "</td></tr>",
+      "<tr><th align='left'>Value</th><td>",
+      ifelse(
+        is.na(nodes_df$plot_value), "",
+        format(round(as.numeric(nodes_df$plot_value), 3), nsmall = 3)
+      ),
+      "</td></tr>",
+      "<tr><th align='left'>Group</th><td>",
+      ifelse(
+        is.na(nodes_df$group) | nodes_df$group == "",
+        "Not belonging to any group",
+        nodes_df$group
+      ),
+      "</td></tr>",
+      "</table>",
+      button_html
     )
   )
 
-  # Ensure no 'NA' strings in tooltip
-  safe <- function(x) ifelse(is.na(x), "", as.character(x))
-  nodes_df$title <- ifelse(safe(nodes_df$kegg_name) == "undefined", paste0(
-    "Group Node Placeholder: ",
-    nodes_df$group, "<br>"
-  ), paste0(
-    "Name: ", ifelse(nchar(safe(nodes_df$kegg_name)) >
-      50, nodes_df$kegg_name, nodes_df$kegg_name[1:50]), "<br>", "Source: ", safe(nodes_df$source),
-    "<br>", "Value: ", safe(format(round(as.numeric(nodes_df$plot_value), 3),
-      nsmall = 3
-    )), "<br>", ifelse(safe(nodes_df$group) != "", paste0(
-      "Group: ",
-      safe(nodes_df$group), "<br>"
-    ), "Not belonging to any group<br>"), button_html
-  ))
+
   return(nodes_df)
 }
 
@@ -369,85 +406,72 @@ style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
 #' @return edges_df with added visual styling columns: color, dashes, arrows, label.
 #' @noRd
 style_edges <- function(edges_df) {
+  # possible subtypes and their styles
+  # name	value	ECrel	PPrel	GErel	Explanation
+  # compound	Entry element id attribute value for compound.	*	*		shared with two successive reactions (ECrel) or intermediate of two interacting proteins (PPrel)
+  # hidden compound	Entry element id attribute value for hidden compound.	*			shared with two successive reactions but not displayed in the pathway map
+  # activation	-->		*		positive and negative effects which may be associated with molecular information below
+  # inhibition	--|		*
+  # expression	-->			*	interactions via DNA binding
+  # repression	--|			*
+  # indirect effect	..>		*	*	indirect effect without molecular details
+  # state change	...		*		state transition
+  # binding/association	---		*		association and dissociation
+  # dissociation	-+-		*
+  # missing interaction	-/-		*	*	missing interaction due to mutation, etc.
+  # phosphorylation	+p		*		molecular events
+  # dephosphorylation	-p		*
+  # glycosylation	+g		*
+  # ubiquitination	+u		*
+  # methylation	+m		*
+
   edge_style_map <- list(
-    compound = list(
-      color = "black", dashes = FALSE, arrows = "to",
-      label = ""
-    ), hidden_compound = list(
-      color = "lightgray", dashes = FALSE,
-      arrows = "to", label = ""
-    ), activation = list(
-      color = "red", dashes = FALSE,
-      arrows = "to", label = ""
-    ), inhibition = list(
-      color = "blue", dashes = FALSE,
-      arrows = "tee", label = ""
-    ), expression = list(
-      color = "red", dashes = TRUE,
-      arrows = "to", label = ""
-    ), repression = list(
-      color = "blue", dashes = TRUE,
-      arrows = "tee", label = ""
-    ), indirect_effect = list(
-      color = "gray", dashes = TRUE,
-      arrows = "to", label = ""
-    ), state_change = list(
-      color = "gray", dashes = TRUE,
-      arrows = "", label = ""
-    ), binding_association = list(
-      color = "black", dashes = TRUE,
-      arrows = "", label = ""
-    ), dissociation = list(
-      color = "gray", dashes = TRUE,
-      arrows = "to", label = ""
-    ), phosphorylation = list(
-      color = "black", dashes = FALSE,
-      arrows = "to", label = "+p"
-    ), dephosphorylation = list(
-      color = "black", dashes = FALSE,
-      arrows = "to", label = "-p"
-    ), glycosylation = list(
-      color = "black", dashes = FALSE,
-      arrows = "to", label = "+g"
-    ), ubiquitination = list(
-      color = "black", dashes = FALSE,
-      arrows = "to", label = "+u"
-    ), methylation = list(
-      color = "black", dashes = FALSE,
-      arrows = "to", label = "+m"
-    ), others_unknown = list(
-      color = "black", dashes = TRUE,
-      arrows = "to", label = "?"
-    ), group_relation = list(
-      color = "transparent",
-      dashes = TRUE, arrows = "", label = ""
-    ) # Invisible edges for group relations
+    compound = list(color = "black", dashes = FALSE, arrows = "to", label = ""),
+    hidden_compound = list(color = "lightgray", dashes = FALSE, arrows = "to", label = ""),
+    activation = list(color = "red", dashes = FALSE, arrows = "to", label = ""),
+    inhibition = list(color = "blue", dashes = FALSE, arrows = "tee", label = ""),
+    expression = list(color = "red", dashes = TRUE, arrows = "to", label = ""),
+    repression = list(color = "blue", dashes = TRUE, arrows = "tee", label = ""),
+    indirect_effect = list(color = "gray", dashes = TRUE, arrows = "to", label = ""),
+    state_change = list(color = "gray", dashes = TRUE, arrows = "", label = ""),
+    binding_association = list(color = "black", dashes = TRUE, arrows = "", label = ""),
+    dissociation = list(color = "gray", dashes = TRUE, arrows = "to", label = ""),
+    missing_interaction = list(color = "gray", dashes = TRUE, arrows = "to", label = "-/-"),
+    phosphorylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+p"),
+    dephosphorylation = list(color = "black", dashes = FALSE, arrows = "to", label = "-p"),
+    glycosylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+g"),
+    ubiquitination = list(color = "black", dashes = FALSE, arrows = "to", label = "+u"),
+    methylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+m"),
+    others_unknown = list(color = "black", dashes = TRUE, arrows = "to", label = "?"),
+    group_relation = list(color = "transparent", dashes = TRUE, arrows = "", label = "")
   )
 
   # https://builtin.com/data-science/and-in-r#:~:text=The%20single%20sign%20version%20%7C%20returns,first%20element%20of%20each%20vector.
-  edges_df$subtype <- gsub("/", "_", edges_df$subtype)
-  edges_df$subtype[
-    is.na(edges_df$subtype) |
-      !(edges_df$subtype %in% names(edge_style_map))
-  ] <- "others_unknown"
+  edges_df$subtype <- tolower(edges_df$subtype)
+  edges_df$subtype <- gsub("[/ ]", "_", edges_df$subtype)
+  edges_df$subtype[is.na(edges_df$subtype) |
+    !(edges_df$subtype %in% names(edge_style_map))] <- "others_unknown"
 
-  edges_df$color <- vapply(
-    edges_df$subtype, function(x) edge_style_map[[x]]$color,
-    character(1)
-  )
-  edges_df$dashes <- vapply(
-    edges_df$subtype, function(x) edge_style_map[[x]]$dashes,
-    logical(1)
-  )
-  edges_df$arrows <- vapply(
-    edges_df$subtype, function(x) edge_style_map[[x]]$arrows,
-    character(1)
-  )
-  edges_df$label <- vapply(
-    edges_df$subtype, function(x) edge_style_map[[x]]$label,
-    character(1)
-  )
+  # Vectorized assignment
+  edges_df$color <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$color, character(1))
+  edges_df$dashes <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$dashes, logical(1))
+  edges_df$arrows <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$arrows, character(1))
+  edges_df$label <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$label, character(1))
 
+
+  return(edges_df)
+}
+
+#' Add tooltips to edges for visNetwork visualization.
+#' @param edges_df Data frame of edges with columns: subtype, type, label.
+#' @return edges_df with added 'title' column for tooltips.
+#' @noRd
+add_edge_tooltip <- function(edges_df) {
+  edges_df$title <- paste0(
+    "Subtype: ", edges_df$subtype, "<br>",
+    "Type: ", edges_df$type, "<br>",
+    "Label: ", ifelse(edges_df$label == "", "N/A", edges_df$label)
+  )
   return(edges_df)
 }
 
@@ -459,7 +483,6 @@ style_edges <- function(edges_df) {
 #' @return Updated nodes data frame with added columns: value, color, source, text
 #' @noRd
 add_results_nodes <- function(nodes_df, results_combined) {
-
   # If results is empty then return the original df
   if (is.null(results_combined)) {
     return(nodes_df)

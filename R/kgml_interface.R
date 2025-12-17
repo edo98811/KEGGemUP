@@ -36,7 +36,8 @@ parse_kgml_relations <- function(file) {
     if (length(subnodes) == 0) {
       data.frame(
         from = entry1, to = entry2, type = type, subtype = NA_character_,
-        rel_value = NA_character_ # value controls the vidth of edges
+        title = NA_character_,
+        rel_value = NA_character_ # value controls the vidth of edges so I use rel_value
       )
     } else {
       data.frame(from = entry1, to = entry2, type = type, subtype = xml_attr(
@@ -52,7 +53,7 @@ parse_kgml_relations <- function(file) {
     warning("No relations found in KGML file.")
     edges_df <- data.frame(
       from = character(0), to = character(0), type = character(0),
-      subtype = character(0), rel_value = character(0)
+      subtype = character(0), rel_value = character(0), title = character(0)
     )
   }
 
