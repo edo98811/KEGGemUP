@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">kegg-graph</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">The `GeneTonic` User's Guide
+    </a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -33,7 +34,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Map differential expression results to nodes</h1>
-      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/main/R/ggkegg_to_visnetwork.R" class="external-link"><code>R/ggkegg_to_visnetwork.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/ggkegg_to_visnetwork.R" class="external-link"><code>R/ggkegg_to_visnetwork.R</code></a></small>
       <div class="d-none name"><code>map_results_to_graph.Rd</code></div>
     </div>
 
@@ -65,15 +66,17 @@
 
 
 <dt id="arg-return-type">return_type<a class="anchor" aria-label="anchor" href="#arg-return-type"></a></dt>
-<dd><p>Output type: "igraph" or "visNetwork".</p></dd>
+<dd><p>Output type: 'igraph' or 'visNetwork'.</p></dd>
 
 
 <dt id="arg-feature-column">feature_column<a class="anchor" aria-label="anchor" href="#arg-feature-column"></a></dt>
-<dd><p>Column name in de_table containing KEGG IDs (if de_results is a single data.frame).</p></dd>
+<dd><p>Column name in de_table containing KEGG IDs
+(if de_results is a single data.frame).</p></dd>
 
 
 <dt id="arg-value-column">value_column<a class="anchor" aria-label="anchor" href="#arg-value-column"></a></dt>
-<dd><p>Column name in de_table containing values to map (if de_results is a single data.frame).</p></dd>
+<dd><p>Column name in de_table containing values to map
+(if de_results is a single data.frame).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -86,6 +89,24 @@
 The pathwhay given as input must be the output of the function <code>kegg_to_graph</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span> <span class="co"># Example pathway ID</span></span></span>
+<span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span>, return_type <span class="op">=</span> <span class="st">"igraph"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading KGML for hsa04110 ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded &amp; cached: hsa04110</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Parsed 134 nodes from KGML file.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Parsed 119 edges from KGML file.</span>
+<span class="r-in"><span><span class="co"># Example differential expression results</span></span></span>
+<span class="r-in"><span><span class="va">de_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  KEGG_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hsa:1234"</span>, <span class="st">"hsa:5678"</span>, <span class="st">"cpd:C00022"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  log2FoldChange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="op">-</span><span class="fl">2.0</span>, <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vis_graph</span> <span class="op">&lt;-</span> <span class="fu">map_results_to_graph</span><span class="op">(</span><span class="va">graph</span>, <span class="va">de_results</span>, return_type <span class="op">=</span> <span class="st">"visNetwork"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Mapping differential expression results to nodes...</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

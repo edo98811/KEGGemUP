@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">kegg-graph</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">The `GeneTonic` User's Guide
+    </a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -33,7 +34,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Parse KEGG KGML files to extract nodes data frame.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/main/R/kgml_interface.R" class="external-link"><code>R/kgml_interface.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/kgml_interface.R" class="external-link"><code>R/kgml_interface.R</code></a></small>
       <div class="d-none name"><code>parse_kgml_entries.Rd</code></div>
     </div>
 
@@ -57,40 +58,53 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data.frame with the following columns:</p><dl><dt>id</dt>
-<dd><p>Unique identifier of the entry within the KGML pathway (from the <code>id</code> attribute).</p></dd>
+<dd><p>Unique identifier of the entry within the KGML pathway
+(from the <code>id</code> attribute).</p></dd>
 
 <dt>kegg_name</dt>
-<dd><p>The KEGG-specific name or identifier of the entity (from the <code>name</code> attribute). This may include one or more KEGG identifiers such as gene IDs, compound IDs, or enzyme EC numbers. Preceded by organism ID</p></dd>
+<dd><p>The KEGG-specific name or identifier of the entity
+(from the <code>name</code> attribute).
+This may include one or more KEGG identifiers such as gene IDs,
+compound IDs, or enzyme EC numbers. Preceded by organism ID</p></dd>
 
 <dt>type</dt>
-<dd><p>Type of the node (from the <code>type</code> attribute), indicating the biological entity class such as <code>"gene"</code>, <code>"enzyme"</code>, <code>"compound"</code>, <code>"map"</code>, <code>"ortholog"</code>, or <code>"group"</code>.</p></dd>
+<dd><p>Type of the node (from the <code>type</code> attribute), indicating the biological
+entity class such as <code>'gene'</code>, <code>'enzyme'</code>, <code>'compound'</code>, <code>'map'</code>, <code>'ortholog'</code>, or <code>'group'</code>.</p></dd>
 
 <dt>link</dt>
-<dd><p>URL linking to the KEGG resource for this entry, if available (from the <code>link</code> attribute).</p></dd>
+<dd><p>URL linking to the KEGG resource for this entry, if available
+(from the <code>link</code> attribute).</p></dd>
 
 <dt>reaction</dt>
-<dd><p>Associated reaction ID(s), if any (from the <code>reaction</code> attribute). Typically present for enzyme entries.</p></dd>
+<dd><p>Associated reaction ID(s), if any (from the <code>reaction</code> attribute).
+Typically present for enzyme entries.</p></dd>
 
 <dt>graphics_name</dt>
-<dd><p>Display name for the entry, taken from the <code>name</code> attribute of the <code>&lt;graphics&gt;</code> node.</p></dd>
+<dd><p>Display name for the entry, taken from the <code>name</code>
+attribute of the <code>&lt;graphics&gt;</code> node.</p></dd>
 
 <dt>label</dt>
 <dd><p>Text label for visualization purposes.</p></dd>
 
 <dt>fgcolor</dt>
-<dd><p>Foreground color of the graphical element (from the <code>fgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
+<dd><p>Foreground color of the graphical element
+(from the <code>fgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
 <dt>bgcolor</dt>
-<dd><p>Background color of the graphical element (from the <code>bgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
+<dd><p>Background color of the graphical element
+(from the <code>bgcolor</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
 <dt>graphics_type</dt>
-<dd><p>Shape or representation type of the graphical element (from the <code>type</code> attribute of <code>&lt;graphics&gt;</code>), such as <code>"rectangle"</code>, <code>"circle"</code>, or <code>"line"</code>.</p></dd>
+<dd><p>Shape or representation type of the graphical element
+(from the <code>type</code> attribute of <code>&lt;graphics&gt;</code>), such as <code>'rectangle'</code>, <code>'circle'</code>, or <code>'line'</code>.</p></dd>
 
 <dt>x</dt>
-<dd><p>X-coordinate of the node’s position in the pathway diagram (from the <code>x</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
+<dd><p>X-coordinate of the node’s position in the pathway diagram
+(from the <code>x</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
 <dt>y</dt>
-<dd><p>Y-coordinate of the node’s position in the pathway diagram (from the <code>y</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
+<dd><p>Y-coordinate of the node’s position in the pathway diagram
+(from the <code>y</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
 
 <dt>width</dt>
 <dd><p>Width of the graphical element (from the <code>width</code> attribute of <code>&lt;graphics&gt;</code>).</p></dd>
@@ -112,14 +126,6 @@ for integration with relational data models or network visualization frameworks
 (e.g., <code>igraph</code>or <code>visNetwork</code>).</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">nodes_df</span> <span class="op">&lt;-</span> <span class="fu">parse_kgml_entries</span><span class="op">(</span><span class="st">"pathway.xml"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nodes_df</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

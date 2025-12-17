@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/edo98811/KEGGemUP/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/edo98811/KEGGemUP/blob/devel/DESCRIPTION)
 
 Filippi E, Marini F (2025). *KEGGemUP: A package to map you differential
 expression results on KEGG pathways*. R package version 0.1.0,

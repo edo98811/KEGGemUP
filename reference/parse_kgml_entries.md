@@ -32,8 +32,8 @@ A data.frame with the following columns:
 - type:
 
   Type of the node (from the `type` attribute), indicating the
-  biological entity class such as `"gene"`, `"enzyme"`, `"compound"`,
-  `"map"`, `"ortholog"`, or `"group"`.
+  biological entity class such as `'gene'`, `'enzyme'`, `'compound'`,
+  `'map'`, `'ortholog'`, or `'group'`.
 
 - link:
 
@@ -67,8 +67,8 @@ A data.frame with the following columns:
 - graphics_type:
 
   Shape or representation type of the graphical element (from the `type`
-  attribute of `<graphics>`), such as `"rectangle"`, `"circle"`, or
-  `"line"`.
+  attribute of `<graphics>`), such as `'rectangle'`, `'circle'`, or
+  `'line'`.
 
 - x:
 
@@ -102,12 +102,3 @@ entities.
 The resulting data provides a tidy, one-row-per-entry representation
 suitable for integration with relational data models or network
 visualization frameworks (e.g., `igraph`or `visNetwork`).
-
-## Examples
-
-``` r
-if (FALSE) { # \dontrun{
-nodes_df <- parse_kgml_entries("pathway.xml")
-head(nodes_df)
-} # }
-```

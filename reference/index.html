@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">kegg-graph</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/kegg-graph-real-data.html">The `GeneTonic` User's Guide
+    </a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -47,115 +48,17 @@
 
       <dl><dt>
 
-          <code><a href="add_colors_to_nodes.html">add_colors_to_nodes()</a></code>
+          <code><a href="download_all_pathways.html">download_all_pathways()</a></code>
 
         </dt>
-        <dd>Add color palettes</dd>
+        <dd>Download all KEGG pathways for a given organism.</dd>
 
         <dt>
 
-          <code><a href="add_columns_nodes_df.html">add_columns_nodes_df()</a></code>
-
-        </dt>
-        <dd>Add columns to nodes_df with default values</dd>
-
-        <dt>
-
-          <code><a href="add_compound_names.html">add_compound_names()</a></code>
-
-        </dt>
-        <dd>Add compound names to compound nodes in the nodes data frame.</dd>
-
-        <dt>
-
-          <code><a href="add_gene_names.html">add_gene_names()</a></code>
-
-        </dt>
-        <dd>Add gene names to gene nodes in the nodes data frame.</dd>
-
-        <dt>
-
-          <code><a href="add_group.html">add_group()</a></code>
-
-        </dt>
-        <dd>Add group information to nodes based on 'undefined' groups.</dd>
-
-        <dt>
-
-          <code><a href="add_results_nodes.html">add_results_nodes()</a></code>
-
-        </dt>
-        <dd>Add results from combined results data frame to nodes data frame</dd>
-
-        <dt>
-
-          <code><a href="add_tooltip.html">add_tooltip()</a></code>
-
-        </dt>
-        <dd>Add tooltips to nodes for visNetwork visualization.</dd>
-
-        <dt>
-
-          <code><a href="combine_results_in_dataframe.html">combine_results_in_dataframe()</a></code>
-
-        </dt>
-        <dd>Combine multiple differential expression results into a single data frame</dd>
-
-        <dt>
-
-          <code><a href="expand_keggs.html">expand_keggs()</a></code>
-
-        </dt>
-        <dd>Handle multiple KEGG IDs in a single string separated by ";"</dd>
-
-        <dt>
-
-          <code><a href="get_and_cache_kgml.html">get_and_cache_kgml()</a></code>
+          <code><a href="download_kgml.html">download_kgml()</a></code>
 
         </dt>
         <dd>Download and cache KEGG KGML files.</dd>
-
-        <dt>
-
-          <code><a href="get_kegg_compounds.html">get_kegg_compounds()</a></code>
-
-        </dt>
-        <dd>Get KEGG compounds with caching.</dd>
-
-        <dt>
-
-          <code><a href="get_kegg_glycans.html">get_kegg_glycans()</a></code>
-
-        </dt>
-        <dd>Get KEGG glycans with caching.</dd>
-
-        <dt>
-
-          <code><a href="get_pathway_name.html">get_pathway_name()</a></code>
-
-        </dt>
-        <dd>Convert KEGG pathway ID to readable pathway name</dd>
-
-        <dt>
-
-          <code><a href="is_valid_de_entry.html">is_valid_de_entry()</a></code>
-
-        </dt>
-        <dd>Check the structure and validity of each entry in de_results</dd>
-
-        <dt>
-
-          <code><a href="is_valid_kgml.html">is_valid_kgml()</a></code>
-
-        </dt>
-        <dd>Validate KGML file structure</dd>
-
-        <dt>
-
-          <code><a href="is_valid_pathway.html">is_valid_pathway()</a></code>
-
-        </dt>
-        <dd>Validate KEGG pathway ID format</dd>
 
         <dt>
 
@@ -163,20 +66,6 @@
 
         </dt>
         <dd>Transform a ggkegg graph to igraph or visNetwork</dd>
-
-        <dt>
-
-          <code><a href="make_igraph_graph.html">make_igraph_graph()</a></code>
-
-        </dt>
-        <dd>Create an igraph graph from nodes and edges data frames</dd>
-
-        <dt>
-
-          <code><a href="make_vis_graph.html">make_vis_graph()</a></code>
-
-        </dt>
-        <dd>Create a visNetwork graph from nodes and edges data frames</dd>
 
         <dt>
 
@@ -201,31 +90,17 @@
 
         <dt>
 
-          <code><a href="remove_kegg_prefix.html">remove_kegg_prefix()</a></code>
+          <code><a href="reset_cache.html">reset_cache()</a></code>
 
         </dt>
-        <dd>Convert KEGG IDs with prefixes to IDs without prefixes</dd>
+        <dd>Reset KEGG and mapping caches by deleting all cached files</dd>
 
         <dt>
 
-          <code><a href="scale_dimensions.html">scale_dimensions()</a></code>
+          <code><a href="return_all_cached.html">return_all_cached()</a></code>
 
         </dt>
-        <dd>Scale node dimensions for better visualization.</dd>
-
-        <dt>
-
-          <code><a href="style_edges.html">style_edges()</a></code>
-
-        </dt>
-        <dd>Style edges based on their subtype for visNetwork visualization.</dd>
-
-        <dt>
-
-          <code><a href="style_nodes.html">style_nodes()</a></code>
-
-        </dt>
-        <dd>Style nodes based on their type for visNetwork visualization.</dd>
+        <dd>Return all cached KEGG and mapping files from BiocFileCache</dd>
       </dl></div>
   </main></div>
 

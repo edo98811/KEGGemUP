@@ -26,7 +26,7 @@ map_results_to_graph(
 
 - return_type:
 
-  Output type: "igraph" or "visNetwork".
+  Output type: 'igraph' or 'visNetwork'.
 
 - feature_column:
 
@@ -47,3 +47,21 @@ An igraph or visNetwork object with mapped results.
 This functionmaps differential expression results onto the nodes of a
 KEGG pathway graph. The pathwhay given as input must be the output of
 the function `kegg_to_graph`.
+
+## Examples
+
+``` r
+pathway <- "hsa04110" # Example pathway ID
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+#> Downloading KGML for hsa04110 ...
+#> Downloaded & cached: hsa04110
+#> Parsed 134 nodes from KGML file.
+#> Parsed 119 edges from KGML file.
+# Example differential expression results
+de_results <- data.frame(
+  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+  log2FoldChange = c(1.5, -2.0, 0.5)
+)
+vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
+#> Mapping differential expression results to nodes...
+```

@@ -77,62 +77,27 @@ graph
 
 ## All functions
 
-- [`add_colors_to_nodes()`](https://edo98811.github.io/KEGGemUP/reference/add_colors_to_nodes.md)
-  : Add color palettes
-- [`add_columns_nodes_df()`](https://edo98811.github.io/KEGGemUP/reference/add_columns_nodes_df.md)
-  : Add columns to nodes_df with default values
-- [`add_compound_names()`](https://edo98811.github.io/KEGGemUP/reference/add_compound_names.md)
-  : Add compound names to compound nodes in the nodes data frame.
-- [`add_gene_names()`](https://edo98811.github.io/KEGGemUP/reference/add_gene_names.md)
-  : Add gene names to gene nodes in the nodes data frame.
-- [`add_group()`](https://edo98811.github.io/KEGGemUP/reference/add_group.md)
-  : Add group information to nodes based on 'undefined' groups.
-- [`add_results_nodes()`](https://edo98811.github.io/KEGGemUP/reference/add_results_nodes.md)
-  : Add results from combined results data frame to nodes data frame
-- [`add_tooltip()`](https://edo98811.github.io/KEGGemUP/reference/add_tooltip.md)
-  : Add tooltips to nodes for visNetwork visualization.
-- [`combine_results_in_dataframe()`](https://edo98811.github.io/KEGGemUP/reference/combine_results_in_dataframe.md)
-  : Combine multiple differential expression results into a single data
-  frame
-- [`expand_keggs()`](https://edo98811.github.io/KEGGemUP/reference/expand_keggs.md)
-  : Handle multiple KEGG IDs in a single string separated by ";"
-- [`get_and_cache_kgml()`](https://edo98811.github.io/KEGGemUP/reference/get_and_cache_kgml.md)
+- [`download_all_pathways()`](https://edo98811.github.io/KEGGemUP/reference/download_all_pathways.md)
+  : Download all KEGG pathways for a given organism.
+- [`download_kgml()`](https://edo98811.github.io/KEGGemUP/reference/download_kgml.md)
   : Download and cache KEGG KGML files.
-- [`get_kegg_compounds()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_compounds.md)
-  : Get KEGG compounds with caching.
-- [`get_kegg_glycans()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_glycans.md)
-  : Get KEGG glycans with caching.
-- [`get_pathway_name()`](https://edo98811.github.io/KEGGemUP/reference/get_pathway_name.md)
-  : Convert KEGG pathway ID to readable pathway name
-- [`is_valid_de_entry()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_de_entry.md)
-  : Check the structure and validity of each entry in de_results
-- [`is_valid_kgml()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_kgml.md)
-  : Validate KGML file structure
-- [`is_valid_pathway()`](https://edo98811.github.io/KEGGemUP/reference/is_valid_pathway.md)
-  : Validate KEGG pathway ID format
 - [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
   : Transform a ggkegg graph to igraph or visNetwork
-- [`make_igraph_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_igraph_graph.md)
-  : Create an igraph graph from nodes and edges data frames
-- [`make_vis_graph()`](https://edo98811.github.io/KEGGemUP/reference/make_vis_graph.md)
-  : Create a visNetwork graph from nodes and edges data frames
 - [`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
   : Map differential expression results to nodes
 - [`parse_kgml_entries()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_entries.md)
   : Parse KEGG KGML files to extract nodes data frame.
 - [`parse_kgml_relations()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_relations.md)
   : Parse KEGG KGML files to extract relations and edges data frames.
-- [`remove_kegg_prefix()`](https://edo98811.github.io/KEGGemUP/reference/remove_kegg_prefix.md)
-  : Convert KEGG IDs with prefixes to IDs without prefixes
-- [`scale_dimensions()`](https://edo98811.github.io/KEGGemUP/reference/scale_dimensions.md)
-  : Scale node dimensions for better visualization.
-- [`style_edges()`](https://edo98811.github.io/KEGGemUP/reference/style_edges.md)
-  : Style edges based on their subtype for visNetwork visualization.
-- [`style_nodes()`](https://edo98811.github.io/KEGGemUP/reference/style_nodes.md)
-  : Style nodes based on their type for visNetwork visualization.
+- [`reset_cache()`](https://edo98811.github.io/KEGGemUP/reference/reset_cache.md)
+  : Reset KEGG and mapping caches by deleting all cached files
+- [`return_all_cached()`](https://edo98811.github.io/KEGGemUP/reference/return_all_cached.md)
+  : Return all cached KEGG and mapping files from BiocFileCache
 
 # Articles
 
 ### All vignettes
 
-- [kegg-graph](https://edo98811.github.io/KEGGemUP/articles/kegg-graph-real-data.md):
+- [The \`GeneTonic\` User's
+  Guide](https://edo98811.github.io/KEGGemUP/articles/kegg-graph-real-data.md)
+  :

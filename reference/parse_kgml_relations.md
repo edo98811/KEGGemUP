@@ -31,15 +31,15 @@ A data.frame with the following columns:
 - type:
 
   The general type of relationship between the two entries (e.g.,
-  `"ECrel"`, `"PPrel"`, `"GErel"`, `"PCrel"`, `"maplink"`). These types
+  `'ECrel'`, `'PPrel'`, `'GErel'`, `'PCrel'`, `'maplink'`). These types
   describe the biological nature of the connection, such as
   enzyme-enzyme relation or protein-protein interaction.
 
 - subtype:
 
   A more specific subtype of the relation, derived from the `<subtype>`
-  child elements of the `<relation>` node (e.g., `"activation"`,
-  `"inhibition"`, `"expression"`, `"compound"`). If no subtype is
+  child elements of the `<relation>` node (e.g., `'activation'`,
+  `'inhibition'`, `'expression'`, `'compound'`). If no subtype is
   defined, this will be `NA`.
 
 - rel_value:
@@ -58,12 +58,3 @@ entities in the pathway. Each `<relation>` may contain one or more
 interaction. The result is a tidy data.frame suitable for network
 analysis or visualization, where each row represents one
 relation–subtype pair.
-
-## Examples
-
-``` r
-if (FALSE) { # \dontrun{
-relations_df <- parse_kgml_relations("pathway.xml")
-head(relations_df)
-} # }
-```

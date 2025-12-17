@@ -5,19 +5,32 @@ Download and cache KEGG KGML files.
 ## Usage
 
 ``` r
-download_kgml(pathway_id, bfc)
+download_kgml(pathway_id, bfc = NULL, directory = NULL)
 ```
 
 ## Arguments
 
 - pathway_id:
 
-  KEGG pathway ID (e.g., "hsa04110").
+  KEGG pathway ID (e.g., 'hsa04110').
 
 - bfc:
 
   BiocFileCache object for caching KEGG KGML files.
 
+- directory:
+
+  Optional directory to save the KGML file if not using cache.
+
 ## Value
 
 Path to the cached KGML file.
+
+## Examples
+
+``` r
+data_dir <- tempdir()
+kgml_path <- download_kgml("hsa04110", directory = data_dir)
+#> Downloading KGML for hsa04110 ...
+#> Downloaded & saved in: /tmp/RtmplT2fdJ/hsa04110.xml
+```
