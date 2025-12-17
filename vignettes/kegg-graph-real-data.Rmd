@@ -1,6 +1,6 @@
 ---
 title: >
-  The `KEGGemUP` package: building KEGG pathway graphs with real data
+  The `KEGGemUP` package: building KEGG pathway graphs and mapping real data results
 author:
   - name: Edoardo Filippi
     affiliation: 
