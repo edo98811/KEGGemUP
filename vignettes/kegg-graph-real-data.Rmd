@@ -232,6 +232,17 @@ graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column
 graph_visnetwork
 ```
 
+You can also control the palette that is used to map the values to colors on the nodes with the parameter `palette`. The default is "RdBu" from RColorBrewer, but you can use any palette supported by RColorBrewer.
+To see the available palettes you can run `RColorBrewer::display.brewer.all()`.
+You can also visit this page: [RColorBrewer palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
+
+```{r use-package-3}
+graph <- kegg_to_graph(pathway, return_type = "igraph")
+graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork", palette = "PiYG")
+graph_visnetwork
+```
+
+## Session info
 ```{r}
 sessionInfo()
 ```
