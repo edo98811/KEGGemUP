@@ -1,6 +1,6 @@
 ---
 title: >
-  The `GeneTonic` User's Guide
+  The `KEGGemUP` package: building KEGG pathway graphs with real data
 author:
   - name: Edoardo Filippi
     affiliation: 
@@ -34,7 +34,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
+The first step is installing the package.
 If you dont have the package installed you can do so by running:
 
 ```{r install-package, eval=FALSE}
