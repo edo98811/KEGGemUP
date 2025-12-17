@@ -62,7 +62,6 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   }
 
   # Cache key / name
-  message("Downloading KGML for ", pathway_id, " ...")
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
 
   if (mode == "cache") {
@@ -130,7 +129,7 @@ download_all_pathways <- function(org) {
 
   all_pathways <- get_kegg_db(bfc_map, paste0("pathway/", org))
 
-  askYesNo("Download all ", nrows(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.") -> answer
+  askYesNo("Download all ", nrow(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.") -> answer
   if (!answer) {
     message("Aborting download of all pathways.")
     return(NULL)
