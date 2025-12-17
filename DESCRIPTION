@@ -47,5 +47,6 @@ Suggests:
     clusterProfiler,
     limma,
     edgeR,
-    purrr
+    purrr,
+    BiocStyle
 Config/testthat/edition: 3
