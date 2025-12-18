@@ -144,9 +144,9 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/RtmpZM8ZLD/hsa00563.xml
+#> Downloaded & saved in: /tmp/RtmpxyMt5S/hsa00563.xml
 kgml_file
-#> [1] "/tmp/RtmpZM8ZLD/hsa00563.xml"
+#> [1] "/tmp/RtmpxyMt5S/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -286,8 +286,6 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Parsed 35 edges from KGML file.
 #> adding rname 'https://rest.kegg.jp/list/compound'
 #> adding rname 'https://rest.kegg.jp/list/glycan'
-#> Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,
-#> : EOF within quoted string
 graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -319,8 +317,6 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
 #> Parsed 35 edges from KGML file.
-#> Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,
-#> : EOF within quoted string
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -339,8 +335,6 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
 #> Parsed 35 edges from KGML file.
-#> Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,
-#> : EOF within quoted string
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork", palette = "PiYG")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
