@@ -39,6 +39,10 @@ map_results_to_graph(
   Column name in de_table containing values to map (if de_results is a
   single data.frame).
 
+- palette:
+
+  Color palette for node coloring (default: "RdBu").
+
 ## Value
 
 An igraph or visNetwork object with mapped results.

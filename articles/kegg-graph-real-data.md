@@ -144,9 +144,9 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/RtmpxyMt5S/hsa00563.xml
+#> Downloaded & saved in: /tmp/Rtmp8Qjeyd/hsa00563.xml
 kgml_file
-#> [1] "/tmp/RtmpxyMt5S/hsa00563.xml"
+#> [1] "/tmp/Rtmp8Qjeyd/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
