@@ -106,13 +106,19 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' genome | ligand | compound | glycan | reaction | rclass | enzyme |
 #' network | variant | disease | drug | dgroup
 #' @importFrom KEGGREST keggList
+#' @importFrom utils read.table
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @export
 get_kegg_db <- function(bfc, db_name = "compound") {
   url <- paste0("https://rest.kegg.jp/list/", db_name)
 
   path <- BiocFileCache::bfcrpath(bfc, url, ext = ".csv")
-  kegg_db <- read.table(path, sep = "\t") |> data.frame()
+  kegg_db <- read.table(
+    path,
+    sep = "\t",
+    quote = "",       
+    comment.char = ""
+  ) |> data.frame()
 
   return(kegg_db)
 }
@@ -121,6 +127,7 @@ get_kegg_db <- function(bfc, db_name = "compound") {
 #' @param org KEGG organism code (e.g., 'hsa' for human).
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache  
+#' @importFrom utils askYesNo
 #' @export
 download_all_pathways <- function(org) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
