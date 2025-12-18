@@ -64,6 +64,7 @@ return_all_cached <- function() {
 #' Reset KEGG and mapping caches by deleting all cached files
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache bfcinfo bfcremove
+#' @importFrom utils askYesNo
 #' @export
 reset_cache <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
