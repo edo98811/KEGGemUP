@@ -25,6 +25,8 @@ map_results_to_graph(
 
 \item{value_column}{Column name in de_table containing values to map
 (if de_results is a single data.frame).}
+
+\item{palette}{Color palette for node coloring (default: "RdBu").}
 }
 \value{
 An igraph or visNetwork object with mapped results.

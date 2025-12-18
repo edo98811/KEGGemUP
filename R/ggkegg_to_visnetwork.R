@@ -89,6 +89,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #' (if de_results is a single data.frame).
 #' @param value_column Column name in de_table containing values to map
 #' (if de_results is a single data.frame).
+#' @param palette Color palette for node coloring (default: "RdBu").
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
