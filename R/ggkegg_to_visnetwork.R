@@ -163,7 +163,7 @@ map_results_to_graph <- function(
     nodes_df <- add_results_nodes(nodes_df, results_combined)
 
     # --- 3. Color and style nodes and edges ---
-    nodes_df <- add_colors_to_nodes(nodes_df, palette = palette)
+    nodes_df <- add_colors_to_nodes(nodes_df, palettes = palette)
     nodes_df <- add_tooltip(nodes_df)
   }
 
