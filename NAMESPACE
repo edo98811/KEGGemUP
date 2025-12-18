@@ -2,6 +2,7 @@
 
 export(download_all_pathways)
 export(download_kgml)
+export(get_kegg_db)
 export(kegg_to_graph)
 export(map_results_to_graph)
 export(parse_kgml_entries)

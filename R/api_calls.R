@@ -107,7 +107,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' network | variant | disease | drug | dgroup
 #' @importFrom KEGGREST keggList
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
-#' @noRd
+#' @export
 get_kegg_db <- function(bfc, db_name = "compound") {
   url <- paste0("https://rest.kegg.jp/list/", db_name)
 
