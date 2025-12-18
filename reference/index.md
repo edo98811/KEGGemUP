@@ -6,6 +6,8 @@
   : Download all KEGG pathways for a given organism.
 - [`download_kgml()`](https://edo98811.github.io/KEGGemUP/reference/download_kgml.md)
   : Download and cache KEGG KGML files.
+- [`get_kegg_db()`](https://edo98811.github.io/KEGGemUP/reference/get_kegg_db.md)
+  : Get KEGG db with caching.
 - [`kegg_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.md)
   : Transform a ggkegg graph to igraph or visNetwork
 - [`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
