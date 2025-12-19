@@ -15,8 +15,8 @@ A data.frame with the following columns:
 \item{from}{The ID of the source entry (node) in the pathway, corresponding to the \code{entry1} attribute in the KGML \verb{<relation>} tag.}
 \item{to}{The ID of the target entry (node) in the pathway, corresponding to the \code{entry2} attribute in the KGML \verb{<relation>} tag.}
 \item{type}{The general type of relationship between the two entries (e.g., \code{'ECrel'}, \code{'PPrel'}, \code{'GErel'}, \code{'PCrel'}, \code{'maplink'}). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.}
-\item{subtype}{A more specific subtype of the relation, derived from the \verb{<subtype>} child elements of the \verb{<relation>} node (e.g., \code{'activation'}, \code{'inhibition'}, \code{'expression'}, \code{'compound'}). If no subtype is defined, this will be \code{NA}.}
-\item{rel_value}{A categorical value associated with the subtype, which encodes the apearence of the arrow (from the \code{value} attribute of \verb{<subtype>}). If not present, this will be \code{NA}.}
+\item{relation_subtype}{A more specific relation_subtype of the relation, derived from the \verb{<relation_subtype>} child elements of the \verb{<relation>} node (e.g., \code{'activation'}, \code{'inhibition'}, \code{'expression'}, \code{'compound'}). If no relation_subtype is defined, this will be \code{NA}.}
+\item{relation_value}{A categorical value associated with the relation_subtype, which encodes the apearence of the arrow (from the \code{value} attribute of \verb{<relation_subtype>}). If not present, this will be \code{NA}.}
 }
 }
 \description{
@@ -26,7 +26,7 @@ Parse KEGG KGML files to extract relations and edges data frames.
 The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
 information as XML, and extracts all \verb{<relation>} elements that describe the
 interactions or relationships between entities in the pathway. Each \verb{<relation>} may
-contain one or more \verb{<subtype>} elements that provide additional details about
+contain one or more \verb{<relation_subtype>} elements that provide additional details about
 the interaction. The result is a tidy data.frame suitable for network analysis or
-visualization, where each row represents one relation–subtype pair.
+visualization, where each row represents one relation–relation_subtype pair.
 }

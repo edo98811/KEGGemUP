@@ -139,29 +139,37 @@ kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")
 kgml_pah_real_example <- system.file("extdata", "hsa04010.xml", package = "KEGGemUP")
 
 # edges_df <- parse_kgml_relations(kgml_path)
-# write.table(edges_df, system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
+# saveRDS(edges_df, file = "inst/extdata/test01.xml_relations.rds")
+
+# edges_df <- parse_kgml_reactions(kgml_path)
+# saveRDS(edges_df, file = "inst/extdata/test01.xml_reactions.rds")
+
+# edges_df <- parse_kgml_edges(kgml_path)
+# saveRDS(edges_df, file = "inst/extdata/test01.xml_edges.rds")
 
 # nodes_df <- parse_kgml_entries(kgml_path)
-# write.table(nodes_df, system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP"),  sep = ";", row.names = FALSE)
+# saveRDS(nodes_df, file = "inst/extdata/test01.xml_nodes.rds")
 
-nodes_df_path <- system.file("extdata", "test01.xml_nodes.csv", package = "KEGGemUP")
-edges_df_path <- system.file("extdata", "test01.xml_edges.csv", package = "KEGGemUP")
+nodes_df_path <- system.file("extdata", "test01.xml_nodes.rds", package = "KEGGemUP")
+edges_df_path <- system.file("extdata", "test01.xml_edges.rds", package = "KEGGemUP")
+edges_df_reactions <- system.file("extdata", "test01.xml_reactions.rds", package = "KEGGemUP")
+edges_df_relations <- system.file("extdata", "test01.xml_relations.rds", package = "KEGGemUP")
 kgml_path_empty <- system.file("extdata", "empty_edges.xml", package = "KEGGemUP")
 
 # Expected nodes
-expected_nodes <- as.data.frame(read.csv(nodes_df_path, sep = ";", colClasses = "character"))
-expected_nodes_cols <- add_columns_nodes_df(expected_nodes)
-expected_nodes_cols$KEGG <- vapply(expected_nodes_cols$kegg_name, remove_kegg_prefix_str, FUN.VALUE = character(1))
+expected_nodes <- as.data.frame(readRDS(nodes_df_path))
 
 # Expected edges
-expected_edges <- as.data.frame(read.csv(edges_df_path, sep = ";", colClasses = "character"))
+expected_edges <- as.data.frame(readRDS(edges_df_path))
+expected_reactions <- as.data.frame(readRDS(edges_df_reactions))
+expected_relations <- as.data.frame(readRDS(edges_df_relations))
 
 # Empty edges
 empty_edges <- data.frame(
   from = character(0),
   to = character(0),
   type = character(0),
-  subtype = character(0),
+  relation_subtype = character(0),
   stringsAsFactors = FALSE
 )
 

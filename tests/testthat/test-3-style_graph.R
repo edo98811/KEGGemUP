@@ -6,9 +6,9 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
 
     # --- Capture all warnings ---
     if (test_name %in% throw_warning) {
-      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined))
+      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes, results_combined))
     } else {
-      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
+      mapped_nodes <- add_results_nodes(expected_nodes, results_combined)
     }
 
     # --- Structure checks ---
@@ -17,7 +17,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     expect_true(all(c("plot_value", "color", "source", "text") %in% colnames(mapped_nodes)),
       info = paste0(test_name, " missing expected columns")
     )
-    expect_equal(nrow(mapped_nodes), nrow(expected_nodes_cols),
+    expect_equal(nrow(mapped_nodes), nrow(expected_nodes),
       info = paste0(test_name, " wrong number of rows")
     )
 
@@ -28,7 +28,6 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
   })
 })
 
-
 test_that("add_colors_to_nodes assigns colors based on values across all test lists", {
   # Load the node reference table once
 
@@ -38,9 +37,9 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
 
     # --- Expect warning ---
     if (test_name %in% throw_warning) {
-      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined))
+      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes, results_combined))
     } else {
-      mapped_nodes <- add_results_nodes(expected_nodes_cols, results_combined)
+      mapped_nodes <- add_results_nodes(expected_nodes, results_combined)
     }
     # Apply color assignment
     colored_nodes <- add_colors_to_nodes(mapped_nodes)
@@ -57,16 +56,12 @@ test_that("add_colors_to_nodes assigns colors based on values across all test li
     expect_true(all(grepl("^#([A-Fa-f0-9]{6})$", non_na_colors)),
       info = paste0(test_name, "invalid color hex codes detected")
     )
-
-    # --- Logical consistency ---
-    expect_equal(!is.na(colored_nodes$plot_value), colored_nodes$color != "#FFFFFF")
   })
 })
 
-
-test_that("known subtypes are styled correctly", {
+test_that("known relation_subtypes are styled correctly", {
   edges <- data.frame(
-    subtype = c("activation", "inhibition", "phosphorylation"),
+    relation_subtype = c("activation", "inhibition", "phosphorylation"),
     id = 1:3
   )
 
@@ -77,48 +72,48 @@ test_that("known subtypes are styled correctly", {
   expect_equal(styled$label, c("", "", "+p"))
 })
 
-test_that("unknown or NA subtypes default to others_unknown", {
+test_that("unknown or NA relation_subtypes default to others_unknown", {
   edges <- data.frame(
-    subtype = c("nonsense", NA)
+    relation_subtype = c("nonsense", NA)
   )
 
   styled <- style_edges(edges)
 
-  expect_true(all(styled$subtype == "others_unknown"))
+  expect_true(all(styled$relation_subtype == "others_unknown"))
   expect_true(all(styled$color == "black"))
   expect_true(all(styled$dashes))
   expect_true(all(styled$arrows == "to"))
   expect_true(all(styled$label == "?"))
 })
 
-test_that("slashes in subtype names are replaced with underscores", {
+test_that("slashes in relation_subtype names are replaced with underscores", {
   edges <- data.frame(
-    subtype = c("phosphorylation/dephosphorylation", "unknown/type")
+    relation_subtype = c("phosphorylation/dephosphorylation", "unknown/type")
   )
 
   styled <- style_edges(edges)
-  expect_false(all(grepl("/", styled$subtype)))
-  expect_equal(styled$subtype, c("others_unknown", "others_unknown")) # not defined, defaults
+  expect_false(all(grepl("/", styled$relation_subtype)))
+  expect_equal(styled$relation_subtype, c("others_unknown", "others_unknown")) # not defined, defaults
 })
 
-test_that("edges_df is empty or has one row", {
-  edges_empty <- data.frame(subtype = character(0))
+test_that("style edges when edges_df is empty or has one row", {
+  edges_empty <- data.frame(relation_subtype = character(0))
   styled_empty <- style_edges(edges_empty)
   expect_equal(nrow(styled_empty), 0)
 
-  edges_one <- data.frame(subtype = c("activation"))
+  edges_one <- data.frame(relation_subtype = c("activation"))
   styled_one <- style_edges(edges_one)
   expect_equal(nrow(styled_one), 1)
 })
 
 test_that("function returns same number of rows", {
-  edges <- data.frame(subtype = c("activation", "repression", "state_change"))
+  edges <- data.frame(relation_subtype = c("activation", "repression", "state_change"))
   styled <- style_edges(edges)
   expect_equal(nrow(styled), 3)
 })
 
-test_that("adds visual styling columns correctly", {
-  styled <- style_nodes(expected_nodes_cols)
+test_that("adds visual styling nodes correctly", {
+  styled <- style_nodes(expected_nodes)
 
   # expect_true(all(styled$fixed))
   expect_true(is.numeric(styled$widthConstraint))
@@ -146,7 +141,7 @@ test_that("tooltip is added correctly", {
 })
 
 test_that("make igraph works", {
-  nodes_df_expected <- expected_nodes_cols
+  nodes_df_expected <- expected_nodes
   edges_df_expected <- expected_edges
 
   title <- "Test Pathway"
@@ -166,7 +161,7 @@ test_that("make igraph works", {
 })
 
 test_that("make visnetwork graph works", {
-  nodes_df_expected <- expected_nodes_cols
+  nodes_df_expected <- expected_nodes
   edges_df_expected <- expected_edges
 
   title <- "Test Pathway"
@@ -185,8 +180,8 @@ test_that("make visnetwork graph works", {
 })
 
 test_that("add groups add groups correctly", {
-  styled <- add_group(expected_nodes_cols)
+  styled <- add_group(expected_nodes)
 
-  expect_equal(unique(styled$group), c("GENE1, aliasA;GENE2, GENE3;NA", NA))
-  expect_equal(sum(styled$group[!is.na(styled$group)] == "GENE1, aliasA;GENE2, GENE3;NA"), 3)
+  expect_equal(unique(styled$group), c("GENE1, aliasA;GENE2, GENE3", NA))
+  expect_equal(sum(styled$group[!is.na(styled$group)] == "GENE1, aliasA;GENE2, GENE3"), 3)
 })

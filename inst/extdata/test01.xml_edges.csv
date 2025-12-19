@@ -1,6 +1,0 @@
-"from";"to";"type";"subtype";"rel_value"
-"1";"2";"PPrel";"activation";"-->"
-"2";"3";"ECrel";"compound";"--"
-"3";"4";"maplink";"inhibition";"--|"
-"4";"5";"PPrel";"expression";"..>"
-"5";"1";"PPrel";"feedback";"--o"

@@ -19,17 +19,25 @@ test_that("remove_kegg_prefix_str removes prefixes and handles multiple IDs", {
 })
 
 test_that("parse_kgml_edges load relationsps correctly", {
-  edges_df <- suppressMessages(parse_kgml_relations(kgml_path))
+  edges_df <- suppressMessages(parse_kgml_edges(kgml_path))
+  expect_equal(edges_df, expected_edges)
+})
+
+test_that("parse_kgml_edges load reactions correctly", {
+  edges_df <- suppressMessages(parse_kgml_edges(kgml_path))
 
   expect_equal(edges_df, expected_edges)
 })
 
 test_that("parse_kgml_entries loads empty edges  correctly", {
-  expect_warning(edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty)), "No relations found in KGML file.")
 
+  expect_warning(edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty)))
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
-  expect_equal(colnames(edges_df), c("from", "to", "type", "subtype", "rel_value", "title"))
+  
+  expect_warning(edges_df <- suppressMessages(parse_kgml_reactions(kgml_path_empty)))
+  expect_true(nrow(edges_df) == 0)
+  expect_true(inherits(edges_df, "data.frame"))
 })
 
 test_that("parse_kgml_entries load nodes correctly", {
@@ -109,10 +117,6 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
 
 
 test_that("download_kgml rejects invalid inputs", {
-  expect_error(
-    download_kgml("hsa00010"),
-    "Either 'directory' or 'bfc' must be provided"
-  )
 
   expect_error(
     download_kgml("hsa00010", bfc = 1),

@@ -40,11 +40,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 
   # --- 2. Parse nodes and edges ---
   nodes_df <- parse_kgml_entries(kgml_file)
-  edges_df <- parse_kgml_relations(kgml_file)
-  nodes_df <- add_columns_nodes_df(nodes_df)
-
-  # Extract KEGG IDs
-  nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, character(1))
+  edges_df <- parse_kgml_edges(kgml_file)
 
   # --- 3. Style nodes and edges ---
   nodes_df <- style_nodes(nodes_df)
@@ -220,6 +216,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @return An igraph object representing the graph.
 #' @noRd
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
+
   # Shapes conversion for igraph
   nodes_df$shape[nodes_df$shape == "box"] <-  "vrectangle"
   nodes_df$shape[nodes_df$shape == "dot"] <-  "circle"
@@ -404,12 +401,12 @@ style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
 }
 
 
-#' Style edges based on their subtype for visNetwork visualization.
-#' @param edges_df Data frame of edges with a column 'subtype'.
+#' Style edges based on their relation_subtype for visNetwork visualization.
+#' @param edges_df Data frame of edges with a column 'relation_subtype'.
 #' @return edges_df with added visual styling columns: color, dashes, arrows, label.
 #' @noRd
 style_edges <- function(edges_df) {
-  # possible subtypes and their styles
+  # possible relation_subtypes and their styles
   # name	value	ECrel	PPrel	GErel	Explanation
   # compound	Entry element id attribute value for compound.	*	*		shared with two successive reactions (ECrel) or intermediate of two interacting proteins (PPrel)
   # hidden compound	Entry element id attribute value for hidden compound.	*			shared with two successive reactions but not displayed in the pathway map
@@ -450,29 +447,29 @@ style_edges <- function(edges_df) {
   )
 
   # https://builtin.com/data-science/and-in-r#:~:text=The%20single%20sign%20version%20%7C%20returns,first%20element%20of%20each%20vector.
-  edges_df$subtype <- tolower(edges_df$subtype)
-  edges_df$subtype <- gsub("[/ ]", "_", edges_df$subtype)
-  edges_df$subtype[is.na(edges_df$subtype) |
-    !(edges_df$subtype %in% names(edge_style_map))] <- "others_unknown"
+  edges_df$relation_subtype <- tolower(edges_df$relation_subtype)
+  edges_df$relation_subtype <- gsub("[/ ]", "_", edges_df$relation_subtype)
+  edges_df$relation_subtype[is.na(edges_df$relation_subtype) |
+    !(edges_df$relation_subtype %in% names(edge_style_map))] <- "others_unknown"
 
   # Vectorized assignment
-  edges_df$color <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$color, character(1))
-  edges_df$dashes <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$dashes, logical(1))
-  edges_df$arrows <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$arrows, character(1))
-  edges_df$label <- vapply(edges_df$subtype, function(x) edge_style_map[[x]]$label, character(1))
+  edges_df$color <- vapply(edges_df$relation_subtype, function(x) edge_style_map[[x]]$color, character(1))
+  edges_df$dashes <- vapply(edges_df$relation_subtype, function(x) edge_style_map[[x]]$dashes, logical(1))
+  edges_df$arrows <- vapply(edges_df$relation_subtype, function(x) edge_style_map[[x]]$arrows, character(1))
+  edges_df$label <- vapply(edges_df$relation_subtype, function(x) edge_style_map[[x]]$label, character(1))
 
 
   return(edges_df)
 }
 
 #' Add tooltips to edges for visNetwork visualization.
-#' @param edges_df Data frame of edges with columns: subtype, type, label.
+#' @param edges_df Data frame of edges with columns: relation_subtype, type, label.
 #' @return edges_df with added 'title' column for tooltips.
 #' @noRd
 add_edge_tooltip <- function(edges_df) {
   edges_df$title <- paste0(
-    "Subtype: ", edges_df$subtype, "<br>",
-    "Type: ", edges_df$type, "<br>",
+    "relation_subtype: ", edges_df$relation_subtype, "<br>",
+    "Type: ", edges_df$relation_type, "<br>",
     "Label: ", ifelse(edges_df$label == "", "N/A", edges_df$label)
   )
   return(edges_df)
