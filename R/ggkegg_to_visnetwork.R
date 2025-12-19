@@ -286,7 +286,7 @@ add_group <- function(nodes_df) {
 scale_dimensions <- function(nodes_df, factor = 2) {
   # Scale x and y coordinates to make the graph look nicer
   nodes_df$x <- as.numeric(nodes_df$x) * factor
-  nodes_df$y <- -as.numeric(nodes_df$y) * factor # Invert y-axis
+  nodes_df$y <- as.numeric(nodes_df$y) * factor 
 
   return(nodes_df)
 }
