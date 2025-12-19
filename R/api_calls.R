@@ -53,7 +53,8 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
     }
     mode <- "dir"
   } else {
-    stop("Either 'directory' or 'bfc' must be provided.")
+    directory <- getwd()
+    message("No 'bfc' or 'directory' provided. Using current working directory: ", directory)
   }
 
   # Validate pathway ID format
