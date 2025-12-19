@@ -71,8 +71,8 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
     return(path)
   } else {
     rname <- paste0(pathway_id, ".xml")
-    file_name <- path.expand(file.path(directory, rname)) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
-
+    directory <- path.expand(directory) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+    file_name <- file.path(directory, rname) 
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
       req_perform(error_call = FALSE)
