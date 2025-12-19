@@ -190,9 +190,8 @@ map_results_to_graph <- function(
 #' @noRd
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for visNetwork
-  nodes_df$shape <- ifelse(nodes_df$shape %in% c("rectangle", "vrectangle"), "box",
-    "dot"
-  )
+  nodes_df$shape[nodes_df$shape == "vrectangle"] <-  "box"
+  nodes_df$shape[nodes_df$shape == "circle"] <-  "dot"
 
   # Different handling if no edges
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
@@ -222,7 +221,8 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @noRd
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for igraph
-  nodes_df$shape <- ifelse(nodes_df$shape == "box", "rectangle", "circle")
+  nodes_df$shape[nodes_df$shape == "box"] <-  "vrectangle"
+  nodes_df$shape[nodes_df$shape == "dot"] <-  "circle"
 
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
@@ -376,9 +376,9 @@ add_tooltip <- function(nodes_df) {
 #' shape, fixed, widthConstraint, heightConstraint, size.
 #' @noRd
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
-  # Base visual settings
-  nodes_df$shape <- ifelse(nodes_df$type == "compound", "dot", "box")
-
+  # Base visual settings (for vinetwork)
+  nodes_df$shape[nodes_df$type == "compound"] <-  "dot"
+  nodes_df$shape[nodes_df$type != "compound"] <-  "box"
   # Set size constraints for non-compound nodes (compute numeric vectors
   # first)
   widths_num <- as.numeric(nodes_df$width) * node_size_multiplier
