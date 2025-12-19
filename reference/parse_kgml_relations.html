@@ -66,11 +66,11 @@
 <dt>type</dt>
 <dd><p>The general type of relationship between the two entries (e.g., <code>'ECrel'</code>, <code>'PPrel'</code>, <code>'GErel'</code>, <code>'PCrel'</code>, <code>'maplink'</code>). These types describe the biological nature of the connection, such as enzyme-enzyme relation or protein-protein interaction.</p></dd>
 
-<dt>subtype</dt>
-<dd><p>A more specific subtype of the relation, derived from the <code>&lt;subtype&gt;</code> child elements of the <code>&lt;relation&gt;</code> node (e.g., <code>'activation'</code>, <code>'inhibition'</code>, <code>'expression'</code>, <code>'compound'</code>). If no subtype is defined, this will be <code>NA</code>.</p></dd>
+<dt>relation_subtype</dt>
+<dd><p>A more specific relation_subtype of the relation, derived from the <code>&lt;relation_subtype&gt;</code> child elements of the <code>&lt;relation&gt;</code> node (e.g., <code>'activation'</code>, <code>'inhibition'</code>, <code>'expression'</code>, <code>'compound'</code>). If no relation_subtype is defined, this will be <code>NA</code>.</p></dd>
 
-<dt>rel_value</dt>
-<dd><p>A categorical value associated with the subtype, which encodes the apearence of the arrow (from the <code>value</code> attribute of <code>&lt;subtype&gt;</code>). If not present, this will be <code>NA</code>.</p></dd>
+<dt>relation_value</dt>
+<dd><p>A categorical value associated with the relation_subtype, which encodes the apearence of the arrow (from the <code>value</code> attribute of <code>&lt;relation_subtype&gt;</code>). If not present, this will be <code>NA</code>.</p></dd>
 
 
 </dl></div>
@@ -79,9 +79,9 @@
     <p>The function reads a KEGG KGML (KEGG Markup Language) file, which encodes pathway
 information as XML, and extracts all <code>&lt;relation&gt;</code> elements that describe the
 interactions or relationships between entities in the pathway. Each <code>&lt;relation&gt;</code> may
-contain one or more <code>&lt;subtype&gt;</code> elements that provide additional details about
+contain one or more <code>&lt;relation_subtype&gt;</code> elements that provide additional details about
 the interaction. The result is a tidy data.frame suitable for network analysis or
-visualization, where each row represents one relation–subtype pair.</p>
+visualization, where each row represents one relation–relation_subtype pair.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

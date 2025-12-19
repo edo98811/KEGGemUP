@@ -1,6 +1,6 @@
 # The \`KEGGemUP\` package: building KEGG pathway graphs and mapping real data results
 
-**Compiled date**: 2025-12-18
+**Compiled date**: 2025-12-19
 
 **Last edited**: 15-12-2025
 
@@ -144,9 +144,9 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/Rtmp8Qjeyd/hsa00563.xml
+#> Downloaded & saved in: /tmp/Rtmpke6Qg4/hsa00563.xml
 kgml_file
-#> [1] "/tmp/Rtmp8Qjeyd/hsa00563.xml"
+#> [1] "/tmp/Rtmpke6Qg4/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -161,8 +161,10 @@ which parses the edges of the pathway graph from a KGML file.
 ``` r
 nodes_df <- parse_kgml_entries(kgml_file)
 #> Parsed 126 nodes from KGML file.
-edges_df <- parse_kgml_relations(kgml_file)
-#> Parsed 35 edges from KGML file.
+edges_df <- parse_kgml_edges(kgml_file)
+#> Parsed 35 relationship edges from KGML file.
+#> Parsed 110 reaction edges from KGML file.
+#> Total edges parsed from KGML file: 145
 ```
 
 #### The output data.frame frame for nodes
@@ -176,14 +178,14 @@ the data, it is just a direct parsing of the KGML file.
 knitr::kable(head(nodes_df))
 ```
 
-| name | id  | kegg_name | type | link                                               | reaction  | graphics_name                                         | label                                                 | fgcolor  | bgcolor  | graphics_type | x   | y   | width | height | components |
-|:-----|:----|:----------|:-----|:---------------------------------------------------|:----------|:------------------------------------------------------|:------------------------------------------------------|:---------|:---------|:--------------|:----|:----|:------|:-------|:-----------|
-| 13   | 13  | hsa:84992 | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:84992> | rn:R05916 | PIGY, HPMRS6, PIG-Y                                   | PIGY, HPMRS6, PIG-Y                                   | \#000000 | \#BFFFBF | rectangle     | 233 | 206 | 46    | 17     | NA         |
-| 14   | 14  | hsa:8818  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:8818>  | rn:R05916 | DPM2, CDG1U                                           | DPM2, CDG1U                                           | \#000000 | \#BFFFBF | rectangle     | 211 | 223 | 46    | 17     | NA         |
-| 15   | 15  | hsa:9091  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:9091>  | rn:R05916 | PIGQ, DEE77, EIEE77, GPI1, GPIBD19, MCAHS4, c407A10.1 | PIGQ, DEE77, EIEE77, GPI1, GPIBD19, MCAHS4, c407A10.1 | \#000000 | \#BFFFBF | rectangle     | 187 | 206 | 46    | 17     | NA         |
-| 16   | 16  | hsa:51227 | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:51227> | rn:R05916 | PIGP, DCRC, DCRC-S, DEE55, DSCR5, DSRC, EIEE55, PIG-P | PIGP, DCRC, DCRC-S, DEE55, DSCR5, DSRC, EIEE55, PIG-P | \#000000 | \#BFFFBF | rectangle     | 233 | 189 | 46    | 17     | NA         |
-| 17   | 17  | hsa:5283  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5283>  | rn:R05916 | PIGH, GPI-H                                           | PIGH, GPI-H                                           | \#000000 | \#BFFFBF | rectangle     | 187 | 189 | 46    | 17     | NA         |
-| 18   | 18  | hsa:5279  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5279>  | rn:R05916 | PIGC, GPI2, GPIBD16, MRT62                            | PIGC, GPI2, GPIBD16, MRT62                            | \#000000 | \#BFFFBF | rectangle     | 233 | 172 | 46    | 17     | NA         |
+| name | id  | kegg_name | type | link                                               | reaction  | graphics_name                                         | label                                                 | fgcolor  | bgcolor  | graphics_type | x   | y   | width | height | components | plot_value | source | color    | text | group | fixed | widthConstraint | heightConstraint | size | shape | KEGG  |
+|:-----|:----|:----------|:-----|:---------------------------------------------------|:----------|:------------------------------------------------------|:------------------------------------------------------|:---------|:---------|:--------------|:----|:----|:------|:-------|:-----------|-----------:|:-------|:---------|:-----|:------|:------|----------------:|-----------------:|-----:|:------|:------|
+| 13   | 13  | hsa:84992 | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:84992> | rn:R05916 | PIGY, HPMRS6, PIG-Y                                   | PIGY, HPMRS6, PIG-Y                                   | \#000000 | \#BFFFBF | rectangle     | 233 | 206 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 84992 |
+| 14   | 14  | hsa:8818  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:8818>  | rn:R05916 | DPM2, CDG1U                                           | DPM2, CDG1U                                           | \#000000 | \#BFFFBF | rectangle     | 211 | 223 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 8818  |
+| 15   | 15  | hsa:9091  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:9091>  | rn:R05916 | PIGQ, DEE77, EIEE77, GPI1, GPIBD19, MCAHS4, c407A10.1 | PIGQ, DEE77, EIEE77, GPI1, GPIBD19, MCAHS4, c407A10.1 | \#000000 | \#BFFFBF | rectangle     | 187 | 206 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 9091  |
+| 16   | 16  | hsa:51227 | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:51227> | rn:R05916 | PIGP, DCRC, DCRC-S, DEE55, DSCR5, DSRC, EIEE55, PIG-P | PIGP, DCRC, DCRC-S, DEE55, DSCR5, DSRC, EIEE55, PIG-P | \#000000 | \#BFFFBF | rectangle     | 233 | 189 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 51227 |
+| 17   | 17  | hsa:5283  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5283>  | rn:R05916 | PIGH, GPI-H                                           | PIGH, GPI-H                                           | \#000000 | \#BFFFBF | rectangle     | 187 | 189 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 5283  |
+| 18   | 18  | hsa:5279  | gene | <https://www.kegg.jp/dbget-bin/www_bget?hsa:5279>  | rn:R05916 | PIGC, GPI2, GPIBD16, MRT62                            | PIGC, GPI2, GPIBD16, MRT62                            | \#000000 | \#BFFFBF | rectangle     | 233 | 172 | 46    | 17     | NA         |         NA | NA     | \#BFFFBF |      | NA    | FALSE |              NA |               NA |   NA | NA    | 5279  |
 
 #### The output data.frame frame for edges
 
@@ -197,14 +199,14 @@ information from it.
 knitr::kable(head(edges_df))
 ```
 
-| from | to  | type  | subtype  | rel_value |
-|:-----|:----|:------|:---------|:----------|
-| 37   | 44  | ECrel | compound | 28        |
-| 37   | 46  | ECrel | compound | 28        |
-| 44   | 46  | ECrel | compound | 28        |
-| 191  | 46  | ECrel | compound | 26        |
-| 42   | 47  | ECrel | compound | 31        |
-| 39   | 192 | ECrel | compound | 34        |
+| from | to  | type  | relation_subtype | relation_value | title | width | color | arrows | dashes | label | reaction_id | reaction_name | reaction_type | from_name | to_name |
+|:-----|:----|:------|:-----------------|:---------------|:------|------:|:------|:-------|:-------|:------|:------------|:--------------|:--------------|:----------|:--------|
+| 37   | 44  | ECrel | compound         | 28             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
+| 37   | 46  | ECrel | compound         | 28             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
+| 44   | 46  | ECrel | compound         | 28             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
+| 191  | 46  | ECrel | compound         | 26             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
+| 42   | 47  | ECrel | compound         | 31             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
+| 39   | 192 | ECrel | compound         | 34             | NA    |     1 | gray  | to     | FALSE  |       | NA          | NA            | NA            | NA        | NA      |
 
 ### Build a graph from a pathway ID and map results to nodes
 
@@ -283,7 +285,9 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> adding rname 'https://rest.kegg.jp/get/hsa00563/kgml'
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
-#> Parsed 35 edges from KGML file.
+#> Parsed 35 relationship edges from KGML file.
+#> Parsed 110 reaction edges from KGML file.
+#> Total edges parsed from KGML file: 145
 #> adding rname 'https://rest.kegg.jp/list/compound'
 #> adding rname 'https://rest.kegg.jp/list/glycan'
 graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
@@ -316,7 +320,9 @@ our differential expression results table.
 graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
-#> Parsed 35 edges from KGML file.
+#> Parsed 35 relationship edges from KGML file.
+#> Parsed 110 reaction edges from KGML file.
+#> Total edges parsed from KGML file: 145
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -334,7 +340,9 @@ palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
 graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
-#> Parsed 35 edges from KGML file.
+#> Parsed 35 relationship edges from KGML file.
+#> Parsed 110 reaction edges from KGML file.
+#> Total edges parsed from KGML file: 145
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork", palette = "PiYG")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -367,7 +375,7 @@ sessionInfo()
 #> 
 #> other attached packages:
 #>  [1] edgeR_4.8.1                 limma_3.66.0               
-#>  [3] clusterProfiler_4.18.3      SummarizedExperiment_1.40.0
+#>  [3] clusterProfiler_4.18.4      SummarizedExperiment_1.40.0
 #>  [5] GenomicRanges_1.62.1        Seqinfo_1.0.0              
 #>  [7] MatrixGenerics_1.22.0       matrixStats_1.5.0          
 #>  [9] org.Hs.eg.db_3.22.0         AnnotationDbi_1.72.0       

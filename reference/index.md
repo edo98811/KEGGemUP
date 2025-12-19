@@ -12,8 +12,12 @@
   : Transform a ggkegg graph to igraph or visNetwork
 - [`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
   : Map differential expression results to nodes
+- [`parse_kgml_edges()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_edges.md)
+  : Parse KEGG KGML files to extract combined edges data frame.
 - [`parse_kgml_entries()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_entries.md)
   : Parse KEGG KGML files to extract nodes data frame.
+- [`parse_kgml_reactions()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_reactions.md)
+  : Download KEGG KGML file for a given pathway ID.
 - [`parse_kgml_relations()`](https://edo98811.github.io/KEGGemUP/reference/parse_kgml_relations.md)
   : Parse KEGG KGML files to extract relations and edges data frames.
 - [`reset_cache()`](https://edo98811.github.io/KEGGemUP/reference/reset_cache.md)
