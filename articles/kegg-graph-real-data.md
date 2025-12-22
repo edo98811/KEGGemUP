@@ -1,6 +1,6 @@
 # The \`KEGGemUP\` package: building KEGG pathway graphs and mapping real data results
 
-**Compiled date**: 2025-12-19
+**Compiled date**: 2025-12-22
 
 **Last edited**: 15-12-2025
 
@@ -144,9 +144,9 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/Rtmpy2WsO4/hsa00563.xml
+#> Downloaded & saved in: /tmp/Rtmp98ZDLQ/hsa00563.xml
 kgml_file
-#> [1] "/tmp/Rtmpy2WsO4/hsa00563.xml"
+#> [1] "/tmp/Rtmp98ZDLQ/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -407,14 +407,14 @@ sessionInfo()
 #>  [58] ape_5.8-1               R.oo_1.27.1             glue_1.8.0             
 #>  [61] nlme_3.1-168            GOSemSim_2.36.0         grid_4.5.2             
 #>  [64] cluster_2.1.8.1         reshape2_1.4.5          fgsea_1.36.0           
-#>  [67] gtable_0.3.6            R.methodsS3_1.8.2       tidyr_1.3.1            
+#>  [67] gtable_0.3.6            R.methodsS3_1.8.2       tidyr_1.3.2            
 #>  [70] data.table_1.17.8       xml2_1.5.1              XVector_0.50.0         
 #>  [73] ggrepel_0.9.6           pillar_1.11.1           stringr_1.6.0          
 #>  [76] yulab.utils_0.2.3       splines_4.5.2           tweenr_2.0.3           
 #>  [79] dplyr_1.1.4             treeio_1.34.0           BiocFileCache_3.0.0    
 #>  [82] lattice_0.22-7          bit_4.6.0               tidyselect_1.2.1       
 #>  [85] locfit_1.5-9.12         fontLiberation_0.1.0    GO.db_3.22.0           
-#>  [88] Biostrings_2.78.0       knitr_1.50              fontBitstreamVera_0.1.1
+#>  [88] Biostrings_2.78.0       knitr_1.51              fontBitstreamVera_0.1.1
 #>  [91] xfun_0.55               statmod_1.5.1           visNetwork_2.1.4       
 #>  [94] stringi_1.8.7           lazyeval_0.2.2          ggfun_0.2.0            
 #>  [97] yaml_2.3.12             evaluate_1.0.5          codetools_0.2-20       
