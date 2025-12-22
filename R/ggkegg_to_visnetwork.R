@@ -330,19 +330,20 @@ add_tooltip <- function(nodes_df) {
 
     # Regular node
     paste0(
+      "<h4 style='text-align: center;'>", nodes_df$label, "</h3>",
       "<table>",
-      "<tr><th align='left'>KEGG Name</th><td>",
+      "<tr><th align='left'>KEGG ID  </th><td>",
       ifelse(
         nchar(nodes_df$kegg_name) > 50,
         substr(nodes_df$kegg_name, 1, 50),
         nodes_df$kegg_name
-      ),
+      ),  
       "</td></tr>",
       "<tr><th align='left'>Name</th><td>",
-      ifelse(is.na(nodes_df$graphics_name), "", nodes_df$graphics_name),
+      ifelse(is.na(nodes_df$graphics_name), "N/A", nodes_df$graphics_name),
       "</td></tr>",
       "<tr><th align='left'>Source</th><td>",
-      ifelse(is.na(nodes_df$source), "", nodes_df$source),
+      ifelse(is.na(nodes_df$source), "N/A", nodes_df$source),
       "</td></tr>",
       "<tr><th align='left'>Value</th><td>",
       ifelse(
