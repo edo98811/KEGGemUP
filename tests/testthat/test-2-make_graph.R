@@ -153,3 +153,31 @@ test_that("download_kgml works in cache mode", {
   fake_path <- BiocFileCache::bfcrpath(fake_bfc, "https://rest.kegg.jp/get/hsa00010/kgml")
   expect_equal(result, fake_path)
 })
+
+test_that("get_kegg_db rejects invalid inputs", {
+
+  expect_error(
+    get_kegg_db("compound", bfc = 1),
+    "BiocFileCache"
+  )
+
+  expect_error(
+    get_kegg_db("compound", directory = c("a", "b")),
+    "single string"
+  )
+})
+
+test_that("get_kegg_db works in directory mode", {
+  tmpdir <- tempdir()
+  expected_file <- file.path(tmpdir, "kegg_compound.tsv")
+
+  result <- suppressMessages(
+    get_kegg_db(
+      db_name = "compound",
+      directory = tmpdir
+    )
+  )
+
+  expect_true(file.exists(expected_file))
+  expect_s3_class(result, "data.frame")
+})

@@ -55,6 +55,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   } else {
     directory <- getwd()
     message("No 'bfc' or 'directory' provided. Using current working directory: ", directory)
+    mode <- "dir"
   }
 
   # Validate pathway ID format
@@ -73,7 +74,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   } else {
     rname <- paste0(pathway_id, ".xml")
     directory <- path.expand(directory) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
-    file_name <- file.path(directory, rname) 
+    file_name <- file.path(directory, rname)
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
       req_perform(error_call = FALSE)
@@ -99,27 +100,93 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 
 #' Get KEGG db with caching.
 #'
-#' @param bfc A BiocFileCache object for caching.
-#' @param db_name KEGG database name (e.g., 'compound', 'glycan').
+#' @param db_name Name of the KEGG database to retrieve (default: "compound").
+#' @param bfc BiocFileCache object for caching KEGG database files.
+#' @param directory Optional directory to save the KEGG database file if not using cache.
 #' @return A data frame with KEGG IDs and names.
 #' @details The valid KEGG database names are:
 #' kegg | pathway | brite | module | ko | genes | <org> | vg | vp | ag |
 #' genome | ligand | compound | glycan | reaction | rclass | enzyme |
 #' network | variant | disease | drug | dgroup
+#' @details If neither 'bfc' nor 'directory' is provided, the KEGG database
+#' will be downloaded but not saved. It will be returned as a data frame.
 #' @importFrom KEGGREST keggList
 #' @importFrom utils read.table
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
+#' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
 #' @export
-get_kegg_db <- function(bfc, db_name = "compound") {
+get_kegg_db <- function(db_name = "compound", bfc = NULL, directory = NULL) {
+  # check input validity
+  if (!is.null(bfc) && !is.null(directory)) {
+    stop("Provide either 'bfc' OR 'directory', not both.")
+  } else if (!is.null(bfc)) {
+    # Check that bfc is a BiocFileCache object
+    if (!inherits(bfc, "BiocFileCache")) {
+      stop("'bfc' must be a valid BiocFileCache object.")
+    }
+    mode <- "cache"
+  } else if (!is.null(directory)) {
+    # Check that directory is a single string
+    if (!is.character(directory) || length(directory) != 1) {
+      stop("'directory' must be a single string specifying a valid path.")
+    }
+    # Optionally, create the directory if it does not exist
+    if (!dir.exists(directory)) {
+      dir.create(directory, recursive = TRUE)
+      message("Created directory: ", directory)
+    }
+    mode <- "dir"
+  } else {
+    message("No 'bfc' or 'directory' provided. Not saving KEGG database only downloading and returning.")
+    mode <- "none"
+  }
+
   url <- paste0("https://rest.kegg.jp/list/", db_name)
 
-  path <- BiocFileCache::bfcrpath(bfc, url, ext = ".csv")
+  if (mode == "cache") {
+    path <- BiocFileCache::bfcrpath(bfc, url, ext = ".tsv")
+    message("Downloaded & cached KEGG database: ", db_name)
+    con <- path
+  } else {
+    resp <- request(url) |>
+      req_retry(max_tries = 3) |>
+      req_perform(error_call = FALSE)
+
+    if (resp_is_error(resp)) {
+      warning(
+        "Failed to download KEGG DB: ", db_name,
+        " (HTTP status ", resp_status(resp), ")"
+      )
+      return(NULL)
+    }
+    con <- textConnection(httr2::resp_body_string(resp))
+    on.exit(close(con), add = TRUE)
+  }
+
   kegg_db <- read.table(
-    path,
+    con,
     sep = "\t",
-    quote = "",       
-    comment.char = ""
-  ) |> data.frame()
+    quote = "",
+    comment.char = "",
+    stringsAsFactors = FALSE,
+    col.names = c("kegg_id", "description")
+  ) |> as.data.frame()
+
+  if( mode == "dir") {
+    file_name <- file.path(
+      path.expand(directory),
+      paste0("kegg_", db_name, ".tsv")
+    )
+    write.table(
+      kegg_db,
+      file = file_name,
+      sep = "\t",
+      row.names = FALSE,
+      col.names = TRUE,
+      quote = FALSE
+    )
+    message("Downloaded & saved KEGG database in: ", file_name)
+  }
 
   return(kegg_db)
 }
@@ -127,7 +194,7 @@ get_kegg_db <- function(bfc, db_name = "compound") {
 #' Download all KEGG pathways for a given organism.
 #' @param org KEGG organism code (e.g., 'hsa' for human).
 #' @return None
-#' @importFrom BiocFileCache BiocFileCache  
+#' @importFrom BiocFileCache BiocFileCache
 #' @importFrom utils askYesNo
 #' @export
 download_all_pathways <- function(org) {
