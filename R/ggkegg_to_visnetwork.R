@@ -199,12 +199,29 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
 
-  v <- visNetwork::visOptions(v, highlightNearest = list(
-    enabled = TRUE, degree = 2,
-    hover = TRUE
-  ), selectedBy = "group", nodesIdSelection = TRUE)
+  v <- visNetwork::visOptions(v,
+    highlightNearest = list(
+      enabled = FALSE,
+      # degree = 2,
+      hover = FALSE
+    ),
+    # selectedBy = "group",
+    # nodesIdSelection = TRUE
+  )
 
-  v <- visNetwork::visInteraction(v, dragNodes = TRUE)
+  v <- visNetwork::visInteraction(v,
+    dragNodes = TRUE,
+    multiselect = TRUE,
+    selectable = TRUE
+  ) %>%
+    visNetwork::visEvents(
+      selectNode = "function(nodes) {
+        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
+      }",
+      deselectNode = "function(nodes) {
+        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
+      }"
+    )
 
   return(v)
 }
