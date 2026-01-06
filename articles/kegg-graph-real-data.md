@@ -1,6 +1,6 @@
 # The \`KEGGemUP\` package: building KEGG pathway graphs and mapping real data results
 
-**Compiled date**: 2025-12-22
+**Compiled date**: 2026-01-06
 
 **Last edited**: 15-12-2025
 
@@ -144,9 +144,9 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/Rtmp98ZDLQ/hsa00563.xml
+#> Downloaded & saved in: /tmp/RtmpLUisK4/hsa00563.xml
 kgml_file
-#> [1] "/tmp/Rtmp98ZDLQ/hsa00563.xml"
+#> [1] "/tmp/RtmpLUisK4/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -289,7 +289,9 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Parsed 110 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 145
 #> adding rname 'https://rest.kegg.jp/list/compound'
+#> Downloaded & cached KEGG database: compound
 #> adding rname 'https://rest.kegg.jp/list/glycan'
+#> Downloaded & cached KEGG database: glycan
 graph_visnetwork <- map_results_to_graph(graph, de_results_list, return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -323,6 +325,8 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Parsed 35 relationship edges from KGML file.
 #> Parsed 110 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 145
+#> Downloaded & cached KEGG database: compound
+#> Downloaded & cached KEGG database: glycan
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -343,6 +347,8 @@ graph <- kegg_to_graph(pathway, return_type = "igraph")
 #> Parsed 35 relationship edges from KGML file.
 #> Parsed 110 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 145
+#> Downloaded & cached KEGG database: compound
+#> Downloaded & cached KEGG database: glycan
 graph_visnetwork <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", return_type = "visNetwork", palette = "PiYG")
 #> Mapping differential expression results to nodes...
 graph_visnetwork
@@ -374,7 +380,7 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#>  [1] edgeR_4.8.1                 limma_3.66.0               
+#>  [1] edgeR_4.8.2                 limma_3.66.0               
 #>  [3] clusterProfiler_4.18.4      SummarizedExperiment_1.40.0
 #>  [5] GenomicRanges_1.62.1        Seqinfo_1.0.0              
 #>  [7] MatrixGenerics_1.22.0       matrixStats_1.5.0          
@@ -388,9 +394,9 @@ sessionInfo()
 #>   [1] RColorBrewer_1.1-3      jsonlite_2.0.0          tidydr_0.0.6           
 #>   [4] magrittr_2.0.4          ggtangle_0.0.9          farver_2.1.2           
 #>   [7] rmarkdown_2.30          fs_1.6.6                ragg_1.5.0             
-#>  [10] vctrs_0.6.5             memoise_2.0.1           ggtree_4.0.1           
+#>  [10] vctrs_0.6.5             memoise_2.0.1           ggtree_4.0.3           
 #>  [13] htmltools_0.5.9         S4Arrays_1.10.1         curl_7.0.0             
-#>  [16] SparseArray_1.10.7      gridGraphics_0.5-1      sass_0.4.10            
+#>  [16] SparseArray_1.10.8      gridGraphics_0.5-1      sass_0.4.10            
 #>  [19] bslib_0.9.0             htmlwidgets_1.6.4       desc_1.4.3             
 #>  [22] plyr_1.8.9              httr2_1.2.2             cachem_1.1.0           
 #>  [25] igraph_2.2.1            lifecycle_1.0.4         pkgconfig_2.0.3        
@@ -408,7 +414,7 @@ sessionInfo()
 #>  [61] nlme_3.1-168            GOSemSim_2.36.0         grid_4.5.2             
 #>  [64] cluster_2.1.8.1         reshape2_1.4.5          fgsea_1.36.0           
 #>  [67] gtable_0.3.6            R.methodsS3_1.8.2       tidyr_1.3.2            
-#>  [70] data.table_1.17.8       xml2_1.5.1              XVector_0.50.0         
+#>  [70] data.table_1.18.0       xml2_1.5.1              XVector_0.50.0         
 #>  [73] ggrepel_0.9.6           pillar_1.11.1           stringr_1.6.0          
 #>  [76] yulab.utils_0.2.3       splines_4.5.2           tweenr_2.0.3           
 #>  [79] dplyr_1.1.4             treeio_1.34.0           BiocFileCache_3.0.0    

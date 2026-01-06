@@ -12,14 +12,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/edo98811/KEGGemUP/blob/devel/DESCRIPTION)
 
-Filippi E, Marini F (2025). *KEGGemUP: A package to map you differential
+Filippi E, Marini F (2026). *KEGGemUP: A package to map you differential
 expression results on KEGG pathways*. R package version 0.1.0,
 <https://github.com/edo98811/KEGGemUP>.
 
     @Manual{,
       title = {KEGGemUP: A package to map you differential expression results on KEGG pathways},
       author = {Edoardo Filippi and Federico Marini},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.1.0},
       url = {https://github.com/edo98811/KEGGemUP},
     }

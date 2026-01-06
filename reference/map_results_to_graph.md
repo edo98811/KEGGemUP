@@ -71,4 +71,5 @@ de_results <- data.frame(
 )
 vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
+#> Error in visNetwork::visInteraction(v, dragNodes = TRUE, multiselect = TRUE,     selectable = TRUE) %>% visNetwork::visEvents(selectNode = "function(nodes) {\n        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});\n      }",     deselectNode = "function(nodes) {\n        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});\n      }"): could not find function "%>%"
 ```
