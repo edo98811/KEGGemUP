@@ -71,9 +71,14 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 
     message("Downloaded & cached: ", pathway_id)
     return(path)
-  } else {
-    rname <- paste0(pathway_id, ".xml")
-    directory <- path.expand(directory) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+  } else {}
+    file_name <-
+      if (grepl("\\.[^/\\\\]+$", directory)) {
+        directory
+      } else {
+        file.path(path.expand(directory), paste0(pathway_id, ".xml")) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+      }
+    directory <- path.expand(directory)
     file_name <- file.path(directory, rname)
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
@@ -130,7 +135,7 @@ get_kegg_db <- function(db_name = "compound", bfc = NULL, directory = NULL) {
     if (!is.character(directory) || length(directory) != 1) {
       stop("'directory' must be a single string specifying a valid path.")
     }
-    # Optionally, create the directory if it does not exist
+    # Create the directory if it does not exist
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
       message("Created directory: ", directory)
@@ -172,11 +177,13 @@ get_kegg_db <- function(db_name = "compound", bfc = NULL, directory = NULL) {
     col.names = c("kegg_id", "description")
   ) |> as.data.frame()
 
-  if( mode == "dir") {
-    file_name <- file.path(
-      path.expand(directory),
-      paste0("kegg_", db_name, ".tsv")
-    )
+  if (mode == "dir") {
+    file_name <-
+      if (grepl("\\.[^/\\\\]+$", directory)) {
+        directory
+      } else {
+        file.path(path.expand(directory), paste0("kegg_", db_name, ".tsv"))
+      }
     write.table(
       kegg_db,
       file = file_name,
