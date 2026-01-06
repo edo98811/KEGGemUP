@@ -150,7 +150,7 @@ get_kegg_db <- function(db_name = "compound", bfc = NULL, directory = NULL) {
   } else {
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
-      req_perform(error_call = FALSE)
+      req_perform()
 
     if (resp_is_error(resp)) {
       warning(
