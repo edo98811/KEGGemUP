@@ -671,7 +671,7 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
     ]
 
     if (nrow(nodes_to_color) > 1) {
-      range_val <- max(abs(as.numeric(nodes_to_color$plot_value)))
+      range_val <- max(abs(as.numeric(nodes_to_color$plot_value)), na.rm = TRUE)
     } else if (nrow(nodes_to_color) == 1) {
       range_val <- abs(as.numeric(nodes_to_color$plot_value[[1]]))
     } else {
