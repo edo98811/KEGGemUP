@@ -213,15 +213,15 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
     dragNodes = TRUE,
     multiselect = TRUE,
     selectable = TRUE
-  ) %>%
-    visNetwork::visEvents(
-      selectNode = "function(nodes) {
+  )
+  v <- visNetwork::visEvents(v,
+    selectNode = "function(nodes) {
         Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
       }",
-      deselectNode = "function(nodes) {
+    deselectNode = "function(nodes) {
         Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
       }"
-    )
+  )
 
   return(v)
 }

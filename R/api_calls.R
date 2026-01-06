@@ -71,15 +71,13 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 
     message("Downloaded & cached: ", pathway_id)
     return(path)
-  } else {}
+  } else {
     file_name <-
       if (grepl("\\.[^/\\\\]+$", directory)) {
         directory
       } else {
         file.path(path.expand(directory), paste0(pathway_id, ".xml")) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
       }
-    directory <- path.expand(directory)
-    file_name <- file.path(directory, rname)
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
       req_perform(error_call = FALSE)
@@ -116,11 +114,11 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @details If neither 'bfc' nor 'directory' is provided, the KEGG database
 #' will be downloaded but not saved. It will be returned as a data frame.
 #' @importFrom KEGGREST keggList
-#' @importFrom utils read.table
+#' @importFrom utils read.table write.table
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
 #' @export
-get_kegg_db <- function(db_name = "compound", bfc = NULL, directory = NULL) {
+get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either 'bfc' OR 'directory', not both.")

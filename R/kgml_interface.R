@@ -218,16 +218,6 @@ parse_kgml_entries <- function(file) {
       type = xml2::xml_attr(entry, "type"),
       link = xml2::xml_attr(entry, "link"),
       reaction = xml2::xml_attr(entry, "reaction"),
-      graphics_name = NA_character_,
-      label = NA_character_,
-      fgcolor = NA_character_,
-      bgcolor = NA_character_,
-      graphics_type = NA_character_,
-      x = NA_character_,
-      y = NA_character_,
-      width = NA_character_,
-      height = NA_character_,
-      components = NA_character_,
       stringsAsFactors = FALSE
     )
 
@@ -311,6 +301,7 @@ init_empty_nodes_df <- function() {
     graphics_type    = character(0),
     x                = character(0),
     y                = character(0),
+    choords          = character(0),
     width            = character(0),
     height           = character(0),
     components       = character(0),
