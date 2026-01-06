@@ -186,8 +186,8 @@ map_results_to_graph <- function(
 #' @noRd
 make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   # Shapes conversion for visNetwork
-  nodes_df$shape[nodes_df$shape == "vrectangle"] <-  "box"
-  nodes_df$shape[nodes_df$shape == "circle"] <-  "dot"
+  nodes_df$shape[nodes_df$shape == "vrectangle"] <- "box"
+  nodes_df$shape[nodes_df$shape == "circle"] <- "dot"
 
   # Different handling if no edges
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
@@ -233,10 +233,9 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 #' @return An igraph object representing the graph.
 #' @noRd
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
-
   # Shapes conversion for igraph
-  nodes_df$shape[nodes_df$shape == "box"] <-  "vrectangle"
-  nodes_df$shape[nodes_df$shape == "dot"] <-  "circle"
+  nodes_df$shape[nodes_df$shape == "box"] <- "vrectangle"
+  nodes_df$shape[nodes_df$shape == "dot"] <- "circle"
 
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
@@ -283,9 +282,9 @@ add_group <- function(nodes_df) {
 
     # Make group label group_label <- paste0('group_',
     # undefined_nodes$id[i])
-    
+
     group_elements <- nodes_df$label[nodes_df$id %in% ids]
-    group_label <- paste(group_elements[1:length(group_elements)-1], collapse = ";")
+    group_label <- paste(group_elements[1:length(group_elements) - 1], collapse = ";")
 
     # Assign group label to nodes_df
     nodes_df[nodes_df$id %in% ids, "group"] <- group_label
@@ -303,7 +302,7 @@ add_group <- function(nodes_df) {
 scale_dimensions <- function(nodes_df, factor = 2) {
   # Scale x and y coordinates to make the graph look nicer
   nodes_df$x <- as.numeric(nodes_df$x) * factor
-  nodes_df$y <- as.numeric(nodes_df$y) * factor 
+  nodes_df$y <- as.numeric(nodes_df$y) * factor
 
   return(nodes_df)
 }
@@ -317,7 +316,6 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 #' expression data, and value.
 #' @noRd
 add_tooltip <- function(nodes_df) {
-
   button_html <- ifelse(
     is.na(nodes_df$kegg_name) | is.na(nodes_df$link) | nodes_df$kegg_name == "",
     "",
@@ -354,7 +352,7 @@ add_tooltip <- function(nodes_df) {
         nchar(nodes_df$kegg_name) > 50,
         substr(nodes_df$kegg_name, 1, 50),
         nodes_df$kegg_name
-      ),  
+      ),
       "</td></tr>",
       "<tr><th align='left'>Name</th><td>",
       ifelse(is.na(nodes_df$graphics_name), "N/A", nodes_df$graphics_name),
@@ -392,8 +390,8 @@ add_tooltip <- function(nodes_df) {
 #' @noRd
 style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
   # Base visual settings (for vinetwork)
-  nodes_df$shape[nodes_df$type == "compound"] <-  "dot"
-  nodes_df$shape[nodes_df$type != "compound"] <-  "box"
+  nodes_df$shape[nodes_df$type == "compound"] <- "dot"
+  nodes_df$shape[nodes_df$type != "compound"] <- "box"
   # Set size constraints for non-compound nodes (compute numeric vectors
   # first)
   widths_num <- as.numeric(nodes_df$width) * node_size_multiplier
