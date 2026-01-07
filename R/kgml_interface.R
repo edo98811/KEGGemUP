@@ -373,7 +373,7 @@ collapse_to_dataframe <- function(template_df, dfs_list) {
 
   # Return empty template if no data frames to combine (or only NULLs)
   if (length(dfs_list) == 0) {
-    warning("No entries found in kgml file.")
+    # warning("No entries found in kgml file.")
     return(template_df)
   }
 
