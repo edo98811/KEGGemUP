@@ -53,6 +53,14 @@ This functionmaps differential expression results onto the nodes of a
 KEGG pathway graph. The pathwhay given as input must be the output of
 the function `kegg_to_graph`.
 
+This function can be used to map the differential expression results to
+the graph, the input of the graph must be the output of the function
+`kegg_to_graph` in the igraph format. The results to be mapped can be
+provided either as a list or as a single data.frame. If a single
+data.frame is provided, the default column names for KEGG IDs and values
+are 'KEGG_ids' and 'log2FoldChange', respectively, but these can be
+changed using the `feature_column` and `value_column` parameters.
+
 ## Examples
 
 ``` r
@@ -71,4 +79,5 @@ de_results <- data.frame(
 )
 vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
 #> Mapping differential expression results to nodes...
+#> de_results provided as a single data.frame. Using default column names: value_column = 'log2FoldChange', feature_column = 'KEGG_ids'.
 ```
