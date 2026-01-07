@@ -24,6 +24,8 @@ test_that("test graph is correctly generated", {
   expect_true(inherits(graph, "igraph"))
   expect_equal(igraph::vcount(graph), nrow(expected_nodes))
   expect_equal(igraph::ecount(graph), nrow(expected_edges))
+  vertex_shapes <- igraph::V(graph)$shape
+  expect_true(all(vertex_shapes %in% c("vrectangle", "circle")))
 
 
   with_mocked_bindings(
@@ -47,6 +49,8 @@ test_that("test graph is correctly generated", {
 
 
   expect_true(inherits(graph, "visNetwork"))
+  nodes_df <- graph$x$nodes
+  expect_true(all(nodes_df$shape %in% c("dot", "box")))
 })
 
 
