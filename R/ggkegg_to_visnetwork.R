@@ -446,7 +446,10 @@ style_edges <- function(edges_df) {
     ubiquitination = list(color = "black", dashes = FALSE, arrows = "to", label = "+u"),
     methylation = list(color = "black", dashes = FALSE, arrows = "to", label = "+m"),
     others_unknown = list(color = "black", dashes = TRUE, arrows = "to", label = "?"),
-    group_relation = list(color = "transparent", dashes = TRUE, arrows = "", label = "")
+    group_relation = list(color = "transparent", dashes = TRUE, arrows = "", label = ""),
+    # For reactions
+    reversible = list(color = "black", dashes = TRUE, arrows = "", label = ""),
+    irreversible = list(color = "black", dashes = TRUE, arrows = "", label = "")
   )
 
   # https://builtin.com/data-science/and-in-r#:~:text=The%20single%20sign%20version%20%7C%20returns,first%20element%20of%20each%20vector.
