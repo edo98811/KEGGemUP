@@ -45,14 +45,12 @@ graph <- kegg_to_graph(pathway)
 #> Downloaded & cached: hsa04110
 #> Parsed 134 nodes from KGML file.
 #> Parsed 119 relationship edges from KGML file.
-#> Warning: No entries found in kgml file.
 #> Parsed 0 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 119
 kegg_to_graph(pathway, return_type = "visNetwork")
 #> Downloaded & cached: hsa04110
 #> Parsed 134 nodes from KGML file.
 #> Parsed 119 relationship edges from KGML file.
-#> Warning: No entries found in kgml file.
 #> Parsed 0 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 119
 
