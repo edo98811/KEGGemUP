@@ -65,6 +65,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 
   # Cache key / name
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
+  message("Downloading KGML from: ", url)
 
   if (mode == "cache") {
     path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
