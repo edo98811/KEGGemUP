@@ -520,7 +520,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
     all(required_results %in% names(results_combined))
   )
 
-  # Explode KEGG IDs per node -------------------------------------------
+  # Explode KEGG IDs per node 
   mapping <- do.call(
     rbind,
     lapply(seq_len(nrow(nodes_df)), function(i) {
@@ -532,7 +532,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
     })
   )
 
-  # Join results onto exploded mapping ----------------------------------
+  # Join results onto exploded mapping
   mapping <- merge(
     mapping,
     results_combined,
@@ -545,12 +545,12 @@ add_results_nodes <- function(nodes_df, results_combined) {
     return(nodes_df)
   }
 
-  # Detect multiple matches per node ------------------------------------
+  # Detect multiple matches per node
   match_counts <- table(mapping$id)
   warn_nodes <- names(match_counts[match_counts > 1])
   warn <- length(warn_nodes) > 0
 
-  # Assign first match only -----------------------------
+  # Assign first match only 
   first_hits <- mapping[!duplicated(mapping$id), ]
   idx <- match(first_hits$id, nodes_df$id)
 
@@ -566,7 +566,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
     nodes_df$source[idx]
   )
 
-  # Append text for all matches -----------------------------------------
+  # Append text for all matches
   sep <- ","
   mapping$text_append <- paste0(
     "Source: ", mapping$source,
@@ -588,7 +588,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
     text_by_node
   )
 
-  # --- 6. Warn if necessary ----------------------------------------------------
+  # Warn if necessary 
   if (warn) {
     warning(
       "Some nodes had multiple matching KEGG IDs; ",
