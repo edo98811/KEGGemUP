@@ -89,6 +89,13 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
+#' @details This function can be used to map the differential expression results to the graph,
+#' the input of the graph must be the output of the function
+#' \code{kegg_to_graph} in the igraph format. The results to be mapped can be
+#' provided either as a list or as a single data.frame. If a single data.frame is provided,
+#' the default column names for KEGG IDs and values are 'KEGG_ids' and 'log2FoldChange',
+#' respectively, but these can be changed using the \code{feature_column} and \code{value_column} parameters.
+#'
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
 #' graph <- kegg_to_graph(pathway, return_type = "igraph")
