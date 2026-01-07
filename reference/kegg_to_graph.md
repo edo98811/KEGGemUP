@@ -40,6 +40,7 @@ nodes using the function `map_results_to_graph`.
 ``` r
 pathway <- "hsa04110" # Example pathway ID
 graph <- kegg_to_graph(pathway)
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml
 #> adding rname 'https://rest.kegg.jp/get/hsa04110/kgml'
 #> 
 #> Downloaded & cached: hsa04110
@@ -48,6 +49,7 @@ graph <- kegg_to_graph(pathway)
 #> Parsed 0 reaction edges from KGML file.
 #> Total edges parsed from KGML file: 119
 kegg_to_graph(pathway, return_type = "visNetwork")
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml
 #> Downloaded & cached: hsa04110
 #> Parsed 134 nodes from KGML file.
 #> Parsed 119 relationship edges from KGML file.

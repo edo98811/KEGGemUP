@@ -144,9 +144,10 @@ which has the KEGG pathway ID “hsa00563”.
 
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
-#> Downloaded & saved in: /tmp/Rtmpx8dwoq/hsa00563.xml
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa00563/kgml
+#> Downloaded & saved in: /tmp/Rtmp1xoihn/hsa00563.xml
 kgml_file
-#> [1] "/tmp/Rtmpx8dwoq/hsa00563.xml"
+#> [1] "/tmp/Rtmp1xoihn/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -282,6 +283,7 @@ output, which then we can visualize directly.
 ``` r
 pathway <- "hsa00563"  
 graph <- kegg_to_graph(pathway, return_type = "igraph")
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa00563/kgml
 #> adding rname 'https://rest.kegg.jp/get/hsa00563/kgml'
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
@@ -320,6 +322,7 @@ our differential expression results table.
 
 ``` r
 graph <- kegg_to_graph(pathway, return_type = "igraph")
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa00563/kgml
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
 #> Parsed 35 relationship edges from KGML file.
@@ -343,6 +346,7 @@ palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
 
 ``` r
 graph <- kegg_to_graph(pathway, return_type = "igraph")
+#> Downloading KGML from: https://rest.kegg.jp/get/hsa00563/kgml
 #> Downloaded & cached: hsa00563
 #> Parsed 126 nodes from KGML file.
 #> Parsed 35 relationship edges from KGML file.
