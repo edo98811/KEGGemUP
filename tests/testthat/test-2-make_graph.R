@@ -81,25 +81,25 @@ test_that("add_compound_names caches and assigns glycan and compounds names", {
   bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   with_mocked_bindings(
-    get_kegg_db = function(bfc_arg, db_type) {
-      if (db_type == "compound") {
+    get_kegg_db = function(db_name = "compound", directory = NULL, bfc = NULL) {
+      if (db_name == "compound") {
         return(data.frame(
           name = rownames(real_compounds),
           value = real_compounds[[1]],
           stringsAsFactors = FALSE
         ))
-      } else if (db_type == "glycan") {
+      } else if (db_name == "glycan") {
         return(data.frame(
           name = rownames(real_glycans),
           value = real_glycans[[1]],
           stringsAsFactors = FALSE
         ))
       } else {
-        stop("Unexpected db_type")
+        stop("Unexpected db_name")
       }
     },
     {
-      res <- add_compound_names(nodes_df_basic, bfc)
+      res <- add_compound_names(nodes_df_basic, bfc = bfc)
     }
   )
   # res <- add_compound_names(nodes_df_basic, bfc)

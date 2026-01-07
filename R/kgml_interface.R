@@ -61,7 +61,7 @@ parse_kgml_relations <- function(file) {
 
 #' Download KEGG KGML file for a given pathway ID.
 #'
-#' @param kgml_file Path to the KGML XML file.  
+#' @param kgml_file Path to the KGML XML file.
 #' @return A data.frame with the following columns:
 #' @export
 parse_kgml_reactions <- function(kgml_file) {
@@ -301,7 +301,7 @@ init_empty_nodes_df <- function() {
     graphics_type    = character(0),
     x                = character(0),
     y                = character(0),
-    choords          = character(0),
+    coords           = character(0),
     width            = character(0),
     height           = character(0),
     components       = character(0),
@@ -339,7 +339,7 @@ init_empty_cols_nodes <- function(nodes_df) {
 }
 
 #' Initialize empty columns for edges data frame.
-#' @param edges_df Data frame of edges.  
+#' @param edges_df Data frame of edges.
 #' @return Data frame with additional empty columns initialized.
 #' @noRd
 init_empty_cols_edges <- function(edges_df) {
