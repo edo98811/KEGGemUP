@@ -118,31 +118,11 @@ map_results_to_graph <- function(
   message("Mapping differential expression results to nodes...")
 
   # --- 0. Validate each entry in de_results ---
-  if (!is.null(de_results)) {
-    # If input is a data.frame, convert to default named list
-    if (inherits(de_results, "data.frame")) {
-      de_results <- list(de_input = list(de_table = de_results, value_column = ifelse(is.null(value_column),
-        "log2FoldChange", value_column
-      ), feature_column = ifelse(is.null(feature_column),
-        "KEGG_ids", feature_column
-      )))
-    }
-
-    # Check that de_results is a named list
-    if (!is.list(de_results) || is.null(names(de_results)) || any(names(de_results) ==
-      "")) {
-      warning("de_results must be a named list or NULL. Ignoring de_results.")
-      de_results <- NULL
-    }
-
-    # Keep only valid entries
-    de_results <- de_results[vapply(names(de_results), function(name) {
-      is_valid_de_entry(
-        de_results[[name]],
-        name
-      )
-    }, logical(1))]
-  }
+  de_results <- normalize_de_results(
+    de_results,
+    value_column = value_column,
+    feature_column = feature_column
+  )
 
   # --- 1. Extract nodes and edges from igraph ---
   nodes_df <- igraph::as_data_frame(g, what = "vertices")
