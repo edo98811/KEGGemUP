@@ -1,6 +1,6 @@
 # The \`KEGGemUP\` package: building KEGG pathway graphs and mapping real data results
 
-**Compiled date**: 2026-01-07
+**Compiled date**: 2026-01-09
 
 **Last edited**: 15-12-2025
 
@@ -145,9 +145,9 @@ which has the KEGG pathway ID “hsa00563”.
 ``` r
 kgml_file <- download_kgml("hsa00563", directory = tempdir())  # KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis"
 #> Downloading KGML from: https://rest.kegg.jp/get/hsa00563/kgml
-#> Downloaded & saved in: /tmp/Rtmp1xoihn/hsa00563.xml
+#> Downloaded & saved in: /tmp/RtmpxXuh8j/hsa00563.xml
 kgml_file
-#> [1] "/tmp/Rtmp1xoihn/hsa00563.xml"
+#> [1] "/tmp/RtmpxXuh8j/hsa00563.xml"
 ```
 
 You can use these functions to parse KGML files directly. From these you
@@ -398,14 +398,14 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] RColorBrewer_1.1-3      jsonlite_2.0.0          tidydr_0.0.6           
-#>   [4] magrittr_2.0.4          ggtangle_0.0.9          farver_2.1.2           
+#>   [4] magrittr_2.0.4          ggtangle_0.1.0          farver_2.1.2           
 #>   [7] rmarkdown_2.30          fs_1.6.6                ragg_1.5.0             
-#>  [10] vctrs_0.6.5             memoise_2.0.1           ggtree_4.0.3           
+#>  [10] vctrs_0.6.5             memoise_2.0.1           ggtree_4.0.4           
 #>  [13] htmltools_0.5.9         S4Arrays_1.10.1         curl_7.0.0             
 #>  [16] SparseArray_1.10.8      gridGraphics_0.5-1      sass_0.4.10            
 #>  [19] bslib_0.9.0             htmlwidgets_1.6.4       desc_1.4.3             
 #>  [22] plyr_1.8.9              httr2_1.2.2             cachem_1.1.0           
-#>  [25] igraph_2.2.1            lifecycle_1.0.4         pkgconfig_2.0.3        
+#>  [25] igraph_2.2.1            lifecycle_1.0.5         pkgconfig_2.0.3        
 #>  [28] gson_0.1.0              Matrix_1.7-4            R6_2.6.1               
 #>  [31] fastmap_1.2.0           digest_0.6.39           aplot_0.2.9            
 #>  [34] enrichplot_1.30.4       ggnewscale_0.5.2        patchwork_1.3.2        
@@ -418,7 +418,7 @@ sessionInfo()
 #>  [55] tools_4.5.2             otel_0.2.0              scatterpie_0.2.6       
 #>  [58] ape_5.8-1               R.oo_1.27.1             glue_1.8.0             
 #>  [61] nlme_3.1-168            GOSemSim_2.36.0         grid_4.5.2             
-#>  [64] cluster_2.1.8.1         reshape2_1.4.5          fgsea_1.36.0           
+#>  [64] cluster_2.1.8.1         reshape2_1.4.5          fgsea_1.36.2           
 #>  [67] gtable_0.3.6            R.methodsS3_1.8.2       tidyr_1.3.2            
 #>  [70] data.table_1.18.0       xml2_1.5.1              XVector_0.50.0         
 #>  [73] ggrepel_0.9.6           pillar_1.11.1           stringr_1.6.0          
@@ -435,7 +435,7 @@ sessionInfo()
 #> [106] systemfonts_1.3.1       jquerylib_0.1.4         Rcpp_1.1.0             
 #> [109] dbplyr_2.5.1            png_0.1-8               parallel_4.5.2         
 #> [112] pkgdown_2.2.0           ggplot2_4.0.1           blob_1.2.4             
-#> [115] DOSE_4.4.0              tidytree_0.4.6          ggiraph_0.9.2          
+#> [115] DOSE_4.4.0              tidytree_0.4.7          ggiraph_0.9.2          
 #> [118] scales_1.4.0            purrr_1.2.0             crayon_1.5.3           
 #> [121] BiocStyle_2.38.0        rlang_1.1.6             cowplot_1.2.0          
 #> [124] fastmatch_1.1-6         KEGGREST_1.50.0
