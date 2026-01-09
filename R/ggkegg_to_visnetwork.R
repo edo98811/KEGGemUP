@@ -3,6 +3,7 @@
 #' @param pathway_id KEGG pathway ID (e.g., 'hsa:04110' or '04110').
 #' @param return_type Output type: 'igraph' or 'visNetwork'.
 #' @param scaling_factor Numeric factor to scale node sizes.
+#' @param verbose Logical indicating whether to print progress messages.
 #' @return An igraph or visNetwork object representing the pathway.
 #' @details This function downloads the KGML file for the specified KEGG pathway,
 #' then parses it to generate a graph representation using either the igraph or visNetwork package.
@@ -18,7 +19,7 @@
 #' @importFrom igraph graph_from_data_frame graph_attr make_empty_graph add_vertices delete_edges E V
 #'
 #' @export
-kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1.5) {
+kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1.5, verbose = FALSE) {
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
@@ -41,6 +42,9 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
   # --- 2. Parse nodes and edges ---
   nodes_df <- parse_kgml_entries(kgml_file)
   edges_df <- parse_kgml_edges(kgml_file)
+  graph <- expand_line_nodes_and_edges(nodes_df, edges_df)
+  nodes_df <- graph$nodes
+  edges_df <- graph$edges
 
   # --- 3. Style nodes and edges ---
   nodes_df <- style_nodes(nodes_df)
@@ -86,6 +90,7 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
 #' @param value_column Column name in de_table containing values to map
 #' (if de_results is a single data.frame).
 #' @param palette Color palette for node coloring (default: "RdBu").
+#' @param verbose Logical indicating whether to print progress messages.
 #' @return An igraph or visNetwork object with mapped results.
 #' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
 #' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
@@ -113,13 +118,14 @@ map_results_to_graph <- function(
     return_type = "visNetwork",
     feature_column = NULL,
     value_column = NULL,
-    palette = "RdBu") {
+    palette = "RdBu",
+    verbose = FALSE) {
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
   # Check that g is an igraph object
   if (!inherits(g, "igraph")) {
-    stop("Input graph 'g' must be an igraph object.")
+    stop("Input graph 'g' must be an igraph object. Use 'kegg_to_graph' to create it, and don't set output type to visNetwork.")
   }
 
   message("Mapping differential expression results to nodes...")

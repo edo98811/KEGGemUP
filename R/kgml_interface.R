@@ -112,7 +112,10 @@ parse_kgml_reactions <- function(kgml_file) {
         transform(
           reaction_id = reaction_id,
           reaction_name = reaction_name,
-          reaction_type = reaction_type
+          reaction_type = reaction_type,
+          relation_subtype = reaction_type,
+          label = reaction_name,
+          relation_type = "reaction"
         )
       return(edges)
     } else {
@@ -222,28 +225,70 @@ parse_kgml_entries <- function(file) {
     )
 
     # Extract graphics attributes (only first graphics node is used)
-    if (length(graphics_nodes) > 0) {
-      if (length(graphics_nodes) > 1) {
-        warning(paste("Entry", node_row$id, "has multiple graphics nodes; using the first one."))
+
+
+    if (node_row$type == "group") {
+      if (length(group_components) > 0) {
+        node_row$components <- paste(xml2::xml_attr(group_components, "id"),
+          collapse = ";"
+        )
       }
-      g <- graphics_nodes[[1]]
-      node_row$graphics_name <- xml2::xml_attr(g, "name")
-      node_row$label <- xml2::xml_attr(g, "name") # for visNetwork
-      node_row$fgcolor <- xml2::xml_attr(g, "fgcolor")
-      node_row$bgcolor <- xml2::xml_attr(g, "bgcolor")
-      node_row$graphics_type <- xml2::xml_attr(g, "type")
-      node_row$x <- xml2::xml_attr(g, "x")
-      node_row$y <- xml2::xml_attr(g, "y")
-      node_row$width <- xml2::xml_attr(g, "width")
-      node_row$height <- xml2::xml_attr(g, "height")
+    } else {
+      if (length(graphics_nodes) == 0) {
+        # leave node_row as-is (graphics fields will be NA)
+      } else {
+        # Create one row per graphics node so entries with multiple graphics
+        # become multiple rows (same id/kegg_name/etc) with different graphics attrs
+        rows <- lapply(graphics_nodes, function(g) {
+          g_type <- xml2::xml_attr(g, "type")
+
+          if (g_type == "line") {
+            data.frame(
+              name = node_row$name,
+              id = node_row$id,
+              kegg_name = node_row$kegg_name,
+              type = node_row$type,
+              link = node_row$link,
+              reaction = node_row$reaction,
+              graphics_name = xml2::xml_attr(g, "name"),
+              label = xml2::xml_attr(g, "name"),
+              fgcolor = xml2::xml_attr(g, "fgcolor"),
+              bgcolor = xml2::xml_attr(g, "bgcolor"),
+              graphics_type = g_type,
+              coords = xml2::xml_attr(g, "coords"),
+              stringsAsFactors = FALSE
+            )
+          } else {
+            data.frame(
+              name = node_row$name,
+              id = node_row$id,
+              kegg_name = node_row$kegg_name,
+              type = node_row$type,
+              link = node_row$link,
+              reaction = node_row$reaction,
+              graphics_name = xml2::xml_attr(g, "name"),
+              label = xml2::xml_attr(g, "name"),
+              fgcolor = xml2::xml_attr(g, "fgcolor"),
+              bgcolor = xml2::xml_attr(g, "bgcolor"),
+              graphics_type = g_type,
+              x = xml2::xml_attr(g, "x"),
+              y = xml2::xml_attr(g, "y"),
+              width = xml2::xml_attr(g, "width"),
+              height = xml2::xml_attr(g, "height"),
+              stringsAsFactors = FALSE
+            )
+          }
+        })
+        node_row <- do.call(rbind, rows)
+      }
     }
+    # if (length(graphics_nodes) > 0) {
+
+
+    # }
 
     # Extract group components
-    if (length(group_components) > 0) {
-      node_row$components <- paste(xml2::xml_attr(group_components, "id"),
-        collapse = ";"
-      )
-    }
+
 
     node_row
   })
@@ -251,10 +296,12 @@ parse_kgml_entries <- function(file) {
   # Combine all nodes into a single data frame
   template <- init_empty_nodes_df()
   nodes_df <- collapse_to_dataframe(template, nodes_list)
+
   # Extract KEGG IDs
   nodes_df$KEGG <- vapply(nodes_df$kegg_name, remove_kegg_prefix_str, character(1))
   nodes_df <- init_empty_cols_nodes(nodes_df)
   message("Parsed ", nrow(nodes_df), " nodes from KGML file.")
+
   return(nodes_df)
 }
 
@@ -315,6 +362,7 @@ init_empty_nodes_df <- function() {
     heightConstraint = numeric(0),
     size             = numeric(0),
     shape            = character(0),
+    KEGG             = character(0),
     stringsAsFactors = FALSE
   )
 }
@@ -391,4 +439,86 @@ collapse_to_dataframe <- function(template_df, dfs_list) {
   })
   # Combine all
   do.call(rbind, dfs_aligned)
+}
+
+#' Expand line nodes into multiple point nodes and edges.
+#' @param nodes_df Data frame of nodes.
+#' @param edges_df Data frame of edges.
+#' @return A list with expanded nodes and edges data frames.
+#' @noRd
+expand_line_nodes_and_edges <- function(nodes_df, edges_df) {
+  # Identify line nodes
+  line_nodes <- nodes_df[!is.na(nodes_df$coords) & nodes_df$coords != "", ]
+  line_nodes$id <- make.unique(line_nodes$id)
+
+  # If no line nodes, just return input aligned to templates
+  if (nrow(line_nodes) == 0) {
+    return(list(nodes = nodes_df, edges = edges_df))
+  }
+
+  # Create nodes list
+  new_nodes_list <- lapply(seq_len(nrow(line_nodes)), function(i) {
+    ln <- line_nodes[i, ]
+    xy <- as.numeric(strsplit(ln$coords, ",")[[1]])
+    if (length(xy) < 4 || any(is.na(xy))) {
+      return(NULL)
+    }
+    points <- matrix(xy, ncol = 2, byrow = TRUE)
+    n_points <- nrow(points)
+
+    # One helper node per point
+    lapply(seq_len(n_points), function(j) {
+      n <- data.frame(
+        id = paste0("line_", ln$id, "_", j),
+        name = paste0("line_", ln$id, "_", j),
+        label = "",
+        type = "line_point",
+        x = points[j, 1],
+        y = points[j, 2],
+        shape = "dot",
+        size = 1,
+        color = "transparent",
+        fixed = TRUE
+      )
+    })
+  })
+
+  # Flatten nested list
+  new_nodes_list <- unlist(new_nodes_list, recursive = FALSE)
+
+  # Create edges list
+  new_edges_list <- lapply(seq_len(nrow(line_nodes)), function(i) {
+    ln <- line_nodes[i, ]
+    xy <- as.numeric(strsplit(ln$coords, ",")[[1]])
+    if (length(xy) < 4 || any(is.na(xy))) {
+      return(NULL)
+    }
+    points <- matrix(xy, ncol = 2, byrow = TRUE)
+    n_points <- nrow(points)
+
+    # One edge per consecutive pair
+    lapply(seq_len(n_points - 1), function(j) {
+      e <- data.frame(
+        from = paste0("line_", ln$id, "_", j),
+        to = paste0("line_", ln$id, "_", j + 1),
+        relation_subtype = "line",
+        relation_type = "line",
+        stringsAsFactors = FALSE
+      )
+    })
+  })
+
+  new_edges_list <- unlist(new_edges_list, recursive = FALSE)
+
+  # Remove original line nodes from nodes_df
+  nodes_df <- nodes_df[is.na(nodes_df$coords) | nodes_df$coords == "", ]
+
+  # Combine using collapse_to_dataframe
+  nodes_out <- collapse_to_dataframe(init_empty_nodes_df(), c(list(nodes_df), new_nodes_list))
+  edges_out <- collapse_to_dataframe(init_empty_edges_df(), c(list(edges_df), new_edges_list))
+  # message("duplicate nodes:", nodes_out$id[duplicated(nodes_out$id)])
+  nodes_out <- init_empty_cols_nodes(nodes_out)
+  edges_out <- init_empty_cols_edges(edges_out)
+
+  return(list(nodes = nodes_out, edges = edges_out))
 }

@@ -163,8 +163,16 @@ normalize_de_results <- function(
   } else if (is_valid_dataframe(de_results, name = "de_results")) {
     message(
       "de_results provided as a single data.frame. ",
-      "Using default column names: value_column = 'log2FoldChange', ",
-      "feature_column = 'KEGG_ids'."
+      if (is.null(value_column)) {
+        message("Using default value_column: 'log2FoldChange'")
+      } else {
+        message(paste0("Using provided value_column: '", value_column, "'"))
+      },
+      if (is.null(feature_column)) {
+        message(" and default feature_column: 'KEGG_ids'.")
+      } else {
+        message(paste0(" and provided feature_column: '", feature_column, "'."))
+      }
     )
 
     de_results <- list(

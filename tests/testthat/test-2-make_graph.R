@@ -31,18 +31,17 @@ test_that("parse_kgml_edges load reactions correctly", {
 
 test_that("parse_kgml_entries loads empty edges  correctly", {
 
-  expect_warning(edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty)))
+  edges_df <- suppressMessages(parse_kgml_relations(kgml_path_empty))
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
   
-  expect_warning(edges_df <- suppressMessages(parse_kgml_reactions(kgml_path_empty)))
+  edges_df <- suppressMessages(parse_kgml_reactions(kgml_path_empty))
   expect_true(nrow(edges_df) == 0)
   expect_true(inherits(edges_df, "data.frame"))
 })
 
 test_that("parse_kgml_entries load nodes correctly", {
   nodes_df <- suppressMessages(parse_kgml_entries(kgml_path))
-
   expect_equal(nodes_df, expected_nodes)
 })
 

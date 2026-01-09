@@ -31,19 +31,20 @@ add_results_nodes <- function(nodes_df, results_combined) {
   # Ensure required columns exist
   required_nodes <- c("id", "KEGG", "plot_value", "source", "text")
   required_results <- c("KEGG", "plot_value", "source")
-
   stopifnot(
     all(required_nodes %in% names(nodes_df)),
     all(required_results %in% names(results_combined))
   )
+  
+  nodes_to_check <- nodes_df[nodes_df$type != "line_point", , drop = FALSE]
 
   # Explode KEGG IDs per node 
   mapping <- do.call(
     rbind,
-    lapply(seq_len(nrow(nodes_df)), function(i) {
+    lapply(seq_len(nrow(nodes_to_check)), function(i) {
       data.frame(
-        id = nodes_df$id[i],
-        KEGG = strsplit(nodes_df$KEGG[i], ";", fixed = TRUE)[[1]],
+        id = nodes_to_check$id[i],
+        KEGG = strsplit(nodes_to_check$KEGG[i], ";", fixed = TRUE)[[1]],
         stringsAsFactors = FALSE
       )
     })
@@ -69,18 +70,18 @@ add_results_nodes <- function(nodes_df, results_combined) {
 
   # Assign first match only 
   first_hits <- mapping[!duplicated(mapping$id), ]
-  idx <- match(first_hits$id, nodes_df$id)
+  idx <- match(first_hits$id, nodes_to_check$id)
 
-  nodes_df$plot_value[idx] <- ifelse(
-    is.na(nodes_df$plot_value[idx]),
+  nodes_to_check$plot_value[idx] <- ifelse(
+    is.na(nodes_to_check$plot_value[idx]),
     first_hits$plot_value,
-    nodes_df$plot_value[idx]
+    nodes_to_check$plot_value[idx]
   )
 
-  nodes_df$source[idx] <- ifelse(
-    is.na(nodes_df$source[idx]),
+  nodes_to_check$source[idx] <- ifelse(
+    is.na(nodes_to_check$source[idx]),
     first_hits$source,
-    nodes_df$source[idx]
+    nodes_to_check$source[idx]
   )
 
   # Append text for all matches
@@ -99,9 +100,9 @@ add_results_nodes <- function(nodes_df, results_combined) {
     collapse = ""
   )
 
-  text_idx <- match(names(text_by_node), nodes_df$id)
-  nodes_df$text[text_idx] <- paste0(
-    nodes_df$text[text_idx],
+  text_idx <- match(names(text_by_node), nodes_to_check$id)
+  nodes_to_check$text[text_idx] <- paste0(
+    nodes_to_check$text[text_idx],
     text_by_node
   )
 
@@ -113,6 +114,9 @@ add_results_nodes <- function(nodes_df, results_combined) {
     )
   }
 
+  nodes_df$plot_value[nodes_df$type != "line_point"] <- nodes_to_check$plot_value
+  nodes_df$source[nodes_df$type != "line_point"] <- nodes_to_check$source
+  nodes_df$text[nodes_df$type != "line_point"] <- nodes_to_check$text 
   return(nodes_df)
 }
 
@@ -165,6 +169,7 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
   # Get unique sources
   sources <- unique(na.omit(nodes_df$source))
   valid_nodes <- nodes_df[!is.na(nodes_df$source), , drop = FALSE]
+  # valid_nodes <- valid_nodes[!valid_nodes$type == "line_point", , drop = FALSE]
 
   # Apply a color palette to each source
   for (source_index in seq_along(sources)) {

@@ -1,4 +1,3 @@
-
 #' Add group information to nodes based on 'undefined' groups.
 #' @param nodes_df Data frame of nodes with columns: id, kegg_name, components.
 #' @return nodes_df with updated 'group' column.
@@ -123,8 +122,8 @@ add_tooltip <- function(nodes_df) {
 #' @noRd
 add_edge_tooltip <- function(edges_df) {
   edges_df$title <- paste0(
-    "relation_subtype: ", edges_df$relation_subtype, "<br>",
     "Type: ", edges_df$relation_type, "<br>",
+    "relation_subtype: ", edges_df$relation_subtype, "<br>",
     "Label: ", ifelse(edges_df$label == "", "N/A", edges_df$label)
   )
   return(edges_df)
@@ -157,10 +156,20 @@ style_nodes <- function(nodes_df, node_size_multiplier = 1.2) {
     nodes_df$widthConstraint[undef_idx] <- 1
     nodes_df$heightConstraint[undef_idx] <- 1
   }
+  # Dot nodes size
   dot_idx <- which(nodes_df$shape == "dot")
   if (length(dot_idx) > 0) {
     nodes_df$size[dot_idx] <- 7
   }
+  # Line point nodes
+  line_point_idx <- which(nodes_df$type == "line_point")
+  if (length(line_point_idx) > 0) {
+    nodes_df$shape[line_point_idx] <- "dot"
+    nodes_df$size[line_point_idx] <- 1
+    nodes_df$color[line_point_idx] <- "transparent"
+    nodes_df$fixed[line_point_idx] <- TRUE
+  }
+
   return(nodes_df)
 }
 
@@ -210,7 +219,8 @@ style_edges <- function(edges_df) {
     group_relation = list(color = "transparent", dashes = TRUE, arrows = "", label = ""),
     # For reactions
     reversible = list(color = "black", dashes = TRUE, arrows = "", label = ""),
-    irreversible = list(color = "black", dashes = TRUE, arrows = "", label = "")
+    irreversible = list(color = "black", dashes = TRUE, arrows = "", label = ""),
+    line = list(color = "black", dashes = FALSE, arrows = "", label = "")
   )
 
   # https://builtin.com/data-science/and-in-r#:~:text=The%20single%20sign%20version%20%7C%20returns,first%20element%20of%20each%20vector.
