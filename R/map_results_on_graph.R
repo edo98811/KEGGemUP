@@ -211,24 +211,3 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
   return(nodes_df)
 }
 
-
-#' Add gene names to gene nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
-#' @return Updated nodes data frame with gene names added to gene nodes.
-#' @noRd
-add_gene_names <- function(nodes_df) {
-  # find rows that are genes (logical index)
-  idx <- which(!is.na(nodes_df$type) & nodes_df$type == "gene")
-  if (length(idx) == 0) {
-    return(nodes_df)
-  }
-
-  # Extraction of graphic_name, handle NA
-  graphics_name <- as.character(nodes_df$graphics_name)
-  graphics_name[is.na(graphics_name)] <- "" # Na replaced by empty
-  labels <- gsub(",.*", "", graphics_name[idx]) # take first
-  labels <- trimws(labels)
-
-  nodes_df$label[idx] <- labels
-  return(nodes_df)
-}

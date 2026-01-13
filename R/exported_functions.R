@@ -1,25 +1,9 @@
-#' Transform a ggkegg graph to igraph or visNetwork
-#'
-#' @param pathway_id KEGG pathway ID (e.g., 'hsa:04110' or '04110').
-#' @param return_type Output type: 'igraph' or 'visNetwork'.
-#' @param scaling_factor Numeric factor to scale node sizes.
-#' @param verbose Logical indicating whether to print progress messages.
-#' @return An igraph or visNetwork object representing the pathway.
-#' @details This function downloads the KGML file for the specified KEGG pathway,
-#' then parses it to generate a graph representation using either the igraph or visNetwork package.
-#' It styles nodes and edges based on their types the output can be used for
-#' visualization or further analysis.
-#' If differential expression results are provided,
-#' they can be mapped to the nodes using the function \code{map_results_to_graph}.
-#' @examples
-#' pathway <- "hsa04110" # Example pathway ID
-#' graph <- kegg_to_graph(pathway)
-#' kegg_to_graph(pathway, return_type = "visNetwork")
-#'
-#' @importFrom igraph graph_from_data_frame graph_attr make_empty_graph add_vertices delete_edges E V
-#'
-#' @export
-kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1.5, verbose = FALSE) {
+kegg_to_graph <- function(
+    pathway_id,
+    return_type = "igraph",
+    scaling_factor = 1.5,
+    verbose = FALSE) {
+
   # Check arguments
   return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
@@ -39,39 +23,24 @@ kegg_to_graph <- function(pathway_id, return_type = "igraph", scaling_factor = 1
     return(NULL)
   }
 
+  pathway_name <- paste0("(", pathway_id, ") ", get_pathway_name(pathway_id))
+
   # --- 2. Parse nodes and edges ---
-  nodes_df <- parse_kgml_entries(kgml_file)
-  edges_df <- parse_kgml_edges(kgml_file)
-  graph <- expand_line_nodes_and_edges(nodes_df, edges_df)
-  nodes_df <- graph$nodes
-  edges_df <- graph$edges
+  g <- kgml_to_igraph(kgml_file, pathway_name)
+  g <- standardize_igraph_graph(g, kegg_to_general_node_map, kegg_to_general_edge_map)
 
   # --- 3. Style nodes and edges ---
-  nodes_df <- style_nodes(nodes_df)
-  nodes_df <- add_gene_names(nodes_df)
-  nodes_df <- add_compound_names(nodes_df, bfc_map)
-  nodes_df <- scale_dimensions(nodes_df, factor = scaling_factor)
-  nodes_df <- add_tooltip(nodes_df)
-  nodes_df <- add_group(nodes_df)
-  nodes_df <- nodes_df[order(nodes_df$label), ]
-
-  if (nrow(edges_df)) {
-    edges_df <- style_edges(edges_df)
-    edges_df <- add_edge_tooltip(edges_df)
-  }
-
-  # --- 5. Build pathway name ---
-  pathway_name <- paste0("(", pathway_id, ") ", get_pathway_name(pathway_id))
+  g <- style_igraph_graph(g, bfc_map, scaling_factor = scaling_factor)
 
   # --- 5. Build ---
   result <- switch(return_type,
     igraph = {
-      make_igraph_graph(nodes_df, edges_df, pathway_name)
+      g
     },
     visNetwork = {
-      make_vis_graph(nodes_df, edges_df, pathway_name)
-    },
-    stop("Invalid return_type. Must be 'igraph' or 'visNetwork'.")
+      g_for_vis <- convert_to_visnetwork_dfs(g)
+      make_vis_graph(g_for_vis$nodes_df, g_for_vis$edges_df, pathway_name)
+    }
   )
 
   return(result)
@@ -170,77 +139,3 @@ map_results_to_graph <- function(
 
   return(result)
 }
-
-#' Create a visNetwork graph from nodes and edges data frames
-#' @param nodes_df Data frame of nodes.
-#' @param edges_df Data frame of edges.
-#' @param pathway_name Name of the pathway for the graph title.
-#' @return A visNetwork object representing the graph.
-#' @noRd
-make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
-  # Shapes conversion for visNetwork
-  nodes_df$shape[nodes_df$shape == "vrectangle"] <- "box"
-  nodes_df$shape[nodes_df$shape == "circle"] <- "dot"
-
-  # Different handling if no edges
-  if (nrow(edges_df) == 0 || is.null(edges_df)) {
-    warning("No edges in graph.")
-    v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
-  } else {
-    v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has edges
-  }
-
-  v <- visNetwork::visPhysics(v, enabled = FALSE)
-
-  v <- visNetwork::visOptions(v,
-    highlightNearest = list(
-      enabled = FALSE,
-      # degree = 2,
-      hover = FALSE
-    ),
-    # selectedBy = "group",
-    # nodesIdSelection = TRUE
-  )
-
-  v <- visNetwork::visInteraction(v,
-    dragNodes = TRUE,
-    multiselect = TRUE,
-    selectable = TRUE
-  )
-  v <- visNetwork::visEvents(v,
-    selectNode = "function(nodes) {
-        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
-      }",
-    deselectNode = "function(nodes) {
-        Shiny.setInputValue('graph_click', nodes.nodes, {priority: 'event'});
-      }"
-  )
-
-  return(v)
-}
-
-#' Create an igraph graph from nodes and edges data frames
-#' @param nodes_df Data frame of nodes.
-#' @param edges_df Data frame of edges.
-#' @param pathway_name Name of the pathway for the graph title.
-#' @return An igraph object representing the graph.
-#' @noRd
-make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
-  # Shapes conversion for igraph
-  nodes_df$shape[nodes_df$shape == "box"] <- "vrectangle"
-  nodes_df$shape[nodes_df$shape == "dot"] <- "circle"
-
-  if (nrow(edges_df) == 0 || is.null(edges_df)) {
-    warning("No edges in graph.")
-    fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
-    g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
-    g <- igraph::delete_edges(g, igraph::E(g))
-  } else {
-    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
-  }
-
-  g <- igraph::permute(g, order(igraph::V(g)$label))
-  igraph::graph_attr(g, "title") <- pathway_name
-  return(g)
-}
-
