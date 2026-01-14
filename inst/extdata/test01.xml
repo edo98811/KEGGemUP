@@ -34,6 +34,11 @@
              type="roundrectangle" x="400" y="100" width="100" height="25"/>
     </entry>
 
+    <!-- Line node -->
+    <entry id="41" name="tst:1111 tst:2222 tst:3333" type="gene" reaction="rn:R00001" link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111+tst:2222+tst:3333">
+      <graphics name="GENE1, GENE2, GENE3..." fgcolor="#66CC66" bgcolor="#FFFFFF" type="line" coords="100,150,200,150"/>
+    </entry>
+
     <!-- Group combining multiple genes -->
     <entry id="5" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"

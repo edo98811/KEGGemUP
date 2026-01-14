@@ -136,33 +136,9 @@ throw_warning <- names(all_de_test_lists)[c(3, 4, 5)]
 expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 
 kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")
-kgml_pah_real_example <- system.file("extdata", "hsa04010.xml", package = "KEGGemUP")
-
-# edges_df <- parse_kgml_relations(kgml_path)
-# saveRDS(edges_df, file = "inst/extdata/test01.xml_relations.rds")
-
-# edges_df <- parse_kgml_reactions(kgml_path)
-# saveRDS(edges_df, file = "inst/extdata/test01.xml_reactions.rds")
-
-# edges_df <- parse_kgml_edges(kgml_path)
-# saveRDS(edges_df, file = "inst/extdata/test01.xml_edges.rds")
-
-# nodes_df <- parse_kgml_entries(kgml_path)
-# saveRDS(nodes_df, file = "inst/extdata/test01.xml_nodes.rds")
-
-nodes_df_path <- system.file("extdata", "test01.xml_nodes.rds", package = "KEGGemUP")
-edges_df_path <- system.file("extdata", "test01.xml_edges.rds", package = "KEGGemUP")
-edges_df_reactions <- system.file("extdata", "test01.xml_reactions.rds", package = "KEGGemUP")
-edges_df_relations <- system.file("extdata", "test01.xml_relations.rds", package = "KEGGemUP")
-kgml_path_empty <- system.file("extdata", "empty_edges.xml", package = "KEGGemUP")
-
-# Expected nodes
-expected_nodes <- as.data.frame(readRDS(nodes_df_path))
-
-# Expected edges
-expected_edges <- as.data.frame(readRDS(edges_df_path))
-expected_reactions <- as.data.frame(readRDS(edges_df_reactions))
-expected_relations <- as.data.frame(readRDS(edges_df_relations))
+ref_graph <- readRDS(system.file("extdata", "test01_reference_graph.rds", package = "KEGGemUP"))
+xml_example <- xml2::read_xml(kgml_path)
+kgml_processing_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 
 # Empty edges
 empty_edges <- data.frame(
@@ -181,17 +157,39 @@ nodes_df_basic <- data.frame(
   stringsAsFactors = FALSE
 )
 
-compounds_file <- system.file(
-  "extdata", "compounds.rds",
-  package = "KEGGemUP"
+# make working nodes
+kgml_steps <- list()
+
+kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
+kgml_steps$groups <- parse_kgml_groups(xml_example, kegg_node_defaults())
+kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
+
+kgml_steps$all_nodes <- rbind(
+  kgml_steps$nodes,
+  kgml_steps$groups,
+  kgml_steps$line_nodes
 )
 
-glycan_file <- system.file(
-  "extdata", "glycans.rds",
-  package = "KEGGemUP"
+kgml_steps$relations_edges <- parse_kgml_relations(xml_example, kegg_edge_defaults())
+kgml_steps$reactions_edges <- parse_kgml_reactions(xml_example, kegg_edge_defaults())
+kgml_steps$line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
+
+kgml_steps$all_edges <- rbind(
+  kgml_steps$relations_edges,
+  kgml_steps$reactions_edges,
+  kgml_steps$line_edges
 )
 
-# Load mapping and mock get_compounds to return it
-real_compounds <- data.frame(readRDS(compounds_file))
+saveRDS(kgml_steps, file = "kgml_parsing_steps.rds")
 
-real_glycans <- data.frame(readRDS(glycan_file))
+
+kgml_path <- system.file("extdata", "test01.xml", package = "YourPackageName")
+
+g_test <- kegg_to_graph(
+  pathway_id = "hsa:TEST01",
+  scaling_factor = 1.0,
+  simplified_graph = TRUE,
+  kgml_file = kgml_path
+)
+
+v_test <- plot_visNetwork_kegg(g_mapped)

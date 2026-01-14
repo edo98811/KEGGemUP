@@ -11,26 +11,26 @@ add_results_nodes <- function(nodes_df, results_combined) {
     return(nodes_df)
   }
 
+
   warn <- FALSE
-  # Node mapping has this structure:
-  # id   | KEGG (id is the node id)
+  # nodes_df has this structure:
+  # ids_for_mapping  | KEGG (id is the node id)
   # 1      1111
   # 2      2222
-  # 2      3333
+  # 2      3333;2222
   # 3    K00001
   # 4  tst00002
   # 5 undefined
   # 6      1111
 
   # results_combined has this structure:
-  # KEGG     | plot_value | source
+  # ids_for_mapping     | de_value | source
   # 1111        2.5        de1
   # 2222       -1.2        de2
   # 3333        0.5        de1
-
   # Ensure required columns exist
-  required_nodes <- c("id", "KEGG", "plot_value", "source", "text")
-  required_results <- c("KEGG", "plot_value", "source")
+  required_nodes <- c("id", "ids_for_mapping", "de_value", "source", "text", "type")
+  required_results <- c("ids_for_mapping", "de_value", "source")
   stopifnot(
     all(required_nodes %in% names(nodes_df)),
     all(required_results %in% names(results_combined))
@@ -38,13 +38,13 @@ add_results_nodes <- function(nodes_df, results_combined) {
   
   nodes_to_check <- nodes_df[nodes_df$type != "line_point", , drop = FALSE]
 
-  # Explode KEGG IDs per node 
+  # Explode ids_for_mapping IDs per node 
   mapping <- do.call(
     rbind,
     lapply(seq_len(nrow(nodes_to_check)), function(i) {
       data.frame(
         id = nodes_to_check$id[i],
-        KEGG = strsplit(nodes_to_check$KEGG[i], ";", fixed = TRUE)[[1]],
+        matched_id = strsplit(nodes_to_check$ids_for_mapping[i], ";", fixed = TRUE)[[1]],  # new clear name
         stringsAsFactors = FALSE
       )
     })
@@ -54,7 +54,8 @@ add_results_nodes <- function(nodes_df, results_combined) {
   mapping <- merge(
     mapping,
     results_combined,
-    by = "KEGG",
+    by.x = "matched_id",
+    by.y = "ids_for_mapping",
     all.x = FALSE,
     sort = FALSE
   )
@@ -72,10 +73,10 @@ add_results_nodes <- function(nodes_df, results_combined) {
   first_hits <- mapping[!duplicated(mapping$id), ]
   idx <- match(first_hits$id, nodes_to_check$id)
 
-  nodes_to_check$plot_value[idx] <- ifelse(
-    is.na(nodes_to_check$plot_value[idx]),
-    first_hits$plot_value,
-    nodes_to_check$plot_value[idx]
+  nodes_to_check$de_value[idx] <- ifelse(
+    is.na(nodes_to_check$de_value[idx]),
+    first_hits$de_value,
+    nodes_to_check$de_value[idx]
   )
 
   nodes_to_check$source[idx] <- ifelse(
@@ -84,12 +85,12 @@ add_results_nodes <- function(nodes_df, results_combined) {
     nodes_to_check$source[idx]
   )
 
-  # Append text for all matches
+  # Append text for all matches using the single matched_id
   sep <- ","
   mapping$text_append <- paste0(
     "Source: ", mapping$source,
-    sep, "Value: ", mapping$plot_value,
-    sep, "Id: ", mapping$KEGG,
+    sep, "Value: ", mapping$de_value,
+    sep, "Id: ", mapping$matched_id,  # use the exploded single ID
     ";"
   )
 
@@ -109,12 +110,13 @@ add_results_nodes <- function(nodes_df, results_combined) {
   # Warn if necessary 
   if (warn) {
     warning(
-      "Some nodes had multiple matching KEGG IDs; ",
-      "only the first match was used for plot_value/source."
+      "Some nodes had multiple matching IDs; ",
+      "only the first match was used for de_value/source."
     )
   }
 
-  nodes_df$plot_value[nodes_df$type != "line_point"] <- nodes_to_check$plot_value
+  # Update original dataframe
+  nodes_df$de_value[nodes_df$type != "line_point"] <- nodes_to_check$de_value
   nodes_df$source[nodes_df$type != "line_point"] <- nodes_to_check$source
   nodes_df$text[nodes_df$type != "line_point"] <- nodes_to_check$text 
   return(nodes_df)
@@ -127,35 +129,38 @@ add_results_nodes <- function(nodes_df, results_combined) {
 #' @return A combined data frame with columns: KEGG, value, source
 #' @noRd
 combine_results_in_dataframe <- function(results_list) {
-  # If no results provided, return NULL
+  # Return NULL if no results provided
   if (is.null(results_list) || length(results_list) == 0) {
     return(NULL)
   }
 
-  # Combine all results into a single data frame
+  # Combine all results into a single dataframe
   results <- lapply(names(results_list), function(de_entry_name) {
-    # Extract individual entry
     de_entry <- results_list[[de_entry_name]]
     de_table <- de_entry$de_table
     value_column <- de_entry$value_column
     feature_column <- de_entry$feature_column
 
-    # Handle rownames as feature column
+    # If feature_column is rownames, copy rownames into a new column
     if (feature_column == "rownames") {
       de_table[[feature_column]] <- rownames(de_table)
     }
 
-    de_table[[feature_column]] <- remove_kegg_prefix(de_table[[feature_column]])
+    # Clean KEGG IDs or features
+    ids <- remove_kegg_prefix(de_table[[feature_column]])
 
     data.frame(
-      KEGG = de_table[[feature_column]], plot_value = de_table[[value_column]],
-      source = rep(de_entry_name, nrow(de_table)), stringsAsFactors = FALSE
+      ids_for_mapping = ids,               # required for add_results_nodes
+      de_value = de_table[[value_column]],
+      source = rep(de_entry_name, nrow(de_table)),
+      stringsAsFactors = FALSE
     )
   })
 
-  return(do.call(rbind, results))
+  # Combine into a single dataframe
+  results_combined <- do.call(rbind, results)
+  return(results_combined)
 }
-
 
 #' Add color palettes
 #' @param nodes_df Data frame of nodes with 'value' and 'source' columns.
@@ -181,9 +186,9 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
     ]
 
     if (nrow(nodes_to_color) > 1) {
-      range_val <- max(abs(as.numeric(nodes_to_color$plot_value)), na.rm = TRUE)
+      range_val <- max(abs(as.numeric(nodes_to_color$de_value)), na.rm = TRUE)
     } else if (nrow(nodes_to_color) == 1) {
-      range_val <- abs(as.numeric(nodes_to_color$plot_value[[1]]))
+      range_val <- abs(as.numeric(nodes_to_color$de_value[[1]]))
     } else {
       next
     }
@@ -199,7 +204,7 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
     # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut
     # may be useful to add general info in the dataframe:
     # https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
-    nodes_to_color$color <- palette_ramp(100)[as.numeric(cut(as.numeric(nodes_to_color$plot_value),
+    nodes_to_color$color <- palette_ramp(100)[as.numeric(cut(as.numeric(nodes_to_color$de_value),
       breaks = breaks_seq, include.lowest = TRUE
     ))]
 

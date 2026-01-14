@@ -1,23 +1,58 @@
-#' Add gene names to gene nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
-#' @return Updated nodes data frame with gene names added to gene nodes.
+
+
+#' Style igraph edges based on relation_subtype
+#' @param g An igraph graph object with an edge attribute 'relation_subtype'
+#' @return The igraph graph with styled edge attributes: color, lty, arrow.mode, label
 #' @noRd
-add_labels_kegg <- function(nodes_df) {
-  # find rows that are genes (logical index)
-  idx <- which(!is.na(nodes_df$type) & nodes_df$type == "gene")
-  if (length(idx) == 0) {
-    return(nodes_df)
-  }
+style_edges_igraph <- function(g) {
+  stopifnot("igraph" %in% class(g))
+  stopifnot("name_3" %in% igraph::edge_attr_names(g))
 
-  # Extraction of graphic_name, handle NA
-  graphics_name <- as.character(nodes_df$graphics_name)
-  graphics_name[is.na(graphics_name)] <- "" # Na replaced by empty
-  labels <- gsub(",.*", "", graphics_name[idx]) # take first
-  labels <- trimws(labels)
+  # Define styles 
+  edge_style_map <- list(
+    # Default styles for relation subtypes
+    compound = list(color = "black", lty = 1, arrow.mode = 2, label = ""),
+    hidden_compound = list(color = "lightgray", lty = 1, arrow.mode = 2, label = ""),
+    activation = list(color = "red", lty = 1, arrow.mode = 2, label = ""),
+    inhibition = list(color = "blue", lty = 1, arrow.mode = 3, label = ""),
+    expression = list(color = "red", lty = 2, arrow.mode = 2, label = ""),
+    repression = list(color = "blue", lty = 2, arrow.mode = 3, label = ""),
+    indirect_effect = list(color = "gray", lty = 2, arrow.mode = 2, label = ""),
+    state_change = list(color = "gray", lty = 2, arrow.mode = 0, label = ""),
+    binding_association = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
+    dissociation = list(color = "gray", lty = 2, arrow.mode = 2, label = ""),
+    missing_interaction = list(color = "gray", lty = 2, arrow.mode = 2, label = "-/-"),
+    phosphorylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+p"),
+    dephosphorylation = list(color = "black", lty = 1, arrow.mode = 2, label = "-p"),
+    glycosylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+g"),
+    ubiquitination = list(color = "black", lty = 1, arrow.mode = 2, label = "+u"),
+    methylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+m"),
+    others_unknown = list(color = "black", lty = 2, arrow.mode = 2, label = "?"),
 
-  nodes_df$label[idx] <- labels
-  return(nodes_df)
+    # Default style for group relations
+    group_relation = list(color = "transparent", lty = 2, arrow.mode = 0, label = ""),
+
+    # Default styles for reaction types
+    reversible = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
+    irreversible = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
+    line = list(color = "black", lty = 1, arrow.mode = 0, label = "")
+  )
+
+  # Normalize relation_subtype
+  # I apply this on name 3 which is reaction type or relation subtype
+  rel_sub <- tolower(igraph::E(g)$name_3)
+  rel_sub <- gsub("[/ ]", "_", rel_sub)
+  rel_sub[is.na(rel_sub) | !(rel_sub %in% names(edge_style_map))] <- "others_unknown"
+
+  # Vectorized assignment of edge attributes
+  igraph::E(g)$color <- vapply(rel_sub, function(x) edge_style_map[[x]]$color, character(1))
+  igraph::E(g)$lty <- vapply(rel_sub, function(x) edge_style_map[[x]]$lty, integer(1))
+  igraph::E(g)$arrow.mode <- vapply(rel_sub, function(x) edge_style_map[[x]]$arrow.mode, integer(1))
+  igraph::E(g)$label <- vapply(rel_sub, function(x) edge_style_map[[x]]$label, character(1))
+
+  g
 }
+
 
 # | KEGG `type`      | Semantics                                       | igraph closest shape | visNetwork closest shape  | Rationale                                                               |
 # | ---------------- | ----------------------------------------------- | -------------------- | ------------------------- | ----------------------------------------------------------------------- |
@@ -35,7 +70,6 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1) {
   nodes_df <- igraph::as_data_frame(g, what = "vertices")
   nodes_df <- style_nodes(nodes_df)
   nodes_df <- scale_dimensions(nodes_df, factor = scaling_factor)
-  nodes_df <- add_tooltip(nodes_df)
 
   nodes_df <- nodes_df[order(nodes_df$label), , drop = FALSE]
 
@@ -48,7 +82,7 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1) {
   if (igraph::ecount(g) > 0) {
     edges_df <- igraph::as_data_frame(g, what = "edges")
 
-    edges_df <- style_edges(edges_df)
+    edges_df <- style_edges_igraph(edges_df)
     edges_df <- add_edge_tooltip(edges_df)
 
     # write edge attributes back
@@ -58,6 +92,25 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1) {
   }
 
   g
+}
+
+style_nodes <- function(nodes_df) {
+
+  # Apply default styles based on KEGG type
+  nodes_df$size <- ifelse(is.na(nodes_df$size), 25, nodes_df$size) # to check later
+
+  # Map KEGG types to shapes
+  nodes_df$shape[nodes_df$original_shape == "rectangle"] <- "vrectangle"
+  nodes_df$shape[nodes_df$original_shape == "circle"] <- "circle"
+  nodes_df$shape[nodes_df$original_shape == "roundrectangle"] <- "vrectangle"
+  nodes_df$shape[nodes_df$original_shape == "line"] <- "dot" # ellipse?
+  
+  # Make line nodes fully transparent
+  nodes_df$color[nodes_df$original_shape == "line"] <- "transparent"
+  nodes_df$color[nodes_df$type == "group"] <- "transparent"
+  nodes_df$size[nodes_df$original_shape == "line"] <- 1 
+
+  return(nodes_df)
 }
 
 #' Scale node dimensions for better visualization.
@@ -73,3 +126,4 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 
   return(nodes_df)
 }
+
