@@ -33,9 +33,9 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     results_combined <- combine_results_in_dataframe(de_list)
 
     if (test_name %in% throw_warning) {
-      expect_warning(mapped_nodes <- add_results_nodes(expected_nodes, results_combined))
+      expect_warning(mapped_nodes <- add_results_nodes(kgml_steps$all_nodes , results_combined))
     } else {
-      mapped_nodes <- add_results_nodes(expected_nodes, results_combined)
+      mapped_nodes <- add_results_nodes(kgml_steps$all_nodes , results_combined)
     }
 
     # Structure checks
@@ -43,7 +43,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     expect_true(all(c("id", "de_value", "color", "source", "text") %in% colnames(mapped_nodes)),
       info = paste0(test_name, " missing expected columns")
     )
-    expect_equal(nrow(mapped_nodes), nrow(expected_nodes),
+    expect_equal(nrow(mapped_nodes), nrow(kgml_steps$all_nodes ),
       info = paste0(test_name, " wrong number of rows")
     )
 

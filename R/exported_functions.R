@@ -16,8 +16,6 @@ kegg_to_graph <- function(
     verbose = FALSE,
     simplified_graph = TRUE,
     kgml_file = NULL) {
-  # Check arguments
-  return_type <- match.arg(return_type, choices = c("igraph", "visNetwork"), several.ok = FALSE)
 
   # Validate pathway ID format
   if (!is_valid_pathway(pathway_id)) {
@@ -34,7 +32,7 @@ kegg_to_graph <- function(
     if (verbose) {
       message("Downloading KGML file for pathway ID: ", pathway_id)
     }
-    kgml_file <- download_kgml(pathway_id, bfc_kegg)
+    kgml_file <- download_kgml(pathway_id, bfc = bfc_kegg)
     if (is.null(kgml_file)) {
       warning("Failed to download KGML file for pathway ID: ", pathway_id)
       return(NULL)
@@ -43,8 +41,9 @@ kegg_to_graph <- function(
 
   pathway_name <- paste0("(", pathway_id, ") ", get_pathway_name(pathway_id))
 
-  g <- kgml_to_igraph(kgml_file, pathway_name)
-  g <- standardize_igraph_graph(g,
+  g <- build_kegg_graph(kgml_file, pathway_name, bfc = bfc_map)
+
+  g <- standardize_network(g,
     kegg_to_general_node_map(),
     kegg_to_general_edge_map(),
     node_defaults(),

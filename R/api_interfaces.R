@@ -70,7 +70,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
   if (mode == "cache") {
     path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
 
-    message("Downloaded & cached: ", pathway_id)
+    message("Cached: ", pathway_id)
     return(path)
   } else {
     file_name <-
@@ -120,6 +120,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
 #' @export
 get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
+  message("Retrieving KEGG database: ", db_name)
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either 'bfc' OR 'directory', not both.")
@@ -149,7 +150,7 @@ get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
 
   if (mode == "cache") {
     path <- BiocFileCache::bfcrpath(bfc, url, ext = ".tsv")
-    message("Downloaded & cached KEGG database: ", db_name)
+    message("Cached KEGG database: ", db_name)
     con <- path
   } else {
     resp <- request(url) |>

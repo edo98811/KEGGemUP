@@ -1,5 +1,12 @@
+#' Build an igraph graph from a KEGG KGML file
+#' @param file Path to the KGML file
+#' @param pathway_name Name of the pathway
+#' @param bfc_map BiocFileCache for mapping data (optional)
+#' @return An igraph object representing the KEGG pathway graph
+#' @importFrom xml2 read_xml
+#' @noRd
 build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL) {
-  xml <- read_xml(file)
+  xml <- xml2::read_xml(file)
 
   # Parse nodes (I can do that as all the functions return the same columns)
   nodes_df <- parse_kgml_nodes(xml, kegg_node_defaults())
@@ -22,9 +29,11 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL) {
   if (pathway_name == "") {
     warning("Failed to retrieve pathway name; using 'Pathway' as default.")
   }
+
   g <- make_igraph_graph(nodes_df, edges_df, pathway_name)
   igraph::graph_attr(g, "title") <- pathway_name
   igraph::graph_attr(g, "type") <- pathway_name # open for extension with other types
+  return(g)
 }
 
 #' Standardize igraph nodes and edges to default schema
@@ -107,51 +116,51 @@ standardize_network <- function(g, node_map, edge_map, node_default, edge_defaul
 }
 
 
-# #' Create an igraph graph from nodes and edges data frames
-# #' @param nodes_df Data frame of nodes.
-# #' @param edges_df Data frame of edges.
-# #' @param pathway_name Name of the pathway for the graph title.
-# #' @return An igraph object representing the graph.
-# #' @noRd
-# make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
-#   if (nrow(edges_df) == 0 || is.null(edges_df)) {
-#     warning("No edges in graph.")
-#     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
-#     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
-#     g <- igraph::delete_edges(g, igraph::E(g))
-#   } else {
-#     g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
-#   }
-
-#   g <- igraph::permute(g, order(igraph::V(g)$label))
-#   igraph::graph_attr(g, "title") <- pathway_name
-#   return(g)
-# }
-
 #' Create an igraph graph from nodes and edges data frames
 #' @param nodes_df Data frame of nodes.
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
-#' @param directed Logical, whether the graph should be directed.
 #' @return An igraph object representing the graph.
 #' @noRd
-make_igraph_graph <- function(nodes_df, edges_df, pathway_name, directed = FALSE) {
-  if (nrow(nodes_df) == 0) {
-    stop("Nodes data frame is empty. Cannot create graph.")
-  }
-
-  # Sort nodes by label for consistent vertex order
-  nodes_df <- nodes_df[order(nodes_df$label), , drop = FALSE]
-
-  if (is.null(edges_df) || nrow(edges_df) == 0) {
-    # Create empty graph and add vertices
-    g <- igraph::graph.empty(n = nrow(nodes_df), directed = directed)
-    igraph::vertex_attr(g) <- as.list(nodes_df)
+make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
+  if (nrow(edges_df) == 0 || is.null(edges_df)) {
+    warning("No edges in graph.")
+    fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
+    g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
+    g <- igraph::delete_edges(g, igraph::E(g))
   } else {
-    g <- igraph::graph_from_data_frame(d = edges_df, vertices = nodes_df, directed = directed)
+    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
   }
 
-  # Set pathway title
+  g <- igraph::permute(g, order(igraph::V(g)$label))
   igraph::graph_attr(g, "title") <- pathway_name
   return(g)
 }
+
+# #' Create an igraph graph from nodes and edges data frames
+# #' @param nodes_df Data frame of nodes.
+# #' @param edges_df Data frame of edges.
+# #' @param pathway_name Name of the pathway for the graph title.
+# #' @param directed Logical, whether the graph should be directed.
+# #' @return An igraph object representing the graph.
+# #' @noRd
+# make_igraph_graph <- function(nodes_df, edges_df, pathway_name, directed = FALSE) {
+#   if (nrow(nodes_df) == 0) {
+#     stop("Nodes data frame is empty. Cannot create graph.")
+#   }
+
+#   # Sort nodes by label for consistent vertex order
+#   nodes_df <- nodes_df[order(nodes_df$label), , drop = FALSE]
+
+#   if (is.null(edges_df) || nrow(edges_df) == 0) {
+#     # Create empty graph and add vertices
+#     g <- igraph::graph.empty(n = nrow(nodes_df), directed = directed)
+#     igraph::vertex_attr(g) <- as.list(nodes_df)
+#   } else {
+#     g <- igraph::graph_from_data_frame(d = edges_df, vertices = nodes_df, directed = directed)
+#   }
+
+#   # Set pathway title
+#   igraph::graph_attr(g, "title") <- pathway_name
+#   return(g)
+# }

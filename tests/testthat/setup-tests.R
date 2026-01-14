@@ -136,7 +136,7 @@ throw_warning <- names(all_de_test_lists)[c(3, 4, 5)]
 expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 
 kgml_path <- system.file("extdata", "test01.xml", package = "KEGGemUP")
-ref_graph <- readRDS(system.file("extdata", "test01_reference_graph.rds", package = "KEGGemUP"))
+# ref_graph <- readRDS(system.file("extdata", "test01_reference_graph.rds", package = "KEGGemUP"))
 xml_example <- xml2::read_xml(kgml_path)
 kgml_processing_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 
@@ -158,6 +158,7 @@ nodes_df_basic <- data.frame(
 )
 
 # make working nodes
+xml_example <- xml2::read_xml(kgml_path)
 kgml_steps <- list()
 
 kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
@@ -180,13 +181,16 @@ kgml_steps$all_edges <- rbind(
   kgml_steps$line_edges
 )
 
+g <- make_igraph_graph(kgml_steps$all_nodes, kgml_steps$all_edges, "test01_pathway")
+g <- standardize_network(g, kegg_to_general_edge_map(), kegg_to_general_node_map(), node_defaults(), edge_defaults())
+
 saveRDS(kgml_steps, file = "kgml_parsing_steps.rds")
 
 
 kgml_path <- system.file("extdata", "test01.xml", package = "YourPackageName")
 
 g_test <- kegg_to_graph(
-  pathway_id = "hsa:TEST01",
+  pathway_id = "hsa00001",
   scaling_factor = 1.0,
   simplified_graph = TRUE,
   kgml_file = kgml_path

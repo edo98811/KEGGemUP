@@ -6,6 +6,7 @@ parse_kgml_nodes <- function(xml, defaults) {
     xml,
     ".//entry[@type and not(@type='group') and (not(graphics) or not(graphics/@type='line'))]"
   )
+
   # Process each entry
   nodes_list <- lapply(nodes, function(node) {
     graphics_nodes <- xml2::xml_find_all(node, ".//graphics")
@@ -18,7 +19,7 @@ parse_kgml_nodes <- function(xml, defaults) {
     )
 
     # Fill static attributes from entry
-    entry_nodes_df$kegg_name <- xml2::xml_attr(node, "name")
+    entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
     entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
@@ -62,8 +63,7 @@ parse_kgml_groups <- function(xml, defaults) {
   )
   # Process each entry
   nodes_list <- lapply(group_nodes, function(node) {
-    components_nodes <- xml2::xml_find_all(node, ".//component")
-    n_rows <- max(length(components_nodes), 1) # at least one row per entry
+    n_rows <- 1 # keep the group node itself
 
     # Pre-allocate a data.frame for this entry
     entry_nodes_df <- as.data.frame(
@@ -77,13 +77,15 @@ parse_kgml_groups <- function(xml, defaults) {
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
     entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
-
+    entry_nodes_df$name <- xml2::xml_attr(node, "id") # first row is the group node itself
+    components_nodes <- xml2::xml_find_all(node, ".//component")
     # Fill attributes from graphics nodes
     if (length(components_nodes) > 0) {
       for (i in seq_along(components_nodes)) {
-        g <- components_nodes[i]
-        entry_nodes_df$name <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
-        entry_nodes_df$components[i] <- xml2::xml_attr(g, "id")
+        entry_nodes_df$components <- paste(components_nodes %>% xml2::xml_attr("id"), collapse = ";")
+        # g <- components_nodes[i + 1]
+        # entry_nodes_df$name[i + 1] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
+        # entry_nodes_df$components[i + 1] <- xml2::xml_attr(g, "id")
       }
     }
 
@@ -128,7 +130,7 @@ parse_kgml_lines <- function(xml, defaults) {
     # Fill static attributes from entry
     entry_nodes_df$line_id <- xml2::xml_attr(node, "id")
     entry_nodes_df$name <- xml2::xml_attr(node, "id")
-    entry_nodes_df$kegg_name <- xml2::xml_attr(node, "name")
+    entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
     entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
@@ -194,7 +196,6 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
       edges_df$from[row] <- line_nodes_df$name[idx[i]]
       edges_df$to[row] <- line_nodes_df$name[idx[i + 1]]
       edges_df$type[row] <- "line"
-      edges_df$directed[row] <- FALSE
       row <- row + 1L
     }
   }
@@ -202,14 +203,13 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
   edges_df
 }
 
-
 parse_kgml_relations <- function(xml, defaults) {
   # Find all relation entries
-  rels <- xml_find_all(xml, ".//relation")
+  rels <- xml2::xml_find_all(xml, ".//relation")
 
   # Process each entry
   nodes_list <- lapply(rels, function(relation) {
-    subtype_nodes <- xml2::xml_find_all(node, ".//subtype") # is  0...*
+    subtype_nodes <- xml2::xml_find_all(relation, ".//subtype") # is  0...*
     n_rows <- max(length(subtype_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
@@ -219,15 +219,15 @@ parse_kgml_relations <- function(xml, defaults) {
     )
 
     # Fill static attributes from entry
-    entry_edges_df$from <- xml_attr(rel, "entry1")
-    entry_edges_df$to <- xml_attr(rel, "entry2")
-    entry_edges_df$type <- xml_attr(rel, "type")
+    entry_edges_df$from <- xml2::xml_attr(relation, "entry1")
+    entry_edges_df$to <- xml2::xml_attr(relation, "entry2")
+    entry_edges_df$type <- xml2::xml_attr(relation, "type")
 
-    # Fill attributes from graphics nodes
+    # Fill attributes from subtype nodes
     if (length(subtype_nodes) > 0) {
       for (i in seq_along(subtype_nodes)) {
         if (i > n_rows) {
-          stop("parse_kgml_nodes: More graphics nodes than pre-allocated rows.")
+          stop("parse_kgml_relations: More subtype nodes than pre-allocated rows.")
         }
         g <- subtype_nodes[i]
         entry_edges_df$relation_subtype_name[i] <- xml2::xml_attr(g, "name")
@@ -245,7 +245,7 @@ parse_kgml_relations <- function(xml, defaults) {
 #' @noRd
 parse_kgml_reactions <- function(xml, defaults) {
   # Find all reaction entries
-  reactions <- xml_find_all(xml, ".//reaction")
+  reactions <- xml2::xml_find_all(xml, ".//reaction")
 
   # Process each entry
   nodes_list <- lapply(reactions, function(reaction) {
@@ -266,9 +266,9 @@ parse_kgml_reactions <- function(xml, defaults) {
     )
 
     # Fill static attributes from entry
-    entry_edges_df$reaction_id <- xml_attr(reaction, "id")
-    entry_edges_df$reaction_name <- xml_attr(reaction, "name")
-    entry_edges_df$reaction_type <- xml_attr(reaction, "type")
+    entry_edges_df$reaction_id <- xml2::xml_attr(reaction, "id")
+    entry_edges_df$reaction_name <- xml2::xml_attr(reaction, "name")
+    entry_edges_df$reaction_type <- xml2::xml_attr(reaction, "type")
 
     # Pre-extract substrate attributes
     sub_id <- xml2::xml_attr(substrates_nodes, "id")
@@ -292,14 +292,14 @@ parse_kgml_reactions <- function(xml, defaults) {
     row <- 1L
     for (p in seq_len(n_prod)) {
       for (s in seq_len(n_sub)) {
-        df$from[row] <- sub_id[s]
-        df$to[row] <- prod_id[p]
+        entry_edges_df$from[row] <- sub_id[s]
+        entry_edges_df$to[row] <- prod_id[p]
 
-        df$reaction_from_name[row] <- sub_name[s]
-        df$reaction_to_name[row] <- prod_name[p]
+        entry_edges_df$reaction_from_name[row] <- sub_name[s]
+        entry_edges_df$reaction_to_name[row] <- prod_name[p]
 
-        df$reaction_alt_name_substrate[row] <- sub_alt[s]
-        df$reaction_alt_name_product[row] <- prod_alt[p]
+        entry_edges_df$reaction_alt_name_substrate[row] <- sub_alt[s]
+        entry_edges_df$reaction_alt_name_product[row] <- prod_alt[p]
 
         row <- row + 1L
       }
@@ -325,7 +325,7 @@ add_node_labels <- function(nodes_df, bfc) {
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc)
   glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc)
-  genes_db <- get_kegg_db(db_name = "gene", bfc = bfc)
+  genes_db <- get_kegg_db(db_name = "ko", bfc = bfc)
 
   # Convert to named lookup vectors
   compounds_lookup <- setNames(as.character(compounds_db[, 2]), compounds_db[, 1])
@@ -404,10 +404,10 @@ add_group <- function(nodes_df) {
     if (is.na(comps) || comps == "") next
 
     # Split components and include the group node itself
-    ids <- c(strsplit(comps, ";", fixed = TRUE)[[1]], nodes_df$id[i])
+    ids <- c(strsplit(comps, ";", fixed = TRUE)[[1]], nodes_df$name[i])
 
     # Get indices of all nodes in this group
-    node_idx <- match(ids, nodes_df$id)
+    node_idx <- match(ids, nodes_df$name)
 
     # just to be safe (should not happen)
     if (any(is.na(node_idx))) {

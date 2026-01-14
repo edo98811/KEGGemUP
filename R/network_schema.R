@@ -20,11 +20,10 @@ kegg_node_defaults <- function() {
     coords = NA_character_,
     graphics_type = NA_character_,
     ids_for_mapping = "",
+    point_index = NA_integer_,
 
     # Visualization attributes
     label = "", # minimum necessary
-    fgcolor = NA_character_,
-    bgcolor = NA_character_,
     x = NA_real_,
     y = NA_real_,
     width = NA_real_,
@@ -32,7 +31,7 @@ kegg_node_defaults <- function() {
     source = NA_character_,
     fgcolor = NA_character_,
     bgcolor = NA_character_,
-    group = NA_character_,
+    group = NA_character_
   )
 }
 
@@ -53,7 +52,7 @@ kegg_edge_defaults <- function() {
     reaction_type = NA_character_,
     reaction_from_name = NA_character_,
     reaction_to_name = NA_character_,
-    point_index = NA_integer_,
+    point_index = NA_integer_
   )
 }
 
@@ -62,7 +61,7 @@ kegg_edge_defaults <- function() {
 node_defaults <- function() {
   list(
     # Basic attributes
-    name = NA_integer_, # kegg unique node id
+    name = uuid::UUIDgenerate(), # kegg unique node id
     label = NA_character_,
     title = NA_character_,
     group = NA_character_,
@@ -156,6 +155,6 @@ kegg_to_general_edge_map <- function() {
     reaction_alt_name_product = "",
     reaction_id = "name_1",
     reaction_name = "name_2",
-    reaction_type = "name_3",
+    reaction_type = "name_3"
   )
 }

@@ -1,41 +1,40 @@
-
-
 #' Style igraph edges based on relation_subtype
 #' @param g An igraph graph object with an edge attribute 'relation_subtype'
 #' @return The igraph graph with styled edge attributes: color, lty, arrow.mode, label
+#' @importFrom igraph edge_attr_names E
 #' @noRd
 style_edges_igraph <- function(g) {
   stopifnot("igraph" %in% class(g))
   stopifnot("name_3" %in% igraph::edge_attr_names(g))
 
-  # Define styles 
+  # Define styles
   edge_style_map <- list(
     # Default styles for relation subtypes
-    compound = list(color = "black", lty = 1, arrow.mode = 2, label = ""),
-    hidden_compound = list(color = "lightgray", lty = 1, arrow.mode = 2, label = ""),
-    activation = list(color = "red", lty = 1, arrow.mode = 2, label = ""),
-    inhibition = list(color = "blue", lty = 1, arrow.mode = 3, label = ""),
-    expression = list(color = "red", lty = 2, arrow.mode = 2, label = ""),
-    repression = list(color = "blue", lty = 2, arrow.mode = 3, label = ""),
-    indirect_effect = list(color = "gray", lty = 2, arrow.mode = 2, label = ""),
-    state_change = list(color = "gray", lty = 2, arrow.mode = 0, label = ""),
-    binding_association = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
-    dissociation = list(color = "gray", lty = 2, arrow.mode = 2, label = ""),
-    missing_interaction = list(color = "gray", lty = 2, arrow.mode = 2, label = "-/-"),
-    phosphorylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+p"),
-    dephosphorylation = list(color = "black", lty = 1, arrow.mode = 2, label = "-p"),
-    glycosylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+g"),
-    ubiquitination = list(color = "black", lty = 1, arrow.mode = 2, label = "+u"),
-    methylation = list(color = "black", lty = 1, arrow.mode = 2, label = "+m"),
-    others_unknown = list(color = "black", lty = 2, arrow.mode = 2, label = "?"),
+    compound = list(color = "black", lty = 1L, arrow.mode = 2L, label = ""),
+    hidden_compound = list(color = "lightgray", lty = 1L, arrow.mode = 2L, label = ""),
+    activation = list(color = "red", lty = 1L, arrow.mode = 2L, label = ""),
+    inhibition = list(color = "blue", lty = 1L, arrow.mode = 3L, label = ""),
+    expression = list(color = "red", lty = 2L, arrow.mode = 2L, label = ""),
+    repression = list(color = "blue", lty = 2L, arrow.mode = 3L, label = ""),
+    indirect_effect = list(color = "gray", lty = 2L, arrow.mode = 2L, label = ""),
+    state_change = list(color = "gray", lty = 2L, arrow.mode = 0L, label = ""),
+    binding_association = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
+    dissociation = list(color = "gray", lty = 2L, arrow.mode = 2L, label = ""),
+    missing_interaction = list(color = "gray", lty = 2L, arrow.mode = 2L, label = "-/-"),
+    phosphorylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+p"),
+    dephosphorylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "-p"),
+    glycosylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+g"),
+    ubiquitination = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+u"),
+    methylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+m"),
+    others_unknown = list(color = "black", lty = 2L, arrow.mode = 2L, label = "?"),
 
     # Default style for group relations
-    group_relation = list(color = "transparent", lty = 2, arrow.mode = 0, label = ""),
+    group_relation = list(color = "transparent", lty = 2L, arrow.mode = 0L, label = ""),
 
     # Default styles for reaction types
-    reversible = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
-    irreversible = list(color = "black", lty = 2, arrow.mode = 0, label = ""),
-    line = list(color = "black", lty = 1, arrow.mode = 0, label = "")
+    reversible = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
+    irreversible = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
+    line = list(color = "black", lty = 1L, arrow.mode = 0L, label = "")
   )
 
   # Normalize relation_subtype
@@ -63,7 +62,7 @@ style_edges_igraph <- function(g) {
 
 
 #' @noRd
-style_igraph_graph <- function(g, bfc_map, scaling_factor = 1) {
+style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
   stopifnot(inherits(g, "igraph"))
 
   ## ---- Nodes ----
@@ -80,22 +79,13 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1) {
 
   ## ---- Edges ----
   if (igraph::ecount(g) > 0) {
-    edges_df <- igraph::as_data_frame(g, what = "edges")
-
-    edges_df <- style_edges_igraph(edges_df)
-    edges_df <- add_edge_tooltip(edges_df)
-
-    # write edge attributes back
-    for (col in names(edges_df)) {
-      igraph::edge_attr(g, col) <- edges_df[[col]]
-    }
+    g <- style_edges_igraph(g)
   }
 
   g
 }
 
 style_nodes <- function(nodes_df) {
-
   # Apply default styles based on KEGG type
   nodes_df$size <- ifelse(is.na(nodes_df$size), 25, nodes_df$size) # to check later
 
@@ -104,11 +94,11 @@ style_nodes <- function(nodes_df) {
   nodes_df$shape[nodes_df$original_shape == "circle"] <- "circle"
   nodes_df$shape[nodes_df$original_shape == "roundrectangle"] <- "vrectangle"
   nodes_df$shape[nodes_df$original_shape == "line"] <- "dot" # ellipse?
-  
+
   # Make line nodes fully transparent
   nodes_df$color[nodes_df$original_shape == "line"] <- "transparent"
   nodes_df$color[nodes_df$type == "group"] <- "transparent"
-  nodes_df$size[nodes_df$original_shape == "line"] <- 1 
+  nodes_df$size[nodes_df$original_shape == "line"] <- 1
 
   return(nodes_df)
 }
@@ -126,4 +116,3 @@ scale_dimensions <- function(nodes_df, factor = 2) {
 
   return(nodes_df)
 }
-
