@@ -4,24 +4,13 @@
 \alias{kegg_to_graph}
 \title{Convert KEGG pathway to graph}
 \usage{
-kegg_to_graph(
-  pathway_id,
-  scaling_factor = 1.5,
-  verbose = FALSE,
-  simplified_graph = TRUE,
-  kgml_file = NULL
-)
+kegg_to_graph(pathway_id, kgml_file = NULL)
 }
 \arguments{
 \item{pathway_id}{KEGG pathway ID (e.g., "hsa04110").}
 
-\item{scaling_factor}{Numeric factor to scale node dimensions (default: 1.5).}
-
-\item{verbose}{Logical indicating whether to print progress messages (default: FALSE).}
-
-\item{simplified_graph}{Logical indicating whether to simplify the graph by removing KEGG-specific columns (default: TRUE).}
-
-\item{kgml_file}{Optional local path to a KGML file. If provided, the function will use this file instead of downloading it.}
+\item{kgml_file}{Optional local path to a KGML file.
+If provided, the function will use this file instead of downloading it.}
 }
 \value{
 An igraph object representing the KEGG pathway graph.
@@ -31,6 +20,10 @@ Convert KEGG pathway to graph
 }
 \details{
 This function downloads the KGML file for a given KEGG pathway ID,
-parses it, constructs an igraph object, standardizes its attributes,
-and styles it for visualization.
+parses it and constructs an igraph object.
+}
+\examples{
+pathway_graph <- kegg_to_graph(
+  pathway_id = "hsa04110"
+)
 }

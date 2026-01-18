@@ -28,3 +28,10 @@ network | variant | disease | drug | dgroup
 If neither 'bfc' nor 'directory' is provided, the KEGG database
 will be downloaded but not saved. It will be returned as a data frame.
 }
+\examples{
+# Saving in directory
+data_dir <- tempdir()
+kegg_compounds <- get_kegg_db("compound", directory = data_dir)
+# Just returning without saving
+kegg_genes <- get_kegg_db("genes")
+}

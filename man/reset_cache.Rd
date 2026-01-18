@@ -12,3 +12,11 @@ None
 \description{
 Reset KEGG and mapping caches by deleting all cached files
 }
+\details{
+This function deletes all cached KEGG pathway files
+and mapping files stored using BiocFileCache.
+It prompts the user for confirmation before proceeding with the deletion.
+}
+\examples{
+# reset_cache()
+}

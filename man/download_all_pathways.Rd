@@ -15,3 +15,7 @@ None
 \description{
 Download all KEGG pathways for a given organism.
 }
+\examples{
+# Download all pathways for human
+# download_all_pathways("hsa")
+}

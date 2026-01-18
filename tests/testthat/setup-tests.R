@@ -15,9 +15,6 @@ nodes_B <- c("3333", "9999", "C00008", "K00001")
 # Duplicates within the same vector
 nodes_C <- c("1111", "1111", "C00003", "C00002", "C99999")
 
-# Mix of existing and new, with overlap across vectors
-nodes_D <- c("C00003", "C00008", "3333", "tst00002")
-
 # All compounds including a non-existent one
 nodes_compounds <- c("C00001", "C00002", "C00003", "C00123")
 
@@ -27,6 +24,7 @@ nodes_A_df <- data.frame(
   log2FoldChange = rnorm(length(nodes_A), mean = 0, sd = 1)
 )
 rownames(nodes_A_df) <- nodes_A_df$KEGGID
+
 nodes_B_df <- data.frame(
   KEGG = nodes_B,
   log2FC = rnorm(length(nodes_B), mean = 0, sd = 1)
@@ -35,80 +33,14 @@ nodes_C_df <- data.frame(
   KEGG_ids = nodes_C,
   log2FoldChange = rnorm(length(nodes_C), mean = 0, sd = 1)
 )
-nodes_D_df <- data.frame(
-  KEGG_ids = nodes_D,
-  log2FoldChange = rnorm(length(nodes_D), mean = 0, sd = 1)
-)
 nodes_compounds_df <- data.frame(
   KEGG = nodes_compounds,
   log2FC = rnorm(length(nodes_compounds), mean = 0, sd = 1)
 )
 
-# --- EXAMPLE FAKE DE RESULTS LISTS ---
-
-# Basic case — two datasets, consistent and simple
-de_results_list_1 <- list(
-  genes = list(
-    de_table = nodes_A_df,
-    value_column = "log2FoldChange",
-    feature_column = "KEGGID"
-  ),
-  metabolites = list(
-    de_table = nodes_B_df,
-    value_column = "log2FC",
-    feature_column = "KEGG"
-  )
-)
-
-de_results_list_rownames <- list(
-  genes = list(
-    de_table = nodes_A_df,
-    value_column = "log2FoldChange",
-    feature_column = "rownames"
-  ),
-  metabolites = list(
-    de_table = nodes_B_df,
-    value_column = "log2FC",
-    feature_column = "KEGG"
-  )
-)
-
-
-# Mixed column names and redundant identifiers
-de_results_list_2 <- list(
-  transcr = list(
-    de_table = nodes_C_df,
-    value_column = "log2FoldChange",
-    feature_column = "KEGG_ids"
-  ),
-  proteins = list(
-    de_table = nodes_B_df,
-    value_column = "log2FC",
-    feature_column = "KEGG"
-  ),
-  metabolome = list(
-    de_table = nodes_compounds_df,
-    value_column = "log2FC",
-    feature_column = "KEGG"
-  )
-)
-
-# Duplicates and cross-referenced names
-de_results_list_3 <- list(
-  group1 = list(
-    de_table = nodes_D_df,
-    value_column = "log2FoldChange",
-    feature_column = "KEGG_ids"
-  ),
-  group2 = list(
-    de_table = nodes_C_df,
-    value_column = "log2FoldChange",
-    feature_column = "KEGG_ids"
-  )
-)
 
 # Mixed types and random naming
-de_results_list_4 <- list(
+de_results_list <- list(
   transcriptomics = list(
     de_table = nodes_A_df,
     value_column = "log2FoldChange",
@@ -131,27 +63,22 @@ de_results_list_4 <- list(
   )
 )
 
-all_de_test_lists <- list(
-  genes_metabolites     = de_results_list_1, # Basic and consistent
-  using_rownames        = de_results_list_rownames, # Basic and consistent with rownames as feature_column
-  mixed_omics           = de_results_list_2, # Mixed omics, column name variations
-  duplicates_overlap    = de_results_list_3, # Duplicate / overlapping feature IDs
-  all                   = de_results_list_4 # Large mixed test case
-)
-
 # throw_warning <- names(all_de_test_lists)[c(3, 4, 5)]
 # expected_warnings <- setNames(c(2, 2, 4), throw_warning)
 kgml_path_01 <- system.file("extdata", "test01.xml", package = "KEGGemUP")
 kgml_path_real <- system.file("extdata", "hsa04010.xml", package = "KEGGemUP")
 kgml_path_02 <- system.file("extdata", "test02.xml", package = "KEGGemUP")
-kgml_path_empty <- system.file("extdata", "test_empty.xml", package = "KEGGemUP")
+kgml_path_broken <- system.file("extdata", "broken.xml", package = "KEGGemUP")
+kgml_path_empty <- system.file("extdata", "empty.xml", package = "KEGGemUP")
+kgml_path_no_edges <- system.file("extdata", "no_edges.xml", package = "KEGGemUP")
+kgml_path_invalid <- system.file("extdata", "no_kgml.xml", package = "KEGGemUP")
 kgml_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 
-
-xml_example <- xml2::read_xml(kgml_path_01)
+xml_example <- xml2::read_xml(kgml_path_02)
 kgml_processing_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 expected_graphs <- readRDS(system.file("extdata", "kegg_to_graph_expected.rds", package = "KEGGemUP"))
-bfc <- BiocFileCache(tempfile(), ask = FALSE)
+bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
+bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
 
 # Empty edges
 empty_edges <- data.frame(
@@ -171,8 +98,7 @@ nodes_df_basic <- data.frame(
 )
 
 
-# # make working nodes
-# xml_example <- xml2::read_xml(kgml_path)
+# # Tests for expected outputs of kegg_to_graph and map_results_to_graph
 # kgml_steps <- list()
 
 # kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
@@ -195,63 +121,47 @@ nodes_df_basic <- data.frame(
 #   kgml_steps$line_edges
 # )
 
-# # g_all <- make_igraph_graph(kgml_steps$all_nodes, kgml_steps$all_edges, "test01_pathway")
+# bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
+# bfc_map <- BiocFileCache(cache = file.path(bfc_path, "mappings"), ask = FALSE)
+# g_1 <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
+# g_2 <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
+
+# kgml_steps$g_test_01 <- g_1
+# kgml_steps$g_test_02 <- g_2
 
 # saveRDS(kgml_steps, file = "inst/extdata/kgml_parsing_steps.rds")
 
-devtools::load_all()
-g_test_01 <- kegg_to_graph(
-  pathway_id = "hsa00001",
-  scaling_factor = 1.0,
-  simplified_graph = TRUE,
-  kgml_file = kgml_path_01
-)
+# g_test_01 <- kegg_to_graph(
+#   pathway_id = "hsa00001",
+#   kgml_file = kgml_path_01
+# )
 
-devtools::load_all()
-g_test_02 <- kegg_to_graph(
-  pathway_id = "hsa00001",
-  scaling_factor = 1.0,
-  simplified_graph = TRUE,
-  kgml_file = kgml_path_02
-)
+# g_test_02 <- kegg_to_graph(
+#   pathway_id = "hsa00001",
+#   kgml_file = kgml_path_02
+# )
 
-expected$graphs <- list(
-  g_test_01 = g_test_01,
-  g_test_02 = g_test_02
-)
+# expected <- list(
+#   g_test_01 = g_test_01,
+#   g_test_02 = g_test_02
+# )
+
+# g_test_01_mapped <- map_results_to_graph(
+#   g = g_test_01,
+#   de_results = de_results_list
+# )
+# g_test_02_mapped <- map_results_to_graph(
+#   g = g_test_02,
+#   de_results = de_results_list
+# )
+
+# expected$g_test_01_mapped <- g_test_01_mapped
+# expected$g_test_02_mapped <- g_test_02_mapped
+
+# vis_graph_01 <- plot_kegg_visNetwork(g_test_01_mapped)
+# vis_graph_02 <- plot_kegg_visNetwork(g_test_02_mapped)
+
+# expected$visNetwork_test_01_mapped <- vis_graph_01
+# expected$visNetwork_test_02_mapped <- vis_graph_02
 
 # saveRDS(expected, file = "inst/extdata/kegg_to_graph_expected.rds")
-g_test_01 <- map_results_to_graph(
-  g = g_test_01,
-  de_results = de_results_list_1
-)
-plot_network_01_vis <- plot_visNetwork_kegg(g_test_02)
-plot_network_01_static <- plot_static_kegg(g_test_02)
-plot_network_02_vis <- plot_visNetwork_kegg(g_test_01)
-plot_network_02_static <- plot_static_kegg(g_test_01)
-# traceback()
-# Q
-nodes_df <- as_data_frame(g_test_02, what = "vertices")
-edges_df <- as_data_frame(g_test_02, what = "edges")
-# edges_df[edges_df$type == "line", ]
-# plot(g_test)
-# g_test
-# v_test <- plot_visNetwork_kegg(g_mapped)
-
-# xml_example <- xml2::read_xml(kgml_path_02)
-# kgml_steps <- list()
-# kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
-# kgml_steps$line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
-
-# nodes_df <- as_data_frame(g, what = "vertices")
-# edges_df <- as_data_frame(g, what = "edges")
-
-# g_test <- map_results_to_graph(
-#   g = g_test,
-#   de_results = de_results_list_1
-# )
-# traceback()
-
-
-# devtools::load_all()
-# plot_visNetwork_kegg(g_test)

@@ -39,24 +39,24 @@ test_style_edges_igraph <- function() {
 
   g_styled <- style_edges_igraph(g)
 
-  # ---- attribute existence ----
+  #  attribute existence 
   edge_attrs <- igraph::edge_attr_names(g_styled)
   stopifnot(all(c("color", "lty", "arrow.mode", "label") %in% edge_attrs))
 
-  # ---- relation_subtype_name mapping ----
+  #  relation_subtype_name mapping 
   stopifnot(igraph::E(g_styled)$color[1] == "red")      # activation
   stopifnot(igraph::E(g_styled)$arrow.mode[2] == 3L)   # inhibition
 
-  # ---- unknown relation subtype (no style applied) ----
+  #  unknown relation subtype (no style applied) 
   stopifnot(is.na(igraph::E(g_styled)$color[3]))
   stopifnot(is.na(igraph::E(g_styled)$lty[3]))
   stopifnot(is.na(igraph::E(g_styled)$arrow.mode[3]))
 
-  # ---- reaction_type overrides relation_subtype_name ----
+  #  reaction_type overrides relation_subtype_name 
   stopifnot(igraph::E(g_styled)$lty[4] == 2L)           # reversible
   stopifnot(igraph::E(g_styled)$arrow.mode[4] == 0L)
 
-  # ---- type == "line" overrides everything ----
+  #  type == "line" overrides everything 
   stopifnot(igraph::E(g_styled)$color[5] == "black")
   stopifnot(igraph::E(g_styled)$lty[5] == 1L)
   stopifnot(igraph::E(g_styled)$arrow.mode[5] == 0L)

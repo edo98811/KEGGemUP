@@ -222,7 +222,7 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
     # may be useful to add general info in the dataframe:
     # https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
 
-    nodes_to_color$color <- palette_ramp(100)[
+    nodes_to_color$vertex.color <- palette_ramp(100)[
       as.numeric(cut(
         as.numeric(nodes_to_color$de_value),
         breaks = breaks_seq,
@@ -230,11 +230,11 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
       ))
     ]
 
-    valid_nodes$color[
+    valid_nodes$vertex.color[
       valid_nodes$de_source == sources[source_index]
-    ] <- nodes_to_color$color
+    ] <- nodes_to_color$vertex.color
   }
 
-  nodes_df$color[!is.na(nodes_df$de_source)] <- valid_nodes$color
+  nodes_df$vertex.color[!is.na(nodes_df$de_source)] <- valid_nodes$vertex.color
   return(nodes_df)
 }

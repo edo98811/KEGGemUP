@@ -1,5 +1,5 @@
 test_that("is_valid_de_entry works as expected", {
-  # ---- Valid input ----
+  #  Valid input
   de_table <- data.frame(
     gene = c("A", "B"),
     logFC = c(1.2, -0.5),
@@ -13,11 +13,11 @@ test_that("is_valid_de_entry works as expected", {
   )
   expect_true(is_valid_de_entry(valid_entry, "valid_entry"))
 
-  # ---- Missing required list elements ----
+  # Missing required list elements
   invalid_missing <- list(de_table = de_table)
   expect_warning(expect_false(is_valid_de_entry(invalid_missing, "invalid_missing")))
 
-  # ---- de_table not a data frame ----
+  # de_table not a data frame
   invalid_table <- list(
     de_table = matrix(1:4, ncol = 2),
     value_column = "logFC",
@@ -25,7 +25,7 @@ test_that("is_valid_de_entry works as expected", {
   )
   expect_warning(expect_false(is_valid_de_entry(invalid_table, "invalid_table")))
 
-  # ---- value_column not present ----
+  # Value_column not present
   invalid_value_column <- list(
     de_table = de_table,
     value_column = "not_here",
@@ -33,7 +33,7 @@ test_that("is_valid_de_entry works as expected", {
   )
   expect_warning(expect_false(is_valid_de_entry(invalid_value_column, "invalid_value_column")))
 
-  # ---- feature_column not present or not rownames ----
+  # Feature_column not present or not rownames
   invalid_feature_column <- list(
     de_table = de_table,
     value_column = "logFC",
@@ -41,7 +41,7 @@ test_that("is_valid_de_entry works as expected", {
   )
   expect_warning(expect_false(is_valid_de_entry(invalid_feature_column, "invalid_feature_column")))
 
-  # ---- feature_column = 'rownames' case ----
+  # Feature_column = 'rownames' case
   rownames(de_table) <- de_table$gene
   rowname_entry <- list(
     de_table = de_table,
@@ -49,10 +49,9 @@ test_that("is_valid_de_entry works as expected", {
     feature_column = "rownames"
   )
 
-  # This checks logic– if 'rownames' allowed, expect TRUE
+  # This checks logic– if rownames allowed, expect TRUE
   expect_true(is_valid_de_entry(rowname_entry, "rowname_entry"))
 })
-
 
 test_that("is_valid_pathway correctly identifies valid and invalid KEGG IDs", {
   # Valid KEGG IDs
@@ -144,11 +143,10 @@ test_that("normalize_de_results handles all inputs correctly", {
 })
 
 test_that("normalize_de_results handles MLimmaML and DFrame objects", {
-
   # MLimmaML object (simulate with S3 class)
   mlimma_obj <- structure(list(a = 1:2), class = "MLimmaML")
   wmsgs1 <- capture_warnings(res1 <- normalize_de_results(mlimma_obj))
-  expect_length(wmsgs1, 1)                     # warning from is_valid_dataframe
+  expect_length(wmsgs1, 1) # warning from is_valid_dataframe
   expect_null(res1)
 
   # S4 DFrame / DataFrame object (from S4Vectors)
@@ -157,7 +155,7 @@ test_that("normalize_de_results handles MLimmaML and DFrame objects", {
     df <- DataFrame(KEGG_ids = c("hsa:1", "hsa:2"), log2FoldChange = c(1, -1))
     wmsgs2 <- capture_warnings(res2 <- normalize_de_results(df))
     # Depending on your is_valid_dataframe(), this may emit a warning or pass
-    expect_true(length(wmsgs2) >= 0)  # at least 0 warnings
-    expect_null(res2)               # likely NULL due to class check
+    expect_true(length(wmsgs2) >= 0) # at least 0 warnings
+    expect_null(res2) # likely NULL due to class check
   }
 })

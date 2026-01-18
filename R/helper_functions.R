@@ -50,6 +50,13 @@ expand_keggs <- function(kegg_df) {
 #' Return all cached KEGG and mapping files from BiocFileCache
 #' @return A list containing data frames of cached KEGG and mapping files
 #' @importFrom BiocFileCache BiocFileCache bfcinfo
+#' @details This function retrieves information about 
+#' all cached KEGG pathway files
+#' and mapping files stored using BiocFileCache.
+#' @examples
+#' cache_info <- return_all_cached()
+#' print(cache_info$kegg)      # View cached KEGG pathway files
+#' print(cache_info$mappings)  # View cached mapping files
 #' @export
 return_all_cached <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
@@ -66,6 +73,11 @@ return_all_cached <- function() {
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache bfcinfo bfcremove
 #' @importFrom utils askYesNo
+#' @details This function deletes all cached KEGG pathway files
+#' and mapping files stored using BiocFileCache.
+#' It prompts the user for confirmation before proceeding with the deletion.
+#' @examples
+#' # reset_cache()
 #' @export
 reset_cache <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")

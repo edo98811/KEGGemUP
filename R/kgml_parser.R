@@ -1,5 +1,10 @@
 # https://xml2.r-lib.org/reference/xml_find_all.html matches xpath expressions
 # https://www.w3.org/TR/xpath-31/ section B.2 xpath syntax
+
+#' Map KEGG-styled nodes to visNetwork attributes
+#' @param xml XML document object representing the KGML pathway
+#' @return nodes_df Data frame of nodes with visNetwork-compatible styling columns
+#' @noRd
 parse_kgml_nodes <- function(xml, defaults) {
   # Find all entries that are not group or line (line is an attribute in graphics)
   nodes <- xml2::xml_find_all(
@@ -51,9 +56,15 @@ parse_kgml_nodes <- function(xml, defaults) {
   })
 
   # Combine all entries into a single data frame
-  do.call(rbind, nodes_list)
+  df <- do.call(rbind, nodes_list)
+  message("Parsed ", nrow(df), " nodes from KGML.")
+  df
 }
 
+#' Parse group nodes from KGML XML
+#' @param xml XML document object representing the KGML pathway
+#' @return nodes_df Data frame of group nodes
+#' @noRd
 parse_kgml_groups <- function(xml, defaults) {
   # Find all group entries
   group_nodes <- xml2::xml_find_all(
@@ -95,9 +106,15 @@ parse_kgml_groups <- function(xml, defaults) {
   })
 
   # Combine all entries into a single data frame
-  do.call(rbind, nodes_list)
+  df <- do.call(rbind, nodes_list)
+  message("Parsed ", nrow(df), " group nodes from KGML.")
+  df
 }
 
+#' Map KEGG-styled edges to visNetwork attributes
+#' @param edges_df Data frame of edges extracted from igraph using as_data_frame(what="edges")
+#' @return edges_df with visNetwork-compatible styling columns: arrows, dashes, color, label
+#' @noRd
 parse_kgml_lines <- function(xml, defaults) {
   # Find all line entries (line is an attribute in graphics)
   line_nodes <- xml2::xml_find_all(
@@ -154,9 +171,15 @@ parse_kgml_lines <- function(xml, defaults) {
   })
 
   # Combine all entries into a single data frame
-  do.call(rbind, nodes_list)
+  df <- do.call(rbind, nodes_list)
+  message("Parsed ", nrow(df), " line nodes from KGML.")
+  df
 }
 
+#' Parse line edges from KGML line nodes
+#' @param line_nodes_df Data frame of line nodes extracted from parse_kgml_lines
+#' @return edges_df Data frame of edges created from line nodes
+#' @noRd
 parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
   # Handle empty input
   if (is.null(line_nodes_df) || nrow(line_nodes_df) == 0) {
@@ -200,7 +223,6 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
 
     # Iterate over consecutive points (l-1 edges)
     for (i in seq_len(length(idx) - 1)) {
-      edges_df$name[row] <- uuid::UUIDgenerate()
       edges_df$from[row] <- line_nodes_df$name[idx[i]]
       edges_df$to[row] <- line_nodes_df$name[idx[i + 1]]
       edges_df$type[row] <- "line"
@@ -208,15 +230,20 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
     }
   }
 
+  message("Parsed ", nrow(edges_df), " edges from line nodes.")
   edges_df
 }
 
+#' Parse relation edges from KGML XML
+#' @param xml XML document object representing the KGML pathway
+#' @return edges_df Data frame of relation edges
+#' @noRd
 parse_kgml_relations <- function(xml, defaults) {
   # Find all relation entries
   rels <- xml2::xml_find_all(xml, ".//relation")
 
   # Process each entry
-  nodes_list <- lapply(rels, function(relation) {
+  edges_list <- lapply(rels, function(relation) {
     subtype_nodes <- xml2::xml_find_all(relation, ".//subtype") # is  0...*
     n_rows <- max(length(subtype_nodes), 1) # at least one row per entry
 
@@ -238,7 +265,6 @@ parse_kgml_relations <- function(xml, defaults) {
           stop("parse_kgml_relations: More subtype nodes than pre-allocated rows.")
         }
         g <- subtype_nodes[i]
-        entry_edges_df$name[i] <- uuid::UUIDgenerate()
         entry_edges_df$relation_subtype_name[i] <-  gsub("[/ ]", "_", xml2::xml_attr(g, "name")) # replace / and space with _
         entry_edges_df$relation_subtype_value[i] <- xml2::xml_attr(g, "value")
       }
@@ -248,9 +274,14 @@ parse_kgml_relations <- function(xml, defaults) {
   })
 
   # Combine all entries into a single data frame
-  do.call(rbind, nodes_list)
+  df <- do.call(rbind, edges_list)
+  message("Parsed ", nrow(df), " relations from KGML.")
+  df
 }
 
+#' Parse reaction edges from KGML XML
+#' @param xml XML document object representing the KGML pathway
+#' @return edges_df Data frame of reaction edges 
 #' @noRd
 parse_kgml_reactions <- function(xml, defaults) {
   # Find all reaction entries
@@ -303,7 +334,6 @@ parse_kgml_reactions <- function(xml, defaults) {
     row <- 1L
     for (p in seq_len(n_prod)) {
       for (s in seq_len(n_sub)) {
-        entry_edges_df$name[row] <- uuid::UUIDgenerate()
         entry_edges_df$from[row] <- sub_id[s]
         entry_edges_df$to[row] <- prod_id[p]
 
@@ -320,7 +350,9 @@ parse_kgml_reactions <- function(xml, defaults) {
   })
 
   # Combine all entries into a single data frame
-  do.call(rbind, nodes_list)
+  df <- do.call(rbind, nodes_list)
+  message("Parsed ", nrow(df), " reactions from KGML.")
+  df
 }
 
 
@@ -418,7 +450,11 @@ add_reaction_labels <- function(nodes_df, bfc) {
   nodes_df
 }
 
-
+#' Add group labels and coordinates to group nodes in the nodes data frame.
+#' @param nodes_df Data frame of nodes with a column 'type' indicating node type 
+#' and a column 'components' listing component node IDs.
+#' @return Updated nodes data frame with group labels and coordinates added to group nodes.
+#' @noRd
 add_group <- function(nodes_df) {
   # Identify undefined nodes (group nodes)
   group_idx <- which(nodes_df$type == "group")

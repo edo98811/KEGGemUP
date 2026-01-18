@@ -85,7 +85,6 @@ igraph_edges_to_visNetwork <- function(edges_df) {
 kegg_nodes_to_visNetwork <- function(nodes_df) {
   # Set borderRadius for roundrectangle nodes
   nodes_df$borderRadius <- ifelse(nodes_df$graphics_type == "roundrectangle", 10, 0)
-  nodes_df$borderRadius <- NA_integer_
 
   # Fix position for line nodes
   nodes_df$fixed <- ifelse(nodes_df$graphics_type == "line", TRUE, FALSE)
@@ -112,7 +111,7 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
         "black"
       }
     list(
-      background = nodes_df$color[i],
+      background = nodes_df$vertex.color[i],
       border = border_color,
       highlight = list(border = "red")
     )

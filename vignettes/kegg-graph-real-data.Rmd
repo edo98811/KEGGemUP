@@ -149,8 +149,7 @@ You can use these functions to parse KGML files directly. From these you can bui
 
 
 ```{r kgml-parsing}
-nodes_df <- parse_kgml_entries(kgml_file)
-edges_df <- parse_kgml_edges(kgml_file)
+
 ```
 
 

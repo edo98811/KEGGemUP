@@ -1,6 +1,7 @@
 # https://rpubs.com/huanfaChen/261838
 
-#' @noRd
+#' Default KEGG node attributes
+#' @return A list of default KEGG node attributes
 #' @noRd
 kegg_node_defaults <- function() {
   list(
@@ -35,7 +36,7 @@ kegg_node_defaults <- function() {
     fgcolor = NA_character_,
     bgcolor = NA_character_,
     group = NA_character_,
-    color = "white",
+    vertex.color = "white",
     size = 25,
     fixed = TRUE,
     shape = "vrectangle",
@@ -61,7 +62,6 @@ kegg_edge_defaults <- function() {
     reaction_type = NA_character_,
     reaction_from_name = NA_character_,
     reaction_to_name = NA_character_,
-    name = NA_character_,
     point_index = NA_integer_,
     # Style attributes
     directed = TRUE,
@@ -70,105 +70,9 @@ kegg_edge_defaults <- function() {
     value = NA_real_,
     label = "",
     lty = 1,
-    arrows = "to",
+    arrow.mode = "to",
     dashes = FALSE,
     title = NA_character_
   )
 }
 
-
-# #' @noRd
-# node_defaults <- function() {
-#   list(
-#     # Basic attributes
-#     name = NA_character_,
-#     label = NA_character_,
-#     title = NA_character_,
-#     group = NA_character_,
-#     link = NA_character_,
-#     type = NA_character_,
-#     de_value = NA_real_,
-#     de_source = NA_character_,
-#     feature_id_1 = NA_character_, # KEGG: KEGG ids
-#     feature_id_2 = NA_character_, # KEGG: graphics_name
-#     original_shape = NA_character_,
-#     ids_for_mapping = "", # KEGG: ENTREZID
-
-#     # Style attributes
-#     color = "white",
-#     size = 25,
-#     x = NA_integer_,
-#     y = NA_integer_,
-#     fixed = TRUE,
-#     width = NA_integer_, # for visNetwork
-#     height = NA_integer_, # for visNetwork
-#     borderRadius = NA_integer_, # for visNetwork
-#     shape = "vrectangle",
-#     text = ""
-#   )
-# }
-
-# #' @noRd
-# edge_defaults <- function() {
-#   list(
-#     # Basic attributes
-#     from = NA_character_,
-#     to = NA_character_,
-#     id = NA_character_,
-#     type = NA_character_,
-#     link = NA_character_,
-#     name_1 = NA_character_, # KEGG: Name
-#     name_2 = NA_character_, # KEGG: Type
-#     name_3 = NA_character_, # KEGG: Subtype
-#   )
-# }
-
-# #' @noRd
-# kegg_to_general_node_map <- function() {
-#   c(
-#     # Identity / annotation
-#     name = "name",
-#     label = "label",
-#     link = "link",
-#     type = "type",
-#     reaction = "reaction",
-#     reaction_link = "reaction_link",
-#     KEGG = "feature_id_1", # KEGG  ID
-#     graphics_name = "feature_id_2", # the long name used in KEGG graphics
-#     ids_for_mapping = "ids_for_mapping",
-#     graphics_type = "original_shape",
-
-#     # Layout / geometry
-#     x = "x",
-#     y = "y",
-#     width = "width",
-#     height = "height",
-
-#     # Styling
-#     text = "text"
-#   )
-# }
-
-
-# #' @noRd
-# kegg_to_general_edge_map <- function() {
-#   c(
-#     # Topology
-#     from = "from",
-#     to = "to",
-
-#     # Identity / annotation
-#     name = "id",
-#     type = "type",
-#     line_info = "name_3",
-#     link = "link",
-#     relation_type = "name_1", # KEGG: Type (e.g., PPrel, GErel)
-#     relation_subtype_name = "name_3",
-#     relation_subtype_value = "label",
-#     reaction_alt_name_substrate = "",
-#     reaction_alt_name_product = "",
-#     reaction_id = "name_1",
-#     reaction_name = "name_2",
-#     reaction_type = "name_3"
-#   )
-# }

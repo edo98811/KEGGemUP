@@ -9,8 +9,7 @@ map_results_to_graph(
   de_results,
   feature_column = NULL,
   value_column = NULL,
-  palette = "RdBu",
-  verbose = FALSE
+  palette = "RdBu"
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ map_results_to_graph(
 
 \item{palette}{Color palette for node coloring (default: "RdBu").}
 
-\item{verbose}{Logical indicating whether to print progress messages.}
-
 \item{return_type}{Output type: 'igraph' or 'visNetwork'.}
 }
 \value{
@@ -37,24 +34,29 @@ An igraph or visNetwork object with mapped results.
 Map differential expression results to nodes
 }
 \details{
-This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
-
-This function can be used to map the differential expression results to the graph,
+This function can be used to map the differential expression
+results to the graph,
 the input of the graph must be the output of the function
 \code{kegg_to_graph} in the igraph format. The results to be mapped can be
-provided either as a list or as a single data.frame. If a single data.frame is provided,
-the default column names for KEGG IDs and values are 'KEGG_ids' and 'log2FoldChange',
-respectively, but these can be changed using the \code{feature_column} and \code{value_column} parameters.
+provided either as a list or as a single data.frame. If a single data.frame
+is provided,
+the default column names for KEGG IDs and values are
+'KEGG_ids' and 'log2FoldChange',
+respectively, but these can be changed using the
+\code{feature_column} and \code{value_column} parameters.
 }
 \examples{
 pathway <- "hsa04110" # Example pathway ID
-graph <- kegg_to_graph(pathway, return_type = "igraph")
+graph <- kegg_to_graph(pathway_id = pathway, scaling_factor = 1.5)
 # Example differential expression results
 de_results <- data.frame(
   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
   log2FoldChange = c(1.5, -2.0, 0.5)
 )
-vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
+vis_graph <- map_results_to_graph(graph,
+  de_results,
+  feature_column = "KEGG_ids",
+  value_column = "log2FoldChange"
+)
 
 }

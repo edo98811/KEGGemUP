@@ -46,7 +46,7 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
     if (!is.character(directory) || length(directory) != 1) {
       stop("'directory' must be a single string specifying a valid path.")
     }
-    # Optionally, create the directory if it does not exist
+    # Create the directory if it does not exist
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
       message("Created directory: ", directory)
@@ -118,8 +118,17 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @importFrom utils read.table write.table
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
+#' @examples
+#' # Saving in directory
+#' data_dir <- tempdir()
+#' kegg_compounds <- get_kegg_db("compound", directory = data_dir)
+#' # Just returning without saving
+#' kegg_genes <- get_kegg_db("genes")
 #' @export
-get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
+get_kegg_db <- function(
+    db_name = "compound",
+    directory = NULL,
+    bfc = NULL) {
   message("Retrieving KEGG database: ", db_name)
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
@@ -203,6 +212,9 @@ get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache
 #' @importFrom utils askYesNo
+#' @examples 
+#' # Download all pathways for human
+#' # download_all_pathways("hsa")
 #' @export
 download_all_pathways <- function(org) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
