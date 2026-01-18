@@ -1,6 +1,4 @@
 test_that("add_node_labels caches and assigns glycan, compound, and gene names", {
-  bfc <- BiocFileCache(tempfile(), ask = FALSE)
-
   # Run the function
   res <- add_node_labels(nodes_df_basic, bfc = bfc)
 
@@ -24,7 +22,6 @@ test_that("add_node_labels caches and assigns glycan, compound, and gene names",
 })
 
 test_that("add_reaction_labels assigns reaction labels and links correctly", {
-  bfc <- BiocFileCache(tempfile(), ask = FALSE)
 
   # Run the function
   res <- add_reaction_labels(nodes_df_basic, bfc = bfc)
@@ -48,7 +45,6 @@ test_that("add_reaction_labels assigns reaction labels and links correctly", {
 
 
 test_that("download_kgml rejects invalid inputs", {
-
   expect_error(
     download_kgml("hsa00010", bfc = 1),
     "BiocFileCache"
@@ -74,7 +70,6 @@ test_that("download_kgml works in directory mode", {
 })
 
 test_that("download_kgml works in cache mode", {
-  fake_bfc <- BiocFileCache(tempdir(), ask = FALSE)
 
   result <- suppressMessages(download_kgml(
     pathway_id = "hsa00010",
@@ -86,7 +81,6 @@ test_that("download_kgml works in cache mode", {
 })
 
 test_that("get_kegg_db rejects invalid inputs", {
-
   expect_error(
     get_kegg_db("compound", bfc = 1),
     "BiocFileCache"

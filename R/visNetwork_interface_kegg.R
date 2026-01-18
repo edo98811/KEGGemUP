@@ -50,7 +50,7 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
 igraph_edges_to_visNetwork <- function(edges_df) {
   # Map arrow.mode from igraph to visNetwork arrows
   # igraph arrow.mode: 0 = none, 1 = back, 2 = to, 3 = tee, 4 = both (etc)
-  edges_df$arrows <- switch_arrow <- function(mode) {
+  switch_arrow <- function(mode) {
     if (is.na(mode)) {
       return("")
     }
@@ -58,7 +58,7 @@ igraph_edges_to_visNetwork <- function(edges_df) {
       "0" = "",
       "1" = "from",
       "2" = "to",
-      "3" = "to", 
+      "3" = "to",
       "4" = "to;from",
       "" # default
     )
@@ -72,6 +72,8 @@ igraph_edges_to_visNetwork <- function(edges_df) {
   # Ensure color and label exist
   if (!"color" %in% names(edges_df)) edges_df$color <- "gray"
   if (!"label" %in% names(edges_df)) edges_df$label <- ""
+  edges_df$from <- as.character(edges_df$from)
+  edges_df$to <- as.character(edges_df$to)
 
   edges_df
 }
@@ -81,18 +83,39 @@ igraph_edges_to_visNetwork <- function(edges_df) {
 #' @return nodes_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
 #' @noRd
 kegg_nodes_to_visNetwork <- function(nodes_df) {
+  # Set borderRadius for roundrectangle nodes
+  nodes_df$borderRadius <- ifelse(nodes_df$graphics_type == "roundrectangle", 10, 0)
   nodes_df$borderRadius <- NA_integer_
-  # for visNetwork: set borderRadius for roundrectangle
-  nodes_df$borderRadius <- ifelse(nodes_df$original_shape == "roundrectangle", 10, 0)
+
+  # Fix position for line nodes
+  nodes_df$fixed <- ifelse(nodes_df$graphics_type == "line", TRUE, FALSE)
 
   # Map KEGG types to shapes
-  nodes_df$shape[nodes_df$original_shape == "rectangle"] <- "box"
-  nodes_df$shape[nodes_df$original_shape == "circle"] <- "dot"
-  nodes_df$shape[nodes_df$original_shape == "roundrectangle"] <- "box"
-  nodes_df$shape[nodes_df$original_shape == "line"] <- "ellipse"
+  nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "box"
+  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "dot"
+  nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "box"
+  nodes_df$shape[nodes_df$graphics_type == "line"] <- "ellipse"
+  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
+  nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
 
-  nodes_df$widthConstraint <- nodes_df$width # I decided to keep them interpretable in the network before and convert them to visnetwork here 
+  nodes_df$widthConstraint <- nodes_df$width
   nodes_df$heightConstraint <- nodes_df$height
+  nodes_df$id <- as.character(nodes_df$name)
+  nodes_df$borderWidth <- 2
 
+  # Set border color normally black and red on hover (except for line nodes)
+  nodes_df$color <- lapply(seq_len(nrow(nodes_df)), function(i) {
+    border_color <-
+      if (nodes_df$graphics_type[i] == "line" || nodes_df$graphics_type[i] == "group") {
+        "transparent"
+      } else {
+        "black"
+      }
+    list(
+      background = nodes_df$color[i],
+      border = border_color,
+      highlight = list(border = "red")
+    )
+  })
   return(nodes_df)
 }

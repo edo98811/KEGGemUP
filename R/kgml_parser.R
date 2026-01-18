@@ -30,24 +30,23 @@ parse_kgml_nodes <- function(xml, defaults) {
         if (i > n_rows) {
           stop("parse_kgml_nodes: More graphics nodes than pre-allocated rows.")
         }
-        g <- graphics_nodes[i]
 
+        g <- graphics_nodes[i]
         if (length(graphics_nodes) > 1) {
           entry_nodes_df$name[i] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
         } else {
-          entry_nodes_df$name[i] <- xml2::xml_attr(node, "id")
+          entry_nodes_df$name[i] <- as.character(xml2::xml_attr(node, "id"))
         }
         entry_nodes_df$graphics_name[i] <- xml2::xml_attr(g, "name")
-        entry_nodes_df$x[i] <- xml2::xml_attr(g, "x")
-        entry_nodes_df$y[i] <- xml2::xml_attr(g, "y")
+        entry_nodes_df$x[i] <- as.integer(xml2::xml_attr(g, "x"))
+        entry_nodes_df$y[i] <- as.integer(xml2::xml_attr(g, "y"))
         entry_nodes_df$graphics_type[i] <- xml2::xml_attr(g, "type")
-        entry_nodes_df$width[i] <- xml2::xml_attr(g, "width")
-        entry_nodes_df$height[i] <- xml2::xml_attr(g, "height")
+        entry_nodes_df$width[i] <- as.integer(xml2::xml_attr(g, "width"))
+        entry_nodes_df$height[i] <- as.integer(xml2::xml_attr(g, "height"))
         entry_nodes_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
         entry_nodes_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
       }
     }
-
     entry_nodes_df
   })
 
@@ -72,12 +71,15 @@ parse_kgml_groups <- function(xml, defaults) {
     )
 
     # Fill static attributes from entry
-    entry_nodes_df$kegg_entry_id <- xml2::xml_attr(node, "name")
     entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
+    entry_nodes_df$graphics_type <- "group"
+    # entry_nodes_df$x <- xml2::xml_attr(node, "x")
+    # entry_nodes_df$y <- xml2::xml_attr(node, "y")
     entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
-    entry_nodes_df$name <- xml2::xml_attr(node, "id") # first row is the group node itself
+    entry_nodes_df$name <- as.character(xml2::xml_attr(node, "id"))
+
     components_nodes <- xml2::xml_find_all(node, ".//component")
     # Fill attributes from graphics nodes
     if (length(components_nodes) > 0) {
@@ -129,7 +131,7 @@ parse_kgml_lines <- function(xml, defaults) {
 
     # Fill static attributes from entry
     entry_nodes_df$line_id <- xml2::xml_attr(node, "id")
-    entry_nodes_df$name <- xml2::xml_attr(node, "id")
+    entry_nodes_df$name <- as.character(xml2::xml_attr(node, "id"))
     entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
@@ -156,6 +158,11 @@ parse_kgml_lines <- function(xml, defaults) {
 }
 
 parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
+  # Handle empty input
+  if (is.null(line_nodes_df) || nrow(line_nodes_df) == 0) {
+    return(NULL)
+  }
+
   # Ensure correct order (by line_id and point_index)
   line_nodes_df <- line_nodes_df[
     order(line_nodes_df$line_id, line_nodes_df$point_index),
@@ -193,6 +200,7 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
 
     # Iterate over consecutive points (l-1 edges)
     for (i in seq_len(length(idx) - 1)) {
+      edges_df$name[row] <- uuid::UUIDgenerate()
       edges_df$from[row] <- line_nodes_df$name[idx[i]]
       edges_df$to[row] <- line_nodes_df$name[idx[i + 1]]
       edges_df$type[row] <- "line"
@@ -230,7 +238,8 @@ parse_kgml_relations <- function(xml, defaults) {
           stop("parse_kgml_relations: More subtype nodes than pre-allocated rows.")
         }
         g <- subtype_nodes[i]
-        entry_edges_df$relation_subtype_name[i] <- xml2::xml_attr(g, "name")
+        entry_edges_df$name[i] <- uuid::UUIDgenerate()
+        entry_edges_df$relation_subtype_name[i] <-  gsub("[/ ]", "_", xml2::xml_attr(g, "name")) # replace / and space with _
         entry_edges_df$relation_subtype_value[i] <- xml2::xml_attr(g, "value")
       }
     }
@@ -269,6 +278,8 @@ parse_kgml_reactions <- function(xml, defaults) {
     entry_edges_df$reaction_id <- xml2::xml_attr(reaction, "id")
     entry_edges_df$reaction_name <- xml2::xml_attr(reaction, "name")
     entry_edges_df$reaction_type <- xml2::xml_attr(reaction, "type")
+    entry_edges_df$type <- "reaction"
+
 
     # Pre-extract substrate attributes
     sub_id <- xml2::xml_attr(substrates_nodes, "id")
@@ -292,6 +303,7 @@ parse_kgml_reactions <- function(xml, defaults) {
     row <- 1L
     for (p in seq_len(n_prod)) {
       for (s in seq_len(n_sub)) {
+        entry_edges_df$name[row] <- uuid::UUIDgenerate()
         entry_edges_df$from[row] <- sub_id[s]
         entry_edges_df$to[row] <- prod_id[p]
 
@@ -319,41 +331,55 @@ parse_kgml_reactions <- function(xml, defaults) {
 #' @importFrom BiocFileCache BiocFileCache
 #' @noRd
 add_node_labels <- function(nodes_df, bfc) {
-  # Extract KEGG IDs
-  ids <- nodes_df$KEGG_no_prefix
-
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc)
   glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc)
   genes_db <- get_kegg_db(db_name = "ko", bfc = bfc)
+  enzymes_db <- get_kegg_db(db_name = "enzyme", bfc = bfc)
 
   # Convert to named lookup vectors
   compounds_lookup <- setNames(as.character(compounds_db[, 2]), compounds_db[, 1])
   glycans_lookup <- setNames(as.character(glycans_db[, 2]), glycans_db[, 1])
   genes_lookup <- setNames(as.character(genes_db[, 2]), genes_db[, 1])
+  enzymes_lookup <- setNames(as.character(enzymes_db[, 2]), enzymes_db[, 1])
 
   # Initialize labels
-  labels <- ids
+  labels <- nodes_df$ids_for_mapping
+  ids <- nodes_df$KEGG
 
-  # Compounds (Cxxxxx)
-  is_c <- grepl("^C", ids)
-  found_c <- compounds_lookup[ids[is_c]]
-  found_c[is.na(found_c)] <- ids[is_c]
+  # Compounds
+  is_c <- grepl("^cpd:C", ids)
+  found_c <- compounds_lookup[labels[is_c]]
+  na_pos <- is.na(found_c)
+  found_c[na_pos] <- labels[is_c][na_pos]
   labels[is_c] <- sub(";.*", "", found_c)
 
-  # Glycans (Gxxxxx)
-  is_g <- grepl("^G", ids)
-  found_g <- glycans_lookup[ids[is_g]]
-  found_g[is.na(found_g)] <- ids[is_g]
+  # Glycans
+  is_g <- grepl("^cpd:G", ids)
+  found_g <- glycans_lookup[labels[is_g]]
+  na_pos <- is.na(found_g)
+  found_g[na_pos] <- labels[is_g][na_pos]
   labels[is_g] <- sub(";.*", "", found_g)
 
-  # Genes (Kxxxxx)
-  is_k <- grepl("^K", ids)
-  found_k <- genes_lookup[ids[is_k]]
-  found_k[is.na(found_k)] <- ids[is_k]
+  # Genes
+  is_k <- grepl("^ko:", ids)
+  found_k <- genes_lookup[labels[is_k]]
+  na_pos <- is.na(found_k)
+  found_k[na_pos] <- labels[is_k][na_pos]
   labels[is_k] <- sub(";.*", "", found_k)
 
+  # Enzymes
+  is_e <- grepl("^ec:", ids)
+  found_e <- enzymes_lookup[labels[is_e]]
+  na_pos <- is.na(found_e)
+  found_e[na_pos] <- labels[is_e][na_pos]
+  labels[is_e] <- sub(";.*", "", found_e)
+
+  # Determine which nodes to assign labels to
+  # labels_to_assign <- is_c | is_g | is_k | is_e
+
   # Assign node labels
+  # nodes_df$label[labels_to_assign] <- labels[labels_to_assign]
   nodes_df$label <- labels
   nodes_df
 }
@@ -374,10 +400,12 @@ add_reaction_labels <- function(nodes_df, bfc) {
 
   # Lookup labels
   found_r <- reactions_lookup[reaction_ids[is_r]]
-  found_r[is.na(found_r)] <- reaction_ids[is_r]
+  na_pos <- is.na(found_r)
+  found_r[na_pos] <- reaction_ids[is_r][na_pos]
 
   reaction_labels <- reaction_ids
   reaction_labels[is_r] <- sub(";.*", "", found_r)
+  reaction_labels[!is_r] <- NA_character_
 
   # Assign columns
   nodes_df$reaction_label <- reaction_labels
@@ -420,10 +448,18 @@ add_group <- function(nodes_df) {
 
     # Build group label from component labels (exclude the last one, which is the group node itself)
     comp_labels <- nodes_df$label[node_idx[-length(node_idx)]]
-    group_label <- paste(comp_labels, collapse = ";")
+    group_label <- paste(comp_labels, collapse = ", ")
 
     # Assign group label to all nodes in this group
     nodes_df$group[node_idx] <- group_label
+
+    # Compute average x and y coordinates of all component nodes
+    avg_x <- round(mean(as.numeric(nodes_df$x[node_idx]), na.rm = TRUE))
+    avg_y <- round(mean(as.numeric(nodes_df$y[node_idx]), na.rm = TRUE))
+
+    # Assign average coordinates to the group node itself
+    nodes_df$x[i] <- avg_x
+    nodes_df$y[i] <- avg_y
   }
 
   nodes_df

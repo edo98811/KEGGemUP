@@ -19,7 +19,19 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL) {
   edges_df <- rbind(edges_df, parse_kgml_reactions(xml, kegg_edge_defaults()))
   edges_df <- rbind(edges_df, parse_kgml_lines_edges(line_nodes, kegg_edge_defaults()))
 
-  nodes_df$KEGG_no_prefix <- vapply(nodes_df$KEGG, remove_kegg_prefix_str, character(1))
+  # I don't want to map results on line nodes
+  # Indices to process
+  indexes_to_map <- which(
+    nodes_df$graphics_type != "line" & nodes_df$graphics_type != "group"
+  )
+
+  # Apply remove_kegg_prefix_str to the selected rows
+  nodes_df$ids_for_mapping[indexes_to_map] <- vapply(
+    nodes_df$KEGG[indexes_to_map],
+    remove_kegg_prefix_str,
+    character(1)
+  )
+
 
   # Add informations to nodes
   nodes_df <- add_node_labels(nodes_df, bfc_map)
@@ -30,90 +42,95 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL) {
     warning("Failed to retrieve pathway name; using 'Pathway' as default.")
   }
 
-  g <- make_igraph_graph(nodes_df, edges_df, pathway_name)
+  g <- make_igraph_graph(nodes_df, edges_df)
   igraph::graph_attr(g, "title") <- pathway_name
-  igraph::graph_attr(g, "type") <- pathway_name # open for extension with other types
+  igraph::graph_attr(g, "type") <- "KEGG_Pathway" # open for extension with other types
   return(g)
 }
 
-#' Standardize igraph nodes and edges to default schema
-#' @param g igraph object with KEGG-specific node and edge attributes
-#' @param node_map named vector: KEGG attribute -> general/default attribute
-#' @param edge_map named vector: KEGG attribute -> general/default attribute
-#' @param node_default named list of default node attributes
-#' @param edge_default named list of default edge attributes
-#' @param simplified_graph logical, if TRUE keep only columns in defaults
-#' @return igraph with standardized node and edge attributes
-#' @noRd
-standardize_network <- function(g, node_map, edge_map, node_default, edge_default, simplified_graph = TRUE) {
-  stopifnot(inherits(g, "igraph"))
+# #' Standardize igraph nodes and edges to default schema
+# #' @param g igraph object with KEGG-specific node and edge attributes
+# #' @param node_map named vector: KEGG attribute -> general/default attribute
+# #' @param edge_map named vector: KEGG attribute -> general/default attribute
+# #' @param node_default named list of default node attributes
+# #' @param edge_default named list of default edge attributes
+# #' @param simplified_graph logical, if TRUE keep only columns in defaults
+# #' @return igraph with standardized node and edge attributes
+# #' @noRd
+# standardize_network <- function(g, node_map, edge_map, node_default, edge_default, simplified_graph = TRUE) {
+#   stopifnot(inherits(g, "igraph"))
 
-  ## Standardize nodes
-  # Extract current node attributes
-  node_attrs <- igraph::vertex_attr_names(g)
-  nodes_df <- igraph::as_data_frame(g, what = "vertices")
+#   ## Standardize nodes
+#   # Extract current node attributes
+#   node_attrs <- igraph::vertex_attr_names(g)
+#   nodes_df <- igraph::as_data_frame(g, what = "vertices")
 
-  # Map KEGG -> general defaults
-  for (kegg_attr in names(node_map)) {
-    general_attr <- node_map[[kegg_attr]]
-    if (kegg_attr %in% names(nodes_df)) {
-      nodes_df[[general_attr]] <- nodes_df[[kegg_attr]]
-    }
-  }
+#   # Map KEGG -> general defaults
+#   for (kegg_attr in names(node_map)) {
+#     general_attr <- node_map[[kegg_attr]]
+#     if (kegg_attr %in% names(nodes_df)) {
+#       not_na <- !is.na(nodes_df[[kegg_attr]])
+#       nodes_df[[general_attr]][not_na] <- nodes_df[[kegg_attr]][not_na]
+#     }
+#   }
 
-  # Fill missing default columns
-  for (col in names(node_default)) {
-    if (!col %in% names(nodes_df)) {
-      # This does not duplicate columns, as we only fill missing ones
-      nodes_df[[col]] <- node_default[[col]]
-    }
-  }
+#   # Fill missing default columns
+#   for (col in names(node_default)) {
+#     if (!col %in% names(nodes_df)) {
+#       # This does not duplicate columns, as it only fills missing ones
+#       nodes_df[[col]] <- node_default[[col]]
+#     }
+#   }
 
-  # Optionally remove KEGG-only columns
-  if (simplified_graph) {
-    keep_cols <- names(node_default)
-    nodes_df <- nodes_df[, intersect(names(nodes_df), keep_cols), drop = FALSE]
-  }
+#   # Optionally remove KEGG-only columns
+#   if (simplified_graph) {
 
-  ## Standardize edges
-  edges_df <- igraph::as_data_frame(g, what = "edges")
-  if (nrow(edges_df) > 0) {
-    for (kegg_attr in names(edge_map)) {
-      general_attr <- edge_map[[kegg_attr]]
-      if (kegg_attr %in% names(edges_df) && general_attr != "") {
-        edges_df[[general_attr]] <- edges_df[[kegg_attr]]
-      }
-    }
+#     keep_cols <- names(node_default)
+#     nodes_df <- nodes_df[, intersect(names(nodes_df), keep_cols), drop = FALSE]
+#   }
 
-    # Fill missing default columns
-    for (col in names(edge_default)) {
-      if (!col %in% names(edges_df)) {
-        edges_df[[col]] <- edge_default[[col]]
-      }
-    }
+#   ## Standardize edges
+#   edges_df <- igraph::as_data_frame(g, what = "edges")
+#   if (nrow(edges_df) > 0) {
+#     for (kegg_attr in names(edge_map)) {
+#       general_attr <- edge_map[[kegg_attr]]
+#       if (kegg_attr %in% names(edges_df) && general_attr != "") {
+#         # if (general_attr == "name_3")
+#         not_na <- !is.na(edges_df[[kegg_attr]])
+#         edges_df[[general_attr]][not_na] <- edges_df[[kegg_attr]][not_na]
+#       }
+#     }
 
-    # Optionally remove KEGG-only columns
-    if (simplified_graph) {
-      keep_cols <- names(edge_default)
-      edges_df <- edges_df[, intersect(names(edges_df), keep_cols), drop = FALSE]
-    }
+#     # Fill missing default columns
+#     for (col in names(edge_default)) {
+#       if (!col %in% names(edges_df)) {
+#         edges_df[[col]] <- edge_default[[col]]
+#       }
+#     }
 
-  } else {
-    # No edges: create empty data frame with all default columns
-    edges_df <- as.data.frame(lapply(edge_default, function(x) vector(mode = typeof(x), length = 0)),
-      stringsAsFactors = FALSE
-    )
-  }
+#     # Optionally remove KEGG-only columns
+#     if (simplified_graph) {
+#       keep_cols <- names(edge_default)
+#       edges_df <- edges_df[, intersect(names(edges_df), keep_cols), drop = FALSE]
+#     }
+#   } else {
+#     # No edges: create empty data frame with all default columns
+#     edges_df <- as.data.frame(lapply(edge_default, function(x) vector(mode = typeof(x), length = 0)),
+#       stringsAsFactors = FALSE
+#     )
+#   }
 
-  ## Rebuild igraph with standardized attributes
-  g_std <- igraph::graph_from_data_frame(
-    d = edges_df,
-    vertices = nodes_df,
-    directed = igraph::is_directed(g)
-  )
 
-  return(g_std)
-}
+
+#   ## Rebuild igraph with standardized attributes
+#   g_std <- igraph::graph_from_data_frame(
+#     d = edges_df,
+#     vertices = nodes_df,
+#     directed = igraph::is_directed(g)
+#   )
+
+#   return(g_std)
+# }
 
 
 #' Create an igraph graph from nodes and edges data frames
@@ -133,7 +150,6 @@ make_igraph_graph <- function(nodes_df, edges_df, pathway_name) {
   }
 
   g <- igraph::permute(g, order(igraph::V(g)$label))
-  igraph::graph_attr(g, "title") <- pathway_name
   return(g)
 }
 

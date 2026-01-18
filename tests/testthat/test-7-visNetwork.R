@@ -29,7 +29,7 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
   # Example nodes data frame
   nodes_df <- data.frame(
     name = c("n1", "n2", "n3", "n4"),
-    original_shape = c("rectangle", "circle", "roundrectangle", "line"),
+    graphics_type = c("rectangle", "circle", "roundrectangle", "line"),
     width = c(50, 40, 30, 20),
     height = c(20, 30, 40, 50),
     shape = NA_character_,
@@ -38,6 +38,9 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
 
   nodes_mapped <- kegg_nodes_to_visNetwork(nodes_df)
 
+  # Check borderRadius exists
+  expect_true("borderRadius" %in% names(nodes_mapped))
+  
   # Check borderRadius
   expect_equal(nodes_mapped$borderRadius, c(0, 0, 10, 0))
 
@@ -47,4 +50,8 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
   # Check widthConstraint and heightConstraint
   expect_equal(nodes_mapped$widthConstraint, nodes_df$width)
   expect_equal(nodes_mapped$heightConstraint, nodes_df$height)
+  # Check that roundrectangle maps to box shape with borderRadius
+  expect_equal(nodes_mapped$shape[3], "box")
+
+  expect_equal(nodes_mapped$borderRadius[3], 10)
 })

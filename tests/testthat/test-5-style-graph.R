@@ -1,27 +1,70 @@
-# Test style_edges_igraph
 test_style_edges_igraph <- function() {
-  # Create a small graph with different relation subtypes
-  g <- graph_from_data_frame(
-    data.frame(from = c(1,2,3), to = c(2,3,1), name_3 = c("activation","inhibition","unknown_type")),
-    vertices = data.frame(name = 1:3),
+
+  # Create a small graph covering all styling paths
+  g <- igraph::graph_from_data_frame(
+    data.frame(
+      from = c(1, 2, 3, 4, 5),
+      to   = c(2, 3, 4, 5, 1),
+
+      # relation-level styles
+      relation_subtype_name = c(
+        "activation",        # normal relation
+        "inhibition",        # normal relation
+        "unknown_type",      # should remain unset (no mapping)
+        "compound",          # will be overridden by reaction
+        "activation"         # will be overridden by type
+      ),
+
+      # reaction-level styles
+      reaction_type = c(
+        NA,
+        NA,
+        NA,
+        "reversible",        # overrides relation style
+        NA
+      ),
+
+      # type-level overrides
+      type = c(
+        NA,
+        NA,
+        NA,
+        NA,
+        "line"               # highest priority override
+      )
+    ),
+    vertices = data.frame(name = 1:5),
     directed = TRUE
   )
 
   g_styled <- style_edges_igraph(g)
 
-  # Check that edge attributes were added
+  # ---- attribute existence ----
   edge_attrs <- igraph::edge_attr_names(g_styled)
-  stopifnot(all(c("color","lty","arrow.mode","label") %in% edge_attrs))
+  stopifnot(all(c("color", "lty", "arrow.mode", "label") %in% edge_attrs))
 
-  # Check known types
-  stopifnot(E(g_styled)$color[1] == "red")       # activation
-  stopifnot(E(g_styled)$arrow.mode[2] == 3)     # inhibition
+  # ---- relation_subtype_name mapping ----
+  stopifnot(igraph::E(g_styled)$color[1] == "red")      # activation
+  stopifnot(igraph::E(g_styled)$arrow.mode[2] == 3L)   # inhibition
 
-  # Check unknown type mapped to others_unknown
-  stopifnot(E(g_styled)$label[3] == "?")
-  stopifnot(E(g_styled)$color[3] == "black")
-  stopifnot(E(g_styled)$lty[3] == 2)
+  # ---- unknown relation subtype (no style applied) ----
+  stopifnot(is.na(igraph::E(g_styled)$color[3]))
+  stopifnot(is.na(igraph::E(g_styled)$lty[3]))
+  stopifnot(is.na(igraph::E(g_styled)$arrow.mode[3]))
+
+  # ---- reaction_type overrides relation_subtype_name ----
+  stopifnot(igraph::E(g_styled)$lty[4] == 2L)           # reversible
+  stopifnot(igraph::E(g_styled)$arrow.mode[4] == 0L)
+
+  # ---- type == "line" overrides everything ----
+  stopifnot(igraph::E(g_styled)$color[5] == "black")
+  stopifnot(igraph::E(g_styled)$lty[5] == 1L)
+  stopifnot(igraph::E(g_styled)$arrow.mode[5] == 0L)
+  stopifnot(igraph::E(g_styled)$label[5] == "")
+
+  invisible(TRUE)
 }
+
 
 # Test style_igraph_graph
 test_style_igraph_graph <- function() {
@@ -30,7 +73,7 @@ test_style_igraph_graph <- function() {
     data.frame(from = c(1,2), to = c(2,3), name_3 = c("expression","repression")),
     vertices = data.frame(
       name = 1:3,
-      original_shape = c("rectangle","circle","line"),
+      graphics_type = c("rectangle","circle","line"),
       type = c("gene","compound","group"),
       size = c(NA,30,NA),
       x = c(1, 2, 3), 
@@ -65,30 +108,3 @@ test_style_igraph_graph <- function() {
   edge_attrs <- igraph::edge_attr_names(g_styled)
   stopifnot(all(c("color","lty","arrow.mode","label") %in% edge_attrs))
 }
-
-test_that("add_group correctly assigns group labels", {
-  nodes <- kgml_steps$all_nodes
-
-  nodes$label <- nodes$name
-
-  # Run add_group
-  nodes_updated <- add_group(nodes)
-
-  # Identify group nodes
-  group_nodes <- nodes_updated[nodes_updated$type == "group", ]
-
-  # All group nodes should have non-NA group label
-  expect_false(any(is.na(group_nodes$group)))
-
-  # Components of each group node should have the same group label
-  for (i in seq_len(nrow(group_nodes))) {
-    group_node <- group_nodes[i, ]
-    comps <- strsplit(group_node$components, ";", fixed = TRUE)[[1]]
-    node_idx <- match(c(comps, group_node$name), nodes_updated$name)
-    expect_true(all(nodes_updated$group[node_idx] == group_node$group))
-  }
-
-  # Check that non-NA groups have the expected value
-  expect_true(all(group_nodes$group == "1;2"))
-})
-

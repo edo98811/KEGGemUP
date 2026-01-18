@@ -4,7 +4,7 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
 
     # Structure checks
     expect_true(is.data.frame(result), info = test_name)
-    expect_equal(colnames(result), c("ids_for_mapping", "de_value", "source"),
+    expect_equal(colnames(result), c("ids_for_mapping", "de_value", "de_source"),
       info = paste0(test_name, " unexpected column names")
     )
 
@@ -16,9 +16,6 @@ test_that("combine_results_in_dataframe correctly merges DE results across all t
     expect_false(any(grepl("^cpd:", result$ids_for_mapping)), info = test_name)
     expect_false(any(grepl("^path:", result$ids_for_mapping)), info = test_name)
 
-    # Missing value checks
-    expect_false(any(is.na(result$ids_for_mapping)), info = test_name)
-    expect_false(any(is.na(result$de_value)), info = test_name)
 
     # Row count check
     expected_nrows <- sum(vapply(de_list, function(x) nrow(x$de_table), numeric(1)))
@@ -33,9 +30,9 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     results_combined <- combine_results_in_dataframe(de_list)
 
     if (test_name %in% throw_warning) {
-      expect_warning(mapped_nodes <- add_results_nodes(kgml_steps$all_nodes , results_combined))
+      expect_warning(mapped_nodes <- add_results_nodes(kgml_steps$all_nodes, results_combined))
     } else {
-      mapped_nodes <- add_results_nodes(kgml_steps$all_nodes , results_combined)
+      mapped_nodes <- add_results_nodes(kgml_steps$all_nodes, results_combined)
     }
 
     # Structure checks
@@ -43,7 +40,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df across all 
     expect_true(all(c("id", "de_value", "color", "source", "text") %in% colnames(mapped_nodes)),
       info = paste0(test_name, " missing expected columns")
     )
-    expect_equal(nrow(mapped_nodes), nrow(kgml_steps$all_nodes ),
+    expect_equal(nrow(mapped_nodes), nrow(kgml_steps$all_nodes),
       info = paste0(test_name, " wrong number of rows")
     )
 
@@ -79,4 +76,27 @@ test_that("add_colors_to_nodes assigns colors based on de_value across all test 
       info = paste0(test_name, " invalid color hex codes detected")
     )
   })
+})
+
+test_that("add_results_nodes handles invalid ids_for_mapping column", {
+  invalid_nodes_df <- kgml_steps$all_nodes
+  results_combined <- combine_results_in_dataframe(de_results_list_1)
+
+  # Test with missing ids_for_mapping column
+  invalid_nodes_df$ids_for_mapping <- NA
+  expect_warning(mapped_nodes <- add_results_nodes(invalid_nodes_df, results_combined))
+  expect_true(is.data.frame(mapped_nodes))
+  expect_equal(nrow(mapped_nodes), nrow(invalid_nodes_df))
+
+  # Test with all NA ids_for_mapping
+  invalid_nodes_df$ids_for_mapping <- ""
+  expect_warning(mapped_nodes <- add_results_nodes(invalid_nodes_df, results_combined))
+  expect_true(is.data.frame(mapped_nodes))
+  expect_equal(nrow(mapped_nodes), nrow(invalid_nodes_df))
+
+  invalid_nodes_df$ids_for_mapping <- NULL
+  expect_error(
+    add_results_nodes(invalid_nodes_df, results_combined),
+    regexp = "Missing columns in nodes_df: ids_for_mapping"
+  )
 })

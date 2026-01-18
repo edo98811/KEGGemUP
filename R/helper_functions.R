@@ -4,11 +4,12 @@
 #' @return Character string of KEGG IDs without prefixes, separated by ';'
 #' @noRd
 remove_kegg_prefix_str <- function(kegg_ids) {
-  # Remove prefix (e.g., 'cpd:', 'mmu:', 'ko:', 'path:')
-  separated_elements <- strsplit(kegg_ids, " ")
-  ids <- lapply(separated_elements, function(x) sub("^[a-z]+:", "", x))
-  ids <- paste(unlist(ids), collapse = ";")
-  return(ids)
+  sapply(kegg_ids, function(id) {
+    if (is.na(id)) return(NA_character_)        # preserve NA
+    elements <- strsplit(id, " ")[[1]]          # split by space
+    elements <- sub("^[a-z]+:", "", elements)   # remove prefix
+    paste(elements, collapse = ";")             # collapse back to single string
+  }, USE.NAMES = FALSE)
 }
 
 #' Convert KEGG IDs with prefixes to IDs without prefixes

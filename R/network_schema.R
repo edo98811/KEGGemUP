@@ -1,12 +1,11 @@
 # https://rpubs.com/huanfaChen/261838
 
 #' @noRd
+#' @noRd
 kegg_node_defaults <- function() {
   list(
     # Core KGML attributes
     name = NA_character_,
-    kegg_entry_id = NA_character_,
-    KEGG_no_prefix = "",
     type = NA_character_,
     link = NA_character_,
     reaction = NA_character_,
@@ -19,21 +18,31 @@ kegg_node_defaults <- function() {
     line_id = NA_character_,
     coords = NA_character_,
     graphics_type = NA_character_,
-    ids_for_mapping = "",
     point_index = NA_integer_,
 
+    # Data mapping attributes
+    de_value = NA_real_,
+    de_source = NA_character_,
+    ids_for_mapping = "",
+
     # Visualization attributes
-    label = "", # minimum necessary
-    x = NA_real_,
-    y = NA_real_,
+    label = "",
+    x = NA_integer_,
+    y = NA_integer_,
     width = NA_real_,
     height = NA_real_,
     source = NA_character_,
     fgcolor = NA_character_,
     bgcolor = NA_character_,
-    group = NA_character_
+    group = NA_character_,
+    color = "white",
+    size = 25,
+    fixed = TRUE,
+    shape = "vrectangle",
+    text = ""
   )
 }
+
 
 #' @noRd
 kegg_edge_defaults <- function() {
@@ -52,109 +61,114 @@ kegg_edge_defaults <- function() {
     reaction_type = NA_character_,
     reaction_from_name = NA_character_,
     reaction_to_name = NA_character_,
-    point_index = NA_integer_
-  )
-}
-
-
-#' @noRd
-node_defaults <- function() {
-  list(
-    # Basic attributes
-    name = uuid::UUIDgenerate(), # kegg unique node id
-    label = NA_character_,
-    title = NA_character_,
-    group = NA_character_,
-    link = NA_character_,
-    de_value = NA_real_,
-    de_source = NA_character_,
-    feature_id_1 = NA_character_, # KEGG: KEGG ids
-    feature_id_2 = NA_character_, # KEGG: graphics_name
-    original_shape = NA_character_,
-    ids_for_mapping = "", # KEGG: ENTREZID
-
-    # Style attributes
-    color = "white",
-    size = 25,
-    x = NA_integer_,
-    y = NA_integer_,
-    fixed = FALSE,
-    width = NA_integer_, # for visNetwork
-    height = NA_integer_, # for visNetwork
-    borderRadius = NA_integer_, # for visNetwork
-    shape = "vrectangle",
-    text = ""
-  )
-}
-
-#' @noRd
-edge_defaults <- function() {
-  list(
-    # Basic attributes
-    from = NA_character_,
-    to = NA_character_,
-    id = uuid::UUIDgenerate(),
-    type = NA_character_,
-    link = NA_character_,
-    name_1 = NA_character_, # KEGG: Name
-    name_2 = NA_character_, # KEGG: Type
-    name_3 = NA_character_, # KEGG: Subtype
-
+    name = NA_character_,
+    point_index = NA_integer_,
     # Style attributes
     directed = TRUE,
     color = "gray",
     width = 1,
     value = NA_real_,
     label = "",
-    lty = "solid",
+    lty = 1,
     arrows = "to",
     dashes = FALSE,
     title = NA_character_
   )
 }
 
-#' @noRd
-kegg_to_general_node_map <- function() {
-  c(
-    # Identity / annotation
-    name = "name",
-    label = "label",
-    link = "link",
-    type = "type",
-    KEGG = "feature_id_1", # KEGG  ID
-    graphics_name = "feature_id_2", # the long name used in KEGG graphics
-    KEGG_no_prefix = "ids_for_mapping",
-    original_shape = "graphics_type",
 
-    # Layout / geometry
-    x = "x",
-    y = "y",
-    width = "width",
-    height = "height",
+# #' @noRd
+# node_defaults <- function() {
+#   list(
+#     # Basic attributes
+#     name = NA_character_,
+#     label = NA_character_,
+#     title = NA_character_,
+#     group = NA_character_,
+#     link = NA_character_,
+#     type = NA_character_,
+#     de_value = NA_real_,
+#     de_source = NA_character_,
+#     feature_id_1 = NA_character_, # KEGG: KEGG ids
+#     feature_id_2 = NA_character_, # KEGG: graphics_name
+#     original_shape = NA_character_,
+#     ids_for_mapping = "", # KEGG: ENTREZID
 
-    # Styling
-    text = "text"
-  )
-}
+#     # Style attributes
+#     color = "white",
+#     size = 25,
+#     x = NA_integer_,
+#     y = NA_integer_,
+#     fixed = TRUE,
+#     width = NA_integer_, # for visNetwork
+#     height = NA_integer_, # for visNetwork
+#     borderRadius = NA_integer_, # for visNetwork
+#     shape = "vrectangle",
+#     text = ""
+#   )
+# }
+
+# #' @noRd
+# edge_defaults <- function() {
+#   list(
+#     # Basic attributes
+#     from = NA_character_,
+#     to = NA_character_,
+#     id = NA_character_,
+#     type = NA_character_,
+#     link = NA_character_,
+#     name_1 = NA_character_, # KEGG: Name
+#     name_2 = NA_character_, # KEGG: Type
+#     name_3 = NA_character_, # KEGG: Subtype
+#   )
+# }
+
+# #' @noRd
+# kegg_to_general_node_map <- function() {
+#   c(
+#     # Identity / annotation
+#     name = "name",
+#     label = "label",
+#     link = "link",
+#     type = "type",
+#     reaction = "reaction",
+#     reaction_link = "reaction_link",
+#     KEGG = "feature_id_1", # KEGG  ID
+#     graphics_name = "feature_id_2", # the long name used in KEGG graphics
+#     ids_for_mapping = "ids_for_mapping",
+#     graphics_type = "original_shape",
+
+#     # Layout / geometry
+#     x = "x",
+#     y = "y",
+#     width = "width",
+#     height = "height",
+
+#     # Styling
+#     text = "text"
+#   )
+# }
 
 
-#' @noRd
-kegg_to_general_edge_map <- function() {
-  c(
-    # Topology
-    from = "from",
-    to = "to",
+# #' @noRd
+# kegg_to_general_edge_map <- function() {
+#   c(
+#     # Topology
+#     from = "from",
+#     to = "to",
 
-    # Identity / annotation
-    type = "type", # KEGG: Type (e.g., PPrel, GErel)
-    link = "link",
-    relation_type = "name_1",
-    relation_subtype_name = "name_2",
-    relation_subtype_value = "name_3",
-    reaction_alt_name_substrate = "",
-    reaction_alt_name_product = "",
-    reaction_id = "name_1",
-    reaction_name = "name_2",
-    reaction_type = "name_3"
-  )
-}
+#     # Identity / annotation
+#     name = "id",
+#     type = "type",
+#     line_info = "name_3",
+#     link = "link",
+#     relation_type = "name_1", # KEGG: Type (e.g., PPrel, GErel)
+#     relation_subtype_name = "name_3",
+#     relation_subtype_value = "label",
+#     reaction_alt_name_substrate = "",
+#     reaction_alt_name_product = "",
+#     reaction_id = "name_1",
+#     reaction_name = "name_2",
+#     reaction_type = "name_3"
+#   )
+# }

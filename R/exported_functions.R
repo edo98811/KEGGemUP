@@ -1,22 +1,25 @@
-
 #' Convert KEGG pathway to graph
-#' @details This function downloads the KGML file for a given KEGG pathway ID,
-#' parses it, constructs an igraph object, standardizes its attributes,
-#' and styles it for visualization.
+#' 
 #' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
 #' @param scaling_factor Numeric factor to scale node dimensions (default: 1.5).
 #' @param verbose Logical indicating whether to print progress messages (default: FALSE).
-#' @param simplified_graph Logical indicating whether to simplify the graph by removing KEGG-specific columns (default: TRUE).
 #' @param kgml_file Optional local path to a KGML file. If provided, the function will use this file instead of downloading it.
 #' @return An igraph object representing the KEGG pathway graph.
+#' @details This function downloads the KGML file for a given KEGG pathway ID,
+#' parses it, constructs an igraph object,
+#' and styles it for visualization.
+#' @example 
+#' pathway_graph <- kegg_to_graph(
+#'   pathway_id = "hsa04110",
+#'   scaling_factor = 1.5,
+#'   verbose = TRUE,
+#' )
 #' @export
 kegg_to_graph <- function(
     pathway_id,
     scaling_factor = 1.5,
     verbose = FALSE,
-    simplified_graph = TRUE,
     kgml_file = NULL) {
-
   # Validate pathway ID format
   if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
@@ -43,13 +46,13 @@ kegg_to_graph <- function(
 
   g <- build_kegg_graph(kgml_file, pathway_name, bfc = bfc_map)
 
-  g <- standardize_network(g,
-    kegg_to_general_node_map(),
-    kegg_to_general_edge_map(),
-    node_defaults(),
-    edge_defaults(),
-    simplified_graph = TRUE
-  )
+  # g <- standardize_network(g,
+  #   node_map = kegg_to_general_node_map(),
+  #   edge_map = kegg_to_general_edge_map(),
+  #   node_default = node_defaults(),
+  #   edge_default = edge_defaults(),
+  #   simplified_graph = TRUE
+  # )
 
   g <- style_igraph_graph(g, bfc_map, scaling_factor = scaling_factor)
 
@@ -57,9 +60,6 @@ kegg_to_graph <- function(
 }
 
 #' Map differential expression results to nodes
-#'
-#' @details This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-#' The pathwhay given as input must be the output of the function \code{kegg_to_graph}.
 #'
 #' @param g An igraph object representing the pathway.
 #' @param de_results Named list of differential expression results.
@@ -82,7 +82,7 @@ kegg_to_graph <- function(
 #'
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
-#' graph <- kegg_to_graph(pathway, return_type = "igraph")
+#' graph <- kegg_to_graph(pathway_id = pathway, scaling_factor = 1.5)
 #' # Example differential expression results
 #' de_results <- data.frame(
 #'   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
@@ -126,12 +126,18 @@ map_results_to_graph <- function(
   nodes_updated <- add_colors_to_nodes(nodes_updated, palettes = palette)
 
   # Order nodes to match original graph
-  nodes_updated <- nodes_updated[match(igraph::V(g)$name, nodes_updated$name), ]
+  nodes_updated <- nodes_updated[
+    match(igraph::V(g)$name, nodes_updated$name), ,
+    drop = FALSE
+  ]
 
+  # Safety check
+  stopifnot(identical(nodes_updated$name, igraph::V(g)$name))
   # Update graph attributes
-  igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value[name_map[node_names]]
-  igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source[name_map[node_names]]
-  igraph::vertex_attr(g, "color") <- nodes_updated$color[name_map[node_names]]
+  igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
+  igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
+  igraph::vertex_attr(g, "color") <- nodes_updated$color
+  igraph::vertex_attr(g, "text") <- nodes_updated$text
 
   return(g)
 }
@@ -140,7 +146,7 @@ map_results_to_graph <- function(
 #' @param g visNetwork object representing the pathway graph
 #' @return visNetwork plot of the KEGG pathway
 #' @importFrom igraph as_data_frame graph_attr
-#' @export 
+#' @export
 plot_visNetwork_kegg <- function(g) {
   # Convert igraph to data frames
   nodes_df <- as_data_frame(g, what = "vertices")
@@ -161,10 +167,52 @@ plot_visNetwork_kegg <- function(g) {
   return(v)
 }
 
+#' Plot KEGG pathway graph using ggraph (static plot)
+#' @param g igraph object representing the pathway graph
+#' @return ggraph plot of the KEGG pathway
+#' @importFrom ggraph ggraph geom_edge_link geom_node_point
+#' @importFrom ggplot2 annotation_raster
+#' @export
+plot_static_kegg <- function(
+    g,
+    add_image = FALSE) {
 
-plot_static_kegg <- function(g) {
-  # ggraph(g, layout = "manual", x = x, y = y) +
-  #   annotation_raster(img, xmin = 0, xmax = 50, ymin = 0, ymax = 50) +
-  #   geom_edge_link() +
-  #   geom_node_point()
+  stopifnot(inherits(g, "igraph"))
+
+  # Base ggraph object using manual coordinates
+  p <- ggraph::ggraph(
+    g,
+    layout = "manual",
+    x = igraph::V(g)$x,
+    y = igraph::V(g)$y
+  )
+
+  # Optionally add KEGG background image
+  if (add_image) {
+    pathway_id <- igraph::graph_attr(g, "kegg_id")
+    if (is.null(pathway_id) || is.na(pathway_id)) {
+      stop("Graph attribute 'kegg_id' is required when add_image = TRUE")
+    }
+
+    img <- download_kegg_image(pathway_id)
+
+    if (!is.null(img)) {
+      xlim <- range(igraph::V(g)$x, na.rm = TRUE)
+      ylim <- range(igraph::V(g)$y, na.rm = TRUE)
+
+      p <- p +
+        ggplot2::annotation_raster(
+          img,
+          xmin = xlim[1],
+          xmax = xlim[2],
+          ymin = ylim[1],
+          ymax = ylim[2]
+        )
+    }
+  }
+
+  # Draw graph layers
+  p +
+    ggraph::geom_edge_link() +
+    ggraph::geom_node_point()
 }

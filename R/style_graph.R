@@ -4,12 +4,9 @@
 #' @importFrom igraph edge_attr_names E
 #' @noRd
 style_edges_igraph <- function(g) {
-  stopifnot("igraph" %in% class(g))
-  stopifnot("name_3" %in% igraph::edge_attr_names(g))
+  stopifnot(inherits(g, "igraph"))
 
-  # Define styles
-  edge_style_map <- list(
-    # Default styles for relation subtypes
+  edge_style_map_relation <- list(
     compound = list(color = "black", lty = 1L, arrow.mode = 2L, label = ""),
     hidden_compound = list(color = "lightgray", lty = 1L, arrow.mode = 2L, label = ""),
     activation = list(color = "red", lty = 1L, arrow.mode = 2L, label = ""),
@@ -26,28 +23,63 @@ style_edges_igraph <- function(g) {
     glycosylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+g"),
     ubiquitination = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+u"),
     methylation = list(color = "black", lty = 1L, arrow.mode = 2L, label = "+m"),
-    others_unknown = list(color = "black", lty = 2L, arrow.mode = 2L, label = "?"),
-
-    # Default style for group relations
-    group_relation = list(color = "transparent", lty = 2L, arrow.mode = 0L, label = ""),
-
-    # Default styles for reaction types
-    reversible = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
-    irreversible = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
-    line = list(color = "black", lty = 1L, arrow.mode = 0L, label = "")
+    others_unknown = list(color = "black", lty = 2L, arrow.mode = 2L, label = "?")
   )
 
-  # Normalize relation_subtype
-  # I apply this on name 3 which is reaction type or relation subtype
-  rel_sub <- tolower(igraph::E(g)$name_3)
-  rel_sub <- gsub("[/ ]", "_", rel_sub)
-  rel_sub[is.na(rel_sub) | !(rel_sub %in% names(edge_style_map))] <- "others_unknown"
+  edge_style_map_reaction <- list(
+    reversible   = list(color = "black", lty = 2L, arrow.mode = 0L, label = ""),
+    irreversible = list(color = "black", lty = 2L, arrow.mode = 0L, label = "")
+  )
 
-  # Vectorized assignment of edge attributes
-  igraph::E(g)$color <- vapply(rel_sub, function(x) edge_style_map[[x]]$color, character(1))
-  igraph::E(g)$lty <- vapply(rel_sub, function(x) edge_style_map[[x]]$lty, integer(1))
-  igraph::E(g)$arrow.mode <- vapply(rel_sub, function(x) edge_style_map[[x]]$arrow.mode, integer(1))
-  igraph::E(g)$label <- vapply(rel_sub, function(x) edge_style_map[[x]]$label, character(1))
+  group_relation_style <- list(
+    color = "transparent", lty = 2L, arrow.mode = 0L, label = ""
+  )
+
+  line_relation_style <- list(
+    color = "black", lty = 1L, arrow.mode = 0L, label = ""
+  )
+
+  n <- igraph::ecount(g)
+
+  rel_sub <- tolower(igraph::E(g)$relation_subtype_name)
+
+  for (i in seq_len(n)) {
+    if (!is.na(rel_sub[i]) && rel_sub[i] %in% names(edge_style_map_relation)) {
+      style <- edge_style_map_relation[[rel_sub[i]]]
+      igraph::E(g)$color[i] <- style$color
+      igraph::E(g)$lty[i] <- style$lty
+      igraph::E(g)$arrow.mode[i] <- style$arrow.mode
+      igraph::E(g)$label[i] <- style$label
+    }
+  }
+
+  reac_type <- tolower(igraph::E(g)$reaction_type)
+
+  for (i in seq_len(n)) {
+    if (!is.na(reac_type[i]) && reac_type[i] %in% names(edge_style_map_reaction)) {
+      style <- edge_style_map_reaction[[reac_type[i]]]
+      igraph::E(g)$color[i] <- style$color
+      igraph::E(g)$lty[i] <- style$lty
+      igraph::E(g)$arrow.mode[i] <- style$arrow.mode
+      igraph::E(g)$label[i] <- style$label
+    }
+  }
+
+  edge_type <- tolower(igraph::E(g)$type)
+
+  for (i in seq_len(n)) {
+    if (edge_type[i] == "line") {
+      igraph::E(g)$color[i] <- line_relation_style$color
+      igraph::E(g)$lty[i] <- line_relation_style$lty
+      igraph::E(g)$arrow.mode[i] <- line_relation_style$arrow.mode
+      igraph::E(g)$label[i] <- line_relation_style$label
+    } else if (edge_type[i] == "group") {
+      igraph::E(g)$color[i] <- group_relation_style$color
+      igraph::E(g)$lty[i] <- group_relation_style$lty
+      igraph::E(g)$arrow.mode[i] <- group_relation_style$arrow.mode
+      igraph::E(g)$label[i] <- group_relation_style$label;
+    }
+  }
 
   g
 }
@@ -61,6 +93,11 @@ style_edges_igraph <- function(g) {
 # | `line`           | Reaction, relation, or abstract connector       | `rectangle`          | `ellipse` or `dot`        | igraph has no line-node; represent as minimal node or convert to edge   |
 
 
+#' Style igraph graph nodes and edges
+#' @param g An igraph graph object
+#' @param bfc_map A BiocFileCache map (currently unused)
+#' @param scaling_factor Scaling factor for node dimensions (default: 1.5)
+#' @return The styled igraph graph object
 #' @noRd
 style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
   stopifnot(inherits(g, "igraph"))
@@ -69,8 +106,6 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
   nodes_df <- igraph::as_data_frame(g, what = "vertices")
   nodes_df <- style_nodes(nodes_df)
   nodes_df <- scale_dimensions(nodes_df, factor = scaling_factor)
-
-  nodes_df <- nodes_df[order(nodes_df$label), , drop = FALSE]
 
   # write vertex attributes back
   for (col in names(nodes_df)) {
@@ -82,23 +117,36 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
     g <- style_edges_igraph(g)
   }
 
+  ## ---- Graph attributes ----
+  # Preserve title and type attributes
+  if (!is.null(igraph::graph_attr(g, "title"))) {
+    igraph::graph_attr(g, "title") <- igraph::graph_attr(g, "title")
+  }
+  if (!is.null(igraph::graph_attr(g, "type"))) {
+    igraph::graph_attr(g, "type") <- igraph::graph_attr(g, "type")
+  }
+
   g
 }
 
 style_nodes <- function(nodes_df) {
   # Apply default styles based on KEGG type
   nodes_df$size <- ifelse(is.na(nodes_df$size), 25, nodes_df$size) # to check later
+  nodes_df$size[nodes_df$graphics_type == "circle"] <- 5
 
   # Map KEGG types to shapes
-  nodes_df$shape[nodes_df$original_shape == "rectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$original_shape == "circle"] <- "circle"
-  nodes_df$shape[nodes_df$original_shape == "roundrectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$original_shape == "line"] <- "dot" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "vrectangle"
+  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "circle"
+  nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "vrectangle"
+  nodes_df$shape[nodes_df$graphics_type == "line"] <- "circle" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "circle" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "group"] <- "circle" # ellipse?
 
   # Make line nodes fully transparent
-  nodes_df$color[nodes_df$original_shape == "line"] <- "transparent"
+  nodes_df$color[nodes_df$graphics_type == "line"] <- "transparent"
   nodes_df$color[nodes_df$type == "group"] <- "transparent"
-  nodes_df$size[nodes_df$original_shape == "line"] <- 1
+  nodes_df$size[nodes_df$type == "group"] <- 2
+  nodes_df$size[nodes_df$graphics_type == "line"] <- 1
 
   return(nodes_df)
 }
