@@ -72,22 +72,12 @@ kgml_path_broken <- system.file("extdata", "broken.xml", package = "KEGGemUP")
 kgml_path_empty <- system.file("extdata", "empty.xml", package = "KEGGemUP")
 kgml_path_no_edges <- system.file("extdata", "no_edges.xml", package = "KEGGemUP")
 kgml_path_invalid <- system.file("extdata", "no_kgml.xml", package = "KEGGemUP")
-kgml_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 
+kgml_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 xml_example <- xml2::read_xml(kgml_path_02)
-kgml_processing_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 expected_graphs <- readRDS(system.file("extdata", "kegg_to_graph_expected.rds", package = "KEGGemUP"))
 bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
 bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
-
-# Empty edges
-empty_edges <- data.frame(
-  from = character(0),
-  to = character(0),
-  type = character(0),
-  relation_subtype = character(0),
-  stringsAsFactors = FALSE
-)
 
 nodes_df_basic <- data.frame(
   id = c("n1", "n2", "n3", "n4", "n5", "n6"),
@@ -165,3 +155,6 @@ nodes_df_basic <- data.frame(
 # expected$visNetwork_test_02_mapped <- vis_graph_02
 
 # saveRDS(expected, file = "inst/extdata/kegg_to_graph_expected.rds")
+
+
+

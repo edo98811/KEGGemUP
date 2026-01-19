@@ -59,7 +59,7 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, nodes_list)
-  message("Parsed ", nrow(df), " nodes from KGML.")
+  if (verbose) message("Parsed ", nrow(df), " nodes from KGML.")
   df
 }
 
@@ -372,6 +372,7 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
 #' @importFrom BiocFileCache BiocFileCache
 #' @noRd
 add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
+
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc, verbose = verbose)
   glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc, verbose = verbose)
@@ -385,39 +386,41 @@ add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
   enzymes_lookup <- setNames(as.character(enzymes_db[, 2]), enzymes_db[, 1])
 
   # Initialize labels
-  labels <- nodes_df$ids_for_mapping
+  map_ids <- sub("[;].*", "", nodes_df$ids_for_mapping)
   ids <- nodes_df$KEGG
+  labels <- sub("[;,].*", "", nodes_df$graphics_name)
+  labels[is.na(labels)] <- map_ids[is.na(labels)]
 
   # Compounds
   is_c <- grepl("^cpd:C", ids)
-  found_c <- compounds_lookup[labels[is_c]]
+  found_c <- compounds_lookup[map_ids[is_c]]
   na_pos <- is.na(found_c)
   found_c[na_pos] <- labels[is_c][na_pos]
-  labels[is_c] <- sub(";.*", "", found_c)
+  labels[is_c] <- sub("[;,].*", "", found_c)
   if (verbose) message("Mapped ", sum(!na_pos & is_c), " compounds.")
 
   # Glycans
-  is_g <- grepl("^cpd:G", ids)
-  found_g <- glycans_lookup[labels[is_g]]
+  is_g <- grepl("^gl:G", ids)
+  found_g <- glycans_lookup[map_ids[is_g]]
   na_pos <- is.na(found_g)
   found_g[na_pos] <- labels[is_g][na_pos]
-  labels[is_g] <- sub(";.*", "", found_g)
+  labels[is_g] <- sub("[;,].*", "", found_g)
   if (verbose) message("Mapped ", sum(!na_pos & is_g), " glycans.")
 
   # Genes
   is_k <- grepl("^ko:", ids)
-  found_k <- genes_lookup[labels[is_k]]
+  found_k <- genes_lookup[map_ids[is_k]]
   na_pos <- is.na(found_k)
   found_k[na_pos] <- labels[is_k][na_pos]
-  labels[is_k] <- sub(";.*", "", found_k)
+  labels[is_k] <- sub("[;,].*", "", found_k)
   if (verbose) message("Mapped ", sum(!na_pos & is_k), " genes.")
 
   # Enzymes
   is_e <- grepl("^ec:", ids)
-  found_e <- enzymes_lookup[labels[is_e]]
+  found_e <- enzymes_lookup[map_ids[is_e]]
   na_pos <- is.na(found_e)
   found_e[na_pos] <- labels[is_e][na_pos]
-  labels[is_e] <- sub(";.*", "", found_e)
+  labels[is_e] <- sub("[;,].*", "", found_e)
   if (verbose) message("Mapped ", sum(!na_pos & is_e), " enzymes.")
 
   # Assign node labels
@@ -445,6 +448,7 @@ add_reaction_labels <- function(nodes_df, bfc, verbose = FALSE) {
   na_pos <- is.na(found_r)
   found_r[na_pos] <- reaction_ids[is_r][na_pos]
 
+  # Prepare reaction labels
   reaction_labels <- reaction_ids
   reaction_labels[is_r] <- sub(";.*", "", found_r)
   reaction_labels[!is_r] <- NA_character_

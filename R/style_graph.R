@@ -136,11 +136,11 @@ style_nodes <- function(nodes_df) {
 
   # Map KEGG types to shapes
   nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "circle"
+  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "dot"
   nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$graphics_type == "line"] <- "circle" # ellipse?
-  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "circle" # ellipse?
-  nodes_df$shape[nodes_df$graphics_type == "group"] <- "circle" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "line"] <- "dot" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot" # ellipse?
+  nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot" # ellipse?
 
   # Make line nodes fully transparent
   nodes_df$vertex.color[nodes_df$graphics_type == "line"] <- "transparent"

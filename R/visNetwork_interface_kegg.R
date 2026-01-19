@@ -14,6 +14,11 @@ make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
+  v <- visNetwork::visNodes(
+    v,
+    shape = "dot",
+    widthConstraint = FALSE
+  )
 
   v <- visNetwork::visOptions(v,
     highlightNearest = list(
@@ -96,9 +101,14 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
   nodes_df$shape[nodes_df$graphics_type == "line"] <- "ellipse"
   nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
   nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
-
   nodes_df$widthConstraint <- nodes_df$width
+  # ifelse(
+  #   is.na(nodes_df$width), FALSE, nodes_df$width
+  # )
   nodes_df$heightConstraint <- nodes_df$height
+  # felse(
+  #   is.na(nodes_df$height), FALSE, nodes_df$height
+  # )
   nodes_df$id <- as.character(nodes_df$name)
   nodes_df$borderWidth <- 2
 
@@ -116,5 +126,6 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
       highlight = list(border = "red")
     )
   })
+
   return(nodes_df)
 }

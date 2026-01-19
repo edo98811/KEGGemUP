@@ -100,7 +100,7 @@ map_results_to_graph <- function(
     stop("Input graph 'g' must be an igraph object.")
   }
 
-  message("Mapping differential expression results to nodes...")
+  if (verbose) message("Mapping differential expression results to nodes...")
 
   de_results <- normalize_de_results(
     de_results,

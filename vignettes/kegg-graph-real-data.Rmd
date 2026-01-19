@@ -68,7 +68,6 @@ To learn more about graph manipulation you can refer to the igraph and visNetwor
 ```{r load-example-results}
 message("--- Loading packages...")
 devtools::load_all()
-
 suppressPackageStartupMessages({
   library("macrophage")
   library("org.Hs.eg.db")
@@ -76,6 +75,7 @@ suppressPackageStartupMessages({
   library("AnnotationDbi")
   library("clusterProfiler")
   library("limma")
+  library("igraph")
   library("edgeR")
 })
 message("- Done!")
@@ -141,10 +141,21 @@ This is how to build a KEGG pathway graph and the structure of its nodes and edg
 ```{r}
 graph <- kegg_to_graph("hsa00563")
 
-nodes <- igraph::V(graph)
-edges <- igraph::E(graph) 
-knitr::kable(nodes)
-knitr::kable(edges)
+# Extract all vertex attributes
+nodes_df <- igraph::as_data_frame(graph, what = "vertices")
+
+# Extract all edge attributes
+edges_df <- igraph::as_data_frame(graph, what = "edges")
+
+DT::datatable(
+  nodes_df,
+  options = list(scrollX = TRUE)
+)
+
+DT::datatable(
+  edges_df,
+  options = list(scrollX = TRUE)
+)
 ```
 ## Building KEGG pathway graphs
 
@@ -188,7 +199,7 @@ We will now take a KEGG pathway from the enrichment results we built earlier and
 
 The workflow is as follows: first we build the graph from the KEGG pathway ID, then we map the differential expression results to the nodes of the graph, and at the end we plot the graph using `plot_kegg_visNetwork()`, which creates an interactive visualization of the graph using visNetwork.
 
-```{r use-package}
+```{r use-package, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 pathway <- "hsa00563"  
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_list)
@@ -206,7 +217,7 @@ de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
-```{r use-package-2}
+```{r use-package-2, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
 graph_visnetwork <- plot_kegg_visNetwork(graph)
@@ -217,7 +228,7 @@ You can also control the palette that is used to map the values to colors on the
 To see the available palettes you can run `RColorBrewer::display.brewer.all()`.
 You can also visit this page: [RColorBrewer palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
 
-```{r use-package-3}
+```{r use-package-3, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", palette = "PiYG")
 graph_visnetwork <- plot_kegg_visNetwork(graph)

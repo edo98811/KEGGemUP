@@ -47,5 +47,6 @@ Suggests:
     edgeR,
     purrr,
     S4Vectors,
-    BiocStyle
+    BiocStyle,
+    DT
 Config/testthat/edition: 3
