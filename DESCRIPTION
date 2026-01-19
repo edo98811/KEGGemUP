@@ -31,9 +31,7 @@ Imports:
     KEGGREST,
     visNetwork,
     RColorBrewer,
-    xml2,
-    ggplot2,
-    ggraph
+    xml2
 Suggests: 
     shinytest2,
     mockery,

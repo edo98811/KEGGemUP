@@ -3,9 +3,11 @@
 
 #' Map KEGG-styled nodes to visNetwork attributes
 #' @param xml XML document object representing the KGML pathway
+#' @param defaults A list of default node attributes
+#' @param verbose Logical indicating whether to print verbose messages
 #' @return nodes_df Data frame of nodes with visNetwork-compatible styling columns
 #' @noRd
-parse_kgml_nodes <- function(xml, defaults) {
+parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
   # Find all entries that are not group or line (line is an attribute in graphics)
   nodes <- xml2::xml_find_all(
     xml,
@@ -63,9 +65,11 @@ parse_kgml_nodes <- function(xml, defaults) {
 
 #' Parse group nodes from KGML XML
 #' @param xml XML document object representing the KGML pathway
+#' @param defaults A list of default node attributes
+#' @param verbose Logical indicating whether to print verbose messages
 #' @return nodes_df Data frame of group nodes
 #' @noRd
-parse_kgml_groups <- function(xml, defaults) {
+parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
   # Find all group entries
   group_nodes <- xml2::xml_find_all(
     xml,
@@ -86,8 +90,6 @@ parse_kgml_groups <- function(xml, defaults) {
     entry_nodes_df$type <- xml2::xml_attr(node, "type")
     entry_nodes_df$link <- xml2::xml_attr(node, "link")
     entry_nodes_df$graphics_type <- "group"
-    # entry_nodes_df$x <- xml2::xml_attr(node, "x")
-    # entry_nodes_df$y <- xml2::xml_attr(node, "y")
     entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
     entry_nodes_df$name <- as.character(xml2::xml_attr(node, "id"))
 
@@ -95,10 +97,8 @@ parse_kgml_groups <- function(xml, defaults) {
     # Fill attributes from graphics nodes
     if (length(components_nodes) > 0) {
       for (i in seq_along(components_nodes)) {
-        entry_nodes_df$components <- paste(components_nodes %>% xml2::xml_attr("id"), collapse = ";")
-        # g <- components_nodes[i + 1]
-        # entry_nodes_df$name[i + 1] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
-        # entry_nodes_df$components[i + 1] <- xml2::xml_attr(g, "id")
+        entry_nodes_df$components <-
+          paste(xml2::xml_attr(components_nodes, "id"), collapse = ";")
       }
     }
 
@@ -107,15 +107,17 @@ parse_kgml_groups <- function(xml, defaults) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, nodes_list)
-  message("Parsed ", nrow(df), " group nodes from KGML.")
+    if (verbose) message("Parsed ", nrow(df), " group nodes from KGML.")
   df
 }
 
 #' Map KEGG-styled edges to visNetwork attributes
-#' @param edges_df Data frame of edges extracted from igraph using as_data_frame(what="edges")
-#' @return edges_df with visNetwork-compatible styling columns: arrows, dashes, color, label
+#' @param xml XML document object representing the KGML pathway
+#' @param defaults A list of default edge attributes
+#' @param verbose Logical indicating whether to print verbose messages
+#' @return df Data frame of nodes
 #' @noRd
-parse_kgml_lines <- function(xml, defaults) {
+parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
   # Find all line entries (line is an attribute in graphics)
   line_nodes <- xml2::xml_find_all(
     xml,
@@ -172,15 +174,17 @@ parse_kgml_lines <- function(xml, defaults) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, nodes_list)
-  message("Parsed ", nrow(df), " line nodes from KGML.")
+  if (verbose) message("Parsed ", nrow(df), " line nodes from KGML.")
   df
 }
 
 #' Parse line edges from KGML line nodes
 #' @param line_nodes_df Data frame of line nodes extracted from parse_kgml_lines
+#' @param defaults A list of default edge attributes
+#' @param verbose Logical indicating whether to print verbose messages
 #' @return edges_df Data frame of edges created from line nodes
 #' @noRd
-parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
+parse_kgml_lines_edges <- function(line_nodes_df, defaults, verbose = FALSE) {
   # Handle empty input
   if (is.null(line_nodes_df) || nrow(line_nodes_df) == 0) {
     return(NULL)
@@ -230,15 +234,17 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults) {
     }
   }
 
-  message("Parsed ", nrow(edges_df), " edges from line nodes.")
+  if (verbose) message("Parsed ", nrow(edges_df), " edges from line nodes.")
   edges_df
 }
 
 #' Parse relation edges from KGML XML
 #' @param xml XML document object representing the KGML pathway
+#' @param defaults A list of default edge attributes
+#' @param verbose Logical indicating whether to print verbose messages
 #' @return edges_df Data frame of relation edges
 #' @noRd
-parse_kgml_relations <- function(xml, defaults) {
+parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
   # Find all relation entries
   rels <- xml2::xml_find_all(xml, ".//relation")
 
@@ -265,7 +271,7 @@ parse_kgml_relations <- function(xml, defaults) {
           stop("parse_kgml_relations: More subtype nodes than pre-allocated rows.")
         }
         g <- subtype_nodes[i]
-        entry_edges_df$relation_subtype_name[i] <-  gsub("[/ ]", "_", xml2::xml_attr(g, "name")) # replace / and space with _
+        entry_edges_df$relation_subtype_name[i] <- gsub("[/ ]", "_", xml2::xml_attr(g, "name")) # replace / and space with _
         entry_edges_df$relation_subtype_value[i] <- xml2::xml_attr(g, "value")
       }
     }
@@ -275,15 +281,17 @@ parse_kgml_relations <- function(xml, defaults) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, edges_list)
-  message("Parsed ", nrow(df), " relations from KGML.")
+  if (verbose) message("Parsed ", nrow(df), " relations from KGML.")
   df
 }
 
 #' Parse reaction edges from KGML XML
 #' @param xml XML document object representing the KGML pathway
-#' @return edges_df Data frame of reaction edges 
+#' @param defaults A list of default edge attributes
+#' @param verbose Logical indicating whether to print verbose messages
+#' @return edges_df Data frame of reaction edges
 #' @noRd
-parse_kgml_reactions <- function(xml, defaults) {
+parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
   # Find all reaction entries
   reactions <- xml2::xml_find_all(xml, ".//reaction")
 
@@ -351,7 +359,7 @@ parse_kgml_reactions <- function(xml, defaults) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, nodes_list)
-  message("Parsed ", nrow(df), " reactions from KGML.")
+  if (verbose) message("Parsed ", nrow(df), " reactions from KGML.")
   df
 }
 
@@ -359,15 +367,16 @@ parse_kgml_reactions <- function(xml, defaults) {
 #' Add compound names to compound nodes in the nodes data frame.
 #' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
 #' @param bfc BiocFileCache object for caching KEGG compound mappings.
+#' @param verbose Logical indicating whether to print verbose messages.
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
 #' @noRd
-add_node_labels <- function(nodes_df, bfc) {
+add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
   # Load KEGG databases
-  compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc)
-  glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc)
-  genes_db <- get_kegg_db(db_name = "ko", bfc = bfc)
-  enzymes_db <- get_kegg_db(db_name = "enzyme", bfc = bfc)
+  compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc, verbose = verbose)
+  glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc, verbose = verbose)
+  genes_db <- get_kegg_db(db_name = "ko", bfc = bfc, verbose = verbose)
+  enzymes_db <- get_kegg_db(db_name = "enzyme", bfc = bfc, verbose = verbose)
 
   # Convert to named lookup vectors
   compounds_lookup <- setNames(as.character(compounds_db[, 2]), compounds_db[, 1])
@@ -385,6 +394,7 @@ add_node_labels <- function(nodes_df, bfc) {
   na_pos <- is.na(found_c)
   found_c[na_pos] <- labels[is_c][na_pos]
   labels[is_c] <- sub(";.*", "", found_c)
+  if (verbose) message("Mapped ", sum(!na_pos & is_c), " compounds.")
 
   # Glycans
   is_g <- grepl("^cpd:G", ids)
@@ -392,6 +402,7 @@ add_node_labels <- function(nodes_df, bfc) {
   na_pos <- is.na(found_g)
   found_g[na_pos] <- labels[is_g][na_pos]
   labels[is_g] <- sub(";.*", "", found_g)
+  if (verbose) message("Mapped ", sum(!na_pos & is_g), " glycans.")
 
   # Genes
   is_k <- grepl("^ko:", ids)
@@ -399,6 +410,7 @@ add_node_labels <- function(nodes_df, bfc) {
   na_pos <- is.na(found_k)
   found_k[na_pos] <- labels[is_k][na_pos]
   labels[is_k] <- sub(";.*", "", found_k)
+  if (verbose) message("Mapped ", sum(!na_pos & is_k), " genes.")
 
   # Enzymes
   is_e <- grepl("^ec:", ids)
@@ -406,12 +418,9 @@ add_node_labels <- function(nodes_df, bfc) {
   na_pos <- is.na(found_e)
   found_e[na_pos] <- labels[is_e][na_pos]
   labels[is_e] <- sub(";.*", "", found_e)
-
-  # Determine which nodes to assign labels to
-  # labels_to_assign <- is_c | is_g | is_k | is_e
+  if (verbose) message("Mapped ", sum(!na_pos & is_e), " enzymes.")
 
   # Assign node labels
-  # nodes_df$label[labels_to_assign] <- labels[labels_to_assign]
   nodes_df$label <- labels
   nodes_df
 }
@@ -419,9 +428,10 @@ add_node_labels <- function(nodes_df, bfc) {
 #' Add reaction labels to reaction nodes in the nodes data frame.
 #' @param nodes_df Data frame of nodes with a column 'reaction' containing reaction IDs.
 #' @param bfc BiocFileCache object for caching KEGG reaction mappings.
+#' @param verbose Logical indicating whether to print verbose messages.
 #' @return Updated nodes data frame with reaction labels added to reaction nodes.
 #' @noRd
-add_reaction_labels <- function(nodes_df, bfc) {
+add_reaction_labels <- function(nodes_df, bfc, verbose = FALSE) {
   # Load reaction database
   reactions_db <- get_kegg_db(db_name = "reaction", bfc = bfc)
   reactions_lookup <- setNames(as.character(reactions_db[, 2]), reactions_db[, 1])
@@ -447,15 +457,19 @@ add_reaction_labels <- function(nodes_df, bfc) {
     NA_character_
   )
 
+  if (verbose) {
+    message("Mapped ", sum(!na_pos), " reactions.")
+  }
+
   nodes_df
 }
 
 #' Add group labels and coordinates to group nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type 
+#' @param nodes_df Data frame of nodes with a column 'type' indicating node type
 #' and a column 'components' listing component node IDs.
 #' @return Updated nodes data frame with group labels and coordinates added to group nodes.
 #' @noRd
-add_group <- function(nodes_df) {
+add_group <- function(nodes_df, verbose = FALSE) {
   # Identify undefined nodes (group nodes)
   group_idx <- which(nodes_df$type == "group")
   if (length(group_idx) == 0) {
@@ -496,6 +510,13 @@ add_group <- function(nodes_df) {
     # Assign average coordinates to the group node itself
     nodes_df$x[i] <- avg_x
     nodes_df$y[i] <- avg_y
+
+    if (verbose) {
+      message(
+        "Group node '", nodes_df$name[i], "' assigned label: '",
+        group_label, "' at (", avg_x, ", ", avg_y, ")"
+      )
+    }
   }
 
   nodes_df

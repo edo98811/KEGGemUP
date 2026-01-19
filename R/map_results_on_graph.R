@@ -1,14 +1,16 @@
-
 #' Add results from combined results data frame to nodes data frame
 #' @param nodes_df Data frame of nodes with a column 'ids_for_mapping'
 #' @param results_combined Data frame with combined results containing columns:
 #' ids_for_mapping, de_value, de_source
+#' @param verbose Logical, if TRUE, prints messages about the process.
 #' @return Updated nodes data frame with added columns: de_value, color, de_source, text
 #' @noRd
-add_results_nodes <- function(nodes_df, results_combined) {
-
+add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
   # If results is empty then return the original df
   if (is.null(results_combined)) {
+    if (verbose) {
+      message("results_combined is NULL; returning original nodes_df.")
+    }
     return(nodes_df)
   }
 
@@ -28,7 +30,6 @@ add_results_nodes <- function(nodes_df, results_combined) {
   # 1111        2.5        de1
   # 2222       -1.2        de2
   # 3333        0.5        de1
-  
   # Ensure required columns exist
   required_nodes <- c(
     "name", "ids_for_mapping", "de_value", "de_source", "text", "type"
@@ -59,6 +60,10 @@ add_results_nodes <- function(nodes_df, results_combined) {
     return(nodes_df)
   }
 
+  if (verbose) {
+    message("Found ", nrow(nodes_to_check), " nodes with valid 'ids_for_mapping'.")
+  }
+
   # Explode ids_for_mapping per node
   mapping <- do.call(
     rbind,
@@ -66,7 +71,8 @@ add_results_nodes <- function(nodes_df, results_combined) {
       data.frame(
         name = nodes_to_check$name[i],
         matched_id = strsplit(
-          nodes_to_check$ids_for_mapping[i], ";", fixed = TRUE
+          nodes_to_check$ids_for_mapping[i], ";",
+          fixed = TRUE
         )[[1]],
         stringsAsFactors = FALSE
       )
@@ -83,8 +89,16 @@ add_results_nodes <- function(nodes_df, results_combined) {
     sort = FALSE
   )
 
+  # Messages
   if (nrow(mapping) == 0) {
+    if (verbose) {
+      message("No matches found between nodes and results.")
+    }
     return(nodes_df)
+  } else {
+    if (verbose) {
+      message("Found ", nrow(mapping), " matches between nodes and results.")
+    }
   }
 
   # Detect multiple matches per node
@@ -120,8 +134,7 @@ add_results_nodes <- function(nodes_df, results_combined) {
   text_by_node <- tapply(
     mapping$text_append,
     mapping$name,
-    paste0,
-    collapse = ""
+    paste0
   )
 
   text_idx <- match(names(text_by_node), nodes_to_check$name)
@@ -136,6 +149,9 @@ add_results_nodes <- function(nodes_df, results_combined) {
       "Some nodes had multiple matching IDs; ",
       "only the first match was used for de_value/de_source."
     )
+    if (verbose) {
+      message("Nodes with multiple matches: ", paste(warn_nodes, collapse = ", "))
+    }
   }
 
   # Update original dataframe
@@ -143,22 +159,32 @@ add_results_nodes <- function(nodes_df, results_combined) {
   nodes_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
   nodes_df$text[ids_nodes_to_check] <- nodes_to_check$text
 
+  if (verbose) {
+    message("Successfully added results to ", length(idx), " nodes.")
+  }
+
   return(nodes_df)
 }
 
 #' Combine multiple differential expression results into a single data frame
 #' @param results_list A named list where each element is a differential
 #' expression result
+#' @param verbose Logical, if TRUE, prints messages about the process.
 #' @return A combined data frame with columns:
 #' ids_for_mapping, de_value, de_source
 #' @noRd
-combine_results_in_dataframe <- function(results_list) {
-
+combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
   if (is.null(results_list) || length(results_list) == 0) {
+    if (verbose) {
+      message("No results to combine; returning NULL.")
+    }
     return(NULL)
   }
 
   results <- lapply(names(results_list), function(de_entry_name) {
+    if (verbose) {
+      message("Processing entry: ", de_entry_name)
+    }
 
     de_entry <- results_list[[de_entry_name]]
     de_table <- de_entry$de_table
@@ -179,17 +205,25 @@ combine_results_in_dataframe <- function(results_list) {
     )
   })
 
-  do.call(rbind, results)
-}
+  combined_results <- do.call(rbind, results)
 
+  if (verbose) {
+    message("Combined results data frame created with ", nrow(combined_results), " rows.")
+  }
+
+  return(combined_results)
+}
 
 #' Add color palettes
 #' @param nodes_df Data frame of nodes with 'de_value' and 'de_source' columns.
 #' @param palettes A vector of color palette names from RColorBrewer.
+#' @param verbose Logical indicating whether to print verbose messages.
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom grDevices colorRampPalette
+#' @importFrom stats setNames na.omit
 #' @return nodes_df with colored nodes based on their values.
 #' @noRd
-add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
+add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu"), verbose = FALSE) {
   sources <- unique(na.omit(nodes_df$de_source))
   valid_nodes <- nodes_df[!is.na(nodes_df$de_source), , drop = FALSE]
 
@@ -233,6 +267,13 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu")) {
     valid_nodes$vertex.color[
       valid_nodes$de_source == sources[source_index]
     ] <- nodes_to_color$vertex.color
+
+    if (verbose) {
+      message(
+        "Assigned colors for source '", sources[source_index],
+        "' using palette '", palette, "'."
+      )
+    }
   }
 
   nodes_df$vertex.color[!is.na(nodes_df$de_source)] <- valid_nodes$vertex.color

@@ -4,10 +4,12 @@
 \alias{download_all_pathways}
 \title{Download all KEGG pathways for a given organism.}
 \usage{
-download_all_pathways(org)
+download_all_pathways(org, verbose = FALSE)
 }
 \arguments{
 \item{org}{KEGG organism code (e.g., 'hsa' for human).}
+
+\item{verbose}{Logical, if TRUE, print additional messages.}
 }
 \value{
 None
@@ -17,5 +19,5 @@ Download all KEGG pathways for a given organism.
 }
 \examples{
 # Download all pathways for human
-# download_all_pathways("hsa")
+# download_all_pathways("hsa", verbose = TRUE)
 }

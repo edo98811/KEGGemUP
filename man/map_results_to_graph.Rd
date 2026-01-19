@@ -9,7 +9,8 @@ map_results_to_graph(
   de_results,
   feature_column = NULL,
   value_column = NULL,
-  palette = "RdBu"
+  palette = "RdBu",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ map_results_to_graph(
 
 \item{palette}{Color palette for node coloring (default: "RdBu").}
 
-\item{return_type}{Output type: 'igraph' or 'visNetwork'.}
+\item{verbose}{Whether to print progress messages (default: TRUE).}
 }
 \value{
 An igraph or visNetwork object with mapped results.
@@ -47,7 +48,7 @@ respectively, but these can be changed using the
 }
 \examples{
 pathway <- "hsa04110" # Example pathway ID
-graph <- kegg_to_graph(pathway_id = pathway, scaling_factor = 1.5)
+graph <- kegg_to_graph(pathway_id = pathway)
 # Example differential expression results
 de_results <- data.frame(
   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
