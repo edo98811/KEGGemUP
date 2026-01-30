@@ -101,6 +101,10 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
   nodes_df$shape[nodes_df$graphics_type == "line"] <- "ellipse"
   nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
   nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
+
+  # do set the width intentionally to NA to have the text label take the space it needs
+  nodes_df$width[nodes_df$graphics_type == "circle"] <- NA
+
   nodes_df$widthConstraint <- nodes_df$width
   # ifelse(
   #   is.na(nodes_df$width), FALSE, nodes_df$width
