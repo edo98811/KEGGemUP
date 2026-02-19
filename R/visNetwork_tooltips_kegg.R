@@ -142,23 +142,38 @@ regular_node_html <- function(nodes_df) {
 #' @return edges_df with added 'title' column for tooltips.
 #' @noRd
 add_edge_tooltip <- function(edges_df) {
+  base_url <- "https://www.genome.jp/dbget-bin/www_bget?"
+    button_html_reaction <- ifelse(
+    is.na(edges_df$reaction_name),
+    "",
+    paste0(
+      "<div style='text-align:center; margin-top:5px;'>",
+      "<a href='", base_url, edges_df$reaction_name, "' target='_blank'>",
+      "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
+      "KEGG entry",
+      "</button></a></div>"
+    )
+  )
   edges_df$title <- ifelse(
     edges_df$type == "relation",
     paste0(
+          "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
       "<table>",
-      "<tr><th align='left'>Type </th><td>", edges_df$relation_type, "</td></tr>",
-      "<tr><th align='left'>Subtype 3</th><td>", edges_df$relation_subtype_name, "</td></tr>",
-      "<tr><th align='left'>Label </th><td>", edges_df$relation_subtype_value, "</td></tr>",
+      "<tr><th align='left'>Type: </th><td>", edges_df$relation_type, "</td></tr>",
+      "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name, "</td></tr>",
+      "<tr><th align='left'>Label: </th><td>", edges_df$relation_subtype_value, "</td></tr>",
       "</table>"
     ),
     ifelse(
       edges_df$type == "reaction",
       paste0(
+            "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
         "<table>",
-        "<tr><th align='left'>ID </th><td>", edges_df$reaction_id, "</td></tr>",
-        "<tr><th align='left'>Type </th><td>", edges_df$reaction_type, "</td></tr>",
-        "<tr><th align='left'>Name </th><td>", edges_df$reaction_name, "</td></tr>",
-        "</table>"
+        "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id, "</td></tr>",
+        "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type, "</td></tr>",
+        "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name, "</td></tr>",
+        "</table>",
+        button_html_reaction
       ),
       ""
     )
