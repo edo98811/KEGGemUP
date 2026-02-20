@@ -1,6 +1,6 @@
 test_that("parse_kgml_nodes returns correct nodes", {
-  nodes_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
-  expect_equal(nodes_df, kgml_steps$nodes)
+  vertices_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
+  expect_equal(vertices_df, kgml_steps$nodes)
 })
 
 test_that("parse_kgml_groups returns correct group nodes", {
@@ -29,10 +29,10 @@ test_that("parse_kgml_reactions returns correct edges from reactions", {
 })
 
 test_that("combined nodes (nodes + groups + lines) load correctly", {
-  nodes_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
-  nodes_df <- rbind(nodes_df, parse_kgml_groups(xml_example, kegg_node_defaults()))
-  nodes_df <- rbind(nodes_df, parse_kgml_lines(xml_example, kegg_node_defaults()))
-  expect_equal(nodes_df, kgml_steps$all_nodes)
+  vertices_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
+  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml_example, kegg_node_defaults()))
+  vertices_df <- rbind(vertices_df, parse_kgml_lines(xml_example, kegg_node_defaults()))
+  expect_equal(vertices_df, kgml_steps$all_nodes)
 })
 
 test_that("combined edges (relations + reactions + line edges) load correctly", {
@@ -80,14 +80,14 @@ test_that("add_labels works correctly", {
   genes_db <- data.frame(id = c("K00001", "K00002"), name = c("GeneA", "GeneB;alias"))
   enzymes_db <- data.frame(id = c("1.1.1.1"), name = c("EnzymeX"))
 
-  nodes_df <- data.frame(
+  vertices_df <- data.frame(
     KEGG = c("cpd:C00001", "cpd:C00099", "gl:G00001", "ko:K00001", "ko:K99999", "ec:1.1.1.1", "ec:9.9.9.9"),
     ids_for_mapping = c("C00001", "C00099", "G00001", "K00001", "K99999", "1.1.1.1", "9.9.9.9"),
     graphics_name = c("Water", "beta-Alanine, No", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
     stringsAsFactors = FALSE
   )
 
-  nodes_out <- add_node_labels(nodes_df, bfc = bfc)
+  nodes_out <- add_node_labels(vertices_df, bfc = bfc)
   expect_equal(nodes_out$label[1], "H2O")
   expect_equal(nodes_out$label[2], "beta-Alanine")
   expect_equal(nodes_out$label[3], "N-Acetyl-D-glucosaminyldiphosphodolichol")
@@ -98,12 +98,12 @@ test_that("add_labels works correctly", {
 })
 
 test_that("add_reaction_labels works correctly", {
-  nodes_df <- data.frame(
+  vertices_df <- data.frame(
     reaction = c("rn:R00001", "rn:R00099", NA, "rn:R00002"),
     stringsAsFactors = FALSE
   )
 
-  nodes_out <- add_reaction_labels(nodes_df, bfc = bfc)
+  nodes_out <- add_reaction_labels(vertices_df, bfc = bfc)
   expect_equal(nodes_out$reaction_label[1], "polyphosphate polyphosphohydrolase")
   expect_equal(nodes_out$reaction_label[2], "Cob(I)alamin <=> Cob(II)alamin")
   expect_true(is.na(nodes_out$reaction_label[3]))

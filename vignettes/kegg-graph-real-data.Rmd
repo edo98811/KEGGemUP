@@ -142,13 +142,13 @@ This is how to build a KEGG pathway graph and the structure of its nodes and edg
 graph <- kegg_to_graph("hsa00563")
 
 # Extract all vertex attributes
-nodes_df <- igraph::as_data_frame(graph, what = "vertices")
+vertices_df <- igraph::as_data_frame(graph, what = "vertices")
 
 # Extract all edge attributes
 edges_df <- igraph::as_data_frame(graph, what = "edges")
 
 DT::datatable(
-  nodes_df,
+  vertices_df,
   options = list(scrollX = TRUE)
 )
 

@@ -20,7 +20,7 @@ kegg_to_graph <- function(
   verbose = FALSE
 ) {
   # Validate pathway ID format
-  if (!is_valid_pathway(pathway_id)) {
+  if (is.null(kgml_file) && !is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
   }
 
@@ -116,15 +116,14 @@ map_results_to_graph <- function(
     Returning original graph.")
     return(g)
   }
-
   # Combine results into a single data frame
   results_combined <- combine_results_in_dataframe(de_results, verbose = verbose)
 
   # Get current nodes
-  nodes_df <- igraph::as_data_frame(g, what = "vertices")
-
+  vertices_df <- igraph::as_data_frame(g, what = "vertices")
+  browser()
   # Merge results into nodes
-  nodes_updated <- add_results_nodes(nodes_df, results_combined, verbose = verbose)
+  nodes_updated <- add_results_nodes(vertices_df, results_combined, verbose = verbose)
   nodes_updated <- add_colors_to_nodes(nodes_updated, palettes = palette, verbose = verbose)
 
   # Order nodes to match original graph
@@ -138,8 +137,10 @@ map_results_to_graph <- function(
   # Update graph attributes
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
+  igraph::vertex_attr(g, "vertex.color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "text") <- nodes_updated$text
+  igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
 
   return(g)
 }
@@ -160,21 +161,22 @@ map_results_to_graph <- function(
 #'
 #' @export
 make_kegg_visNetwork <- function(g) {
+   
   # Convert igraph to data frames
-  nodes_df <- as_data_frame(g, what = "vertices")
+  vertices_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
   pathway_name <- igraph::graph_attr(g, "title")
 
   # Style nodes and edges
-  nodes_df <- kegg_nodes_to_visNetwork(nodes_df)
+  vertices_df <- kegg_nodes_to_visNetwork(vertices_df)
   if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df)
 
   # Add tooltips
-  nodes_df <- add_node_tooltip(nodes_df)
+  vertices_df <- add_node_tooltip(vertices_df)
   edges_df <- add_edge_tooltip(edges_df)
 
   # Create visNetwork graph
-  v <- make_vis_graph(nodes_df, edges_df, pathway_name)
+  v <- make_vis_graph(vertices_df, edges_df, pathway_name)
 
   return(v)
 }

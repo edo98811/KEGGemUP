@@ -17,21 +17,21 @@ test_that("combine_results_in_dataframe correctly merges DE results", {
   expect_equal(nrow(result), expected_nrows)
 })
 
-test_that("add_results_nodes correctly maps DE results onto nodes_df", {
-  # Prepare nodes_df
-  nodes_df <- kgml_steps$all_nodes
+test_that("add_results_nodes correctly maps DE results onto vertices_df", {
+  # Prepare vertices_df
+  vertices_df <- kgml_steps$all_nodes
   indexes_to_map <- which(
-    nodes_df$graphics_type != "line" & nodes_df$graphics_type != "group"
+    vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
   )
-  nodes_df$ids_for_mapping[indexes_to_map] <- vapply(
-    nodes_df$KEGG[indexes_to_map],
+  vertices_df$ids_for_mapping[indexes_to_map] <- vapply(
+    vertices_df$KEGG[indexes_to_map],
     remove_kegg_prefix_str,
     character(1)
   )
 
   # Map results
   results_combined <- combine_results_in_dataframe(de_results_list)
-  expect_warning(mapped_nodes <- add_results_nodes(nodes_df, results_combined))
+  expect_warning(mapped_nodes <- add_results_nodes(vertices_df, results_combined))
 
   # Structure checks
   expect_true(is.data.frame(mapped_nodes))
@@ -41,7 +41,7 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df", {
   )
   expect_equal(
     nrow(mapped_nodes),
-    nrow(nodes_df),
+    nrow(vertices_df),
     info = "wrong number of rows"
   )
 
@@ -53,13 +53,13 @@ test_that("add_results_nodes correctly maps DE results onto nodes_df", {
 
 test_that("add_colors_to_nodes assigns colors based on de_value", {
 
-  # Prepare nodes_df
-  nodes_df <- kgml_steps$all_nodes
+  # Prepare vertices_df
+  vertices_df <- kgml_steps$all_nodes
   indexes_to_map <- which(
-    nodes_df$graphics_type != "line" & nodes_df$graphics_type != "group"
+    vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
   )
-  nodes_df$ids_for_mapping[indexes_to_map] <- vapply(
-    nodes_df$KEGG[indexes_to_map],
+  vertices_df$ids_for_mapping[indexes_to_map] <- vapply(
+    vertices_df$KEGG[indexes_to_map],
     remove_kegg_prefix_str,
     character(1)
   )
@@ -67,7 +67,7 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
   # Map results and add colors
   results_combined <- combine_results_in_dataframe(de_results_list)
   expect_warning(mapped_nodes <- add_results_nodes(
-    nodes_df,
+    vertices_df,
     results_combined
   ))
   colored_nodes <- add_colors_to_nodes(mapped_nodes)
@@ -82,24 +82,24 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
 })
 
 test_that("add_results_nodes handles invalid ids_for_mapping column", {
-  invalid_nodes_df <- kgml_steps$all_nodes
+  invalid_vertices_df <- kgml_steps$all_nodes
   results_combined <- combine_results_in_dataframe(de_results_list)
 
   # Test with missing ids_for_mapping column
-  invalid_nodes_df$ids_for_mapping <- NA
-  expect_warning(mapped_nodes <- add_results_nodes(invalid_nodes_df, results_combined))
+  invalid_vertices_df$ids_for_mapping <- NA
+  expect_warning(mapped_nodes <- add_results_nodes(invalid_vertices_df, results_combined))
   expect_true(is.data.frame(mapped_nodes))
-  expect_equal(nrow(mapped_nodes), nrow(invalid_nodes_df))
+  expect_equal(nrow(mapped_nodes), nrow(invalid_vertices_df))
 
   # Test with all NA ids_for_mapping
-  invalid_nodes_df$ids_for_mapping <- ""
-  expect_warning(mapped_nodes <- add_results_nodes(invalid_nodes_df, results_combined))
+  invalid_vertices_df$ids_for_mapping <- ""
+  expect_warning(mapped_nodes <- add_results_nodes(invalid_vertices_df, results_combined))
   expect_true(is.data.frame(mapped_nodes))
-  expect_equal(nrow(mapped_nodes), nrow(invalid_nodes_df))
+  expect_equal(nrow(mapped_nodes), nrow(invalid_vertices_df))
 
-  invalid_nodes_df$ids_for_mapping <- NULL
+  invalid_vertices_df$ids_for_mapping <- NULL
   expect_error(
-    add_results_nodes(invalid_nodes_df, results_combined),
-    regexp = "Missing columns in nodes_df: ids_for_mapping"
+    add_results_nodes(invalid_vertices_df, results_combined),
+    regexp = "Missing columns in vertices_df: ids_for_mapping"
   )
 })

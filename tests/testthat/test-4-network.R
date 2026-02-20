@@ -21,25 +21,25 @@ test_that("build_kegg_graph works correctly", {
   g <- build_kegg_graph(kgml_path_01, "hsa00001", bfc = bfc)
 
   expect_true(inherits(g, "igraph"))
-  nodes_df <- as_data_frame(g, what = "vertices")
+  vertices_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
 
-  expect_true(all(edges_df$from %in% nodes_df$name))
-  expect_true(all(edges_df$to %in% nodes_df$name))
+  expect_true(all(edges_df$from %in% vertices_df$name))
+  expect_true(all(edges_df$to %in% vertices_df$name))
 
   expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
   expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 
-  expect_true(all(is.character(nodes_df$ids_for_mapping)))
-  expect_true(all(nodes_df$ids_for_mapping == "" | nchar(nodes_df$ids_for_mapping)))
+  expect_true(all(is.character(vertices_df$ids_for_mapping)))
+  expect_true(all(vertices_df$ids_for_mapping == "" | nchar(vertices_df$ids_for_mapping)))
 })
 
 test_that("make_igraph_graph handles edge cases", {
-  nodes_df <- data.frame(name = c("1", "2"), label = c("A", "B"))
+  vertices_df <- data.frame(name = c("1", "2"), label = c("A", "B"))
   edges_df <- data.frame(from = character(), to = character())
 
   expect_warning(
-    g <- make_igraph_graph(nodes_df, edges_df, "hsa00001"),
+    g <- make_igraph_graph(vertices_df, edges_df, "hsa00001"),
     regexp = "No edges in graph"
   )
 
@@ -47,19 +47,19 @@ test_that("make_igraph_graph handles edge cases", {
   expect_equal(igraph::vcount(g), 2)
   expect_equal(igraph::ecount(g), 0)
 
-  nodes_df <- data.frame(name = c("1", "2", "3"), label = c("A", "B", "C"))
+  vertices_df <- data.frame(name = c("1", "2", "3"), label = c("A", "B", "C"))
   edges_df <- data.frame(from = c("1", "2"), to = c("2", "3"))
 
-  g <- make_igraph_graph(nodes_df, edges_df, "hsa00001")
+  g <- make_igraph_graph(vertices_df, edges_df, "hsa00001")
 
   expect_true(inherits(g, "igraph"))
   expect_equal(igraph::vcount(g), 3)
   expect_equal(igraph::ecount(g), 2)
 
-  nodes_df <- data.frame(name = c("1", "2"), label = c("A", "B"))
+  vertices_df <- data.frame(name = c("1", "2"), label = c("A", "B"))
 
   expect_warning(
-    g <- make_igraph_graph(nodes_df, NULL, "hsa00001"),
+    g <- make_igraph_graph(vertices_df, NULL, "hsa00001"),
     regexp = "No edges in graph"
   )
 
@@ -67,10 +67,10 @@ test_that("make_igraph_graph handles edge cases", {
   expect_equal(igraph::vcount(g), 2)
   expect_equal(igraph::ecount(g), 0)
 
-  nodes_df <- data.frame(name = c("3", "1", "2"), label = c("Z", "A", "B"))
+  vertices_df <- data.frame(name = c("3", "1", "2"), label = c("Z", "A", "B"))
   edges_df <- data.frame(from = c("3", "1"), to = c("1", "2"))
 
-  g <- make_igraph_graph(nodes_df, edges_df, "hsa00001")
+  g <- make_igraph_graph(vertices_df, edges_df, "hsa00001")
 
   vertex_labels <- igraph::V(g)$label
   expect_equal(vertex_labels, sort(vertex_labels))

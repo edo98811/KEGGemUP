@@ -1,16 +1,16 @@
 #' Create a visNetwork graph from nodes and edges data frames
-#' @param nodes_df Data frame of nodes.
+#' @param vertices_df Data frame of nodes.
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
 #' @noRd
-make_vis_graph <- function(nodes_df, edges_df, pathway_name) {
+make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
   # Different handling if no edges
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
-    v <- visNetwork::visNetwork(nodes = nodes_df, main = pathway_name) # if graph has no edges
+    v <- visNetwork::visNetwork(nodes = vertices_df, main = pathway_name) # if graph has no edges
   } else {
-    v <- visNetwork::visNetwork(nodes = nodes_df, edges = edges_df, main = pathway_name) # if graph has edges
+    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name) # if graph has edges
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
@@ -83,56 +83,54 @@ igraph_edges_to_visNetwork <- function(edges_df) {
 }
 
 #' Map KEGG-styled nodes to visNetwork attributes
-#' @param nodes_df Data frame of nodes extracted from igraph using as_data_frame(what="vertices")
-#' @return nodes_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
+#' @param vertices_df Data frame of nodes extracted from igraph using as_data_frame(what="vertices")
+#' @return vertices_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
 #' @noRd
-kegg_nodes_to_visNetwork <- function(nodes_df) {
+kegg_nodes_to_visNetwork <- function(vertices_df) {
   # Set borderRadius for roundrectangle nodes
-  nodes_df$borderRadius <- ifelse(nodes_df$graphics_type == "roundrectangle", 10, 0)
+  vertices_df$borderRadius <- ifelse(vertices_df$graphics_type == "roundrectangle", 10, 0)
 
   # Fix position for line nodes
-  nodes_df$fixed <- ifelse(nodes_df$graphics_type == "line", TRUE, FALSE)
+  vertices_df$fixed <- ifelse(vertices_df$graphics_type == "line", TRUE, FALSE)
 
   # Map KEGG types to shapes
-  nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "box"
-  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "dot"
-  nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "box"
-  nodes_df$shape[nodes_df$graphics_type == "line"] <- "text"
-  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
+  vertices_df$shape[vertices_df$graphics_type == "rectangle"] <- "box"
+  vertices_df$shape[vertices_df$graphics_type == "circle"] <- "dot"
+  vertices_df$shape[vertices_df$graphics_type == "roundrectangle"] <- "box"
+  vertices_df$shape[vertices_df$graphics_type == "line"] <- "text"
+  vertices_df$shape[vertices_df$graphics_type == "ellipse"] <- "dot"
 
-  nodes_df$font.size[nodes_df$graphics_type == "line"] <- 6 # adjust size based on label length 
+  vertices_df$font.size[vertices_df$graphics_type == "line"] <- 7
 
-  nodes_df$font.multi <- FALSE
+  vertices_df$shape[vertices_df$graphics_type == "group"] <- "dot"
+  vertices_df$widthConstraint <- vertices_df$width
 
-  nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
-  nodes_df$widthConstraint <- nodes_df$width
-
-  nodes_df$widthConstraint <- ifelse(nodes_df$shape == "dot", NA, nodes_df$width)
-  nodes_df$heightConstraint <- nodes_df$height
-  nodes_df$id <- as.character(nodes_df$name)
-  nodes_df$borderWidth <- 2
-  nodes_df$widthConstraint[nodes_df$graphics_type == "line"] <- nchar(as.character(
-    nodes_df[nodes_df$graphics_type == "line", ]$label )) * 4 
-  nodes_df$font.background[nodes_df$graphics_type == "line"] <- "white"
+  vertices_df$widthConstraint <- ifelse(vertices_df$shape == "dot", NA, vertices_df$width)
+  vertices_df$heightConstraint <- vertices_df$height
+  vertices_df$id <- as.character(vertices_df$name)
+  vertices_df$borderWidth <- 2
+  vertices_df$widthConstraint[vertices_df$graphics_type == "line"] <- nchar(as.character(
+    vertices_df[vertices_df$graphics_type == "line", ]$label )) * 4 
+  vertices_df$font.background[vertices_df$graphics_type == "line"] <- "white"
 
   # Set border color normally black and red on hover (except for line nodes)
-  nodes_df$color <- lapply(seq_len(nrow(nodes_df)), function(i) {
+  vertices_df$color <- lapply(seq_len(nrow(vertices_df)), function(i) {
     border_color <-
-      if (#nodes_df$graphics_type[i] == "line" || 
-      nodes_df$graphics_type[i] %in% c("group", "line")) {
+      if (#vertices_df$graphics_type[i] == "line" || 
+      vertices_df$graphics_type[i] %in% c("group", "line")) {
         "transparent"
       } else {
         "black"
       }
     list(
-      background = nodes_df$vertex.color[i],
+      background = vertices_df$vertex.color[i],
       border = border_color,
       highlight = list(border = "red")
     )
   })
 
-  nodes_df <- scale_dimensions(nodes_df, factor = 0.4)
-  # nodes_df <- nodes_df[order(nodes_df$label), ]
+  vertices_df <- scale_dimensions(vertices_df, factor = 0.4)
+  # vertices_df <- vertices_df[order(vertices_df$label), ]
 
-  return(nodes_df)
+  return(vertices_df)
 }

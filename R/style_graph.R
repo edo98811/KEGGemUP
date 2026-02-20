@@ -114,13 +114,13 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
   stopifnot(inherits(g, "igraph"))
 
   ## ---- Nodes ----
-  nodes_df <- igraph::as_data_frame(g, what = "vertices")
-  nodes_df <- style_nodes(nodes_df)
-  nodes_df <- scale_dimensions(nodes_df, factor = scaling_factor)
+  vertices_df <- igraph::as_data_frame(g, what = "vertices")
+  vertices_df <- style_nodes(vertices_df)
+  vertices_df <- scale_dimensions(vertices_df, factor = scaling_factor)
 
   # write vertex attributes back
-  for (col in names(nodes_df)) {
-    igraph::vertex_attr(g, col) <- nodes_df[[col]]
+  for (col in names(vertices_df)) {
+    igraph::vertex_attr(g, col) <- vertices_df[[col]]
   }
 
   ## ---- Edges ----
@@ -140,37 +140,37 @@ style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
   g
 }
 
-style_nodes <- function(nodes_df) {
+style_nodes <- function(vertices_df) {
   # Apply default styles based on KEGG type
-  nodes_df$size <- ifelse(is.na(nodes_df$size), 25, nodes_df$size) # to check later
-  nodes_df$size[nodes_df$graphics_type == "circle"] <- 5
+  vertices_df$size <- ifelse(is.na(vertices_df$size), 25, vertices_df$size) # to check later
+  vertices_df$size[vertices_df$graphics_type == "circle"] <- 5
 
   # Map KEGG types to shapes
-  nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$graphics_type == "circle"] <- "circle"
-  nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "vrectangle"
-  nodes_df$shape[nodes_df$graphics_type == "line"] <- "circle" # ellipse?
-  nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "circle" # ellipse?
-  nodes_df$shape[nodes_df$graphics_type == "group"] <- "circle" # ellipse?
+  vertices_df$shape[vertices_df$graphics_type == "rectangle"] <- "vrectangle"
+  vertices_df$shape[vertices_df$graphics_type == "circle"] <- "circle"
+  vertices_df$shape[vertices_df$graphics_type == "roundrectangle"] <- "vrectangle"
+  vertices_df$shape[vertices_df$graphics_type == "line"] <- "circle" # ellipse?
+  vertices_df$shape[vertices_df$graphics_type == "ellipse"] <- "circle" # ellipse?
+  vertices_df$shape[vertices_df$graphics_type == "group"] <- "circle" # ellipse?
 
   # Make line nodes transparent
-  nodes_df$vertex.color[nodes_df$graphics_type == "line"] <- "transparent"
-  nodes_df$vertex.color[nodes_df$type == "group"] <- "transparent"
-  nodes_df$size[nodes_df$type == "group"] <- 2
-  nodes_df$size[nodes_df$graphics_type == "line"] <- 1
-  return(nodes_df)
+  vertices_df$vertex.color[vertices_df$graphics_type == "line"] <- "transparent"
+  vertices_df$vertex.color[vertices_df$type == "group"] <- "transparent"
+  vertices_df$size[vertices_df$type == "group"] <- 2
+  vertices_df$size[vertices_df$graphics_type == "line"] <- 1
+  return(vertices_df)
 }
 
 #' Scale node dimensions for better visualization.
-#' @param nodes_df Data frame of nodes with x and y coordinates.
+#' @param vertices_df Data frame of nodes with x and y coordinates.
 #' @param factor Scaling factor (default: 2).
 #'
-#' @return nodes_df with scaled x and y coordinates.
+#' @return vertices_df with scaled x and y coordinates.
 #' @noRd
-scale_dimensions <- function(nodes_df, factor = 10) {
+scale_dimensions <- function(vertices_df, factor = 10) {
   # Scale x and y coordinates to make the graph look nicer
-  nodes_df$x <- as.numeric(nodes_df$x) * factor
-  nodes_df$y <- as.numeric(nodes_df$y) * factor
+  vertices_df$x <- as.numeric(vertices_df$x) * factor
+  vertices_df$y <- as.numeric(vertices_df$y) * factor
 
-  return(nodes_df)
+  return(vertices_df)
 }

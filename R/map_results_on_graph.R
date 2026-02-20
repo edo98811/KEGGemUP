@@ -1,21 +1,21 @@
 #' Add results from combined results data frame to nodes data frame
-#' @param nodes_df Data frame of nodes with a column 'ids_for_mapping'
+#' @param vertices_df Data frame of nodes with a column 'ids_for_mapping'
 #' @param results_combined Data frame with combined results containing columns:
 #' ids_for_mapping, de_value, de_source
 #' @param verbose Logical, if TRUE, prints messages about the process.
 #' @return Updated nodes data frame with added columns: de_value, color, de_source, text
 #' @noRd
-add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
+add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   # If results is empty then return the original df
   if (is.null(results_combined)) {
     if (verbose) {
-      message("results_combined is NULL; returning original nodes_df.")
+      message("results_combined is NULL; returning original vertices_df.")
     }
-    return(nodes_df)
+    return(vertices_df)
   }
 
   warn <- FALSE
-  # nodes_df has this structure:
+  # vertices_df has this structure:
   # ids_for_mapping  | KEGG (id is the node id)
   # 1      1111
   # 2      2222
@@ -38,11 +38,11 @@ add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
     "ids_for_mapping", "de_value", "de_source"
   )
 
-  missing_nodes <- setdiff(required_nodes, names(nodes_df))
+  missing_nodes <- setdiff(required_nodes, names(vertices_df))
   missing_results <- setdiff(required_results, names(results_combined))
 
   if (length(missing_nodes) > 0) {
-    stop("Missing columns in nodes_df: ", paste(missing_nodes, collapse = ", "))
+    stop("Missing columns in vertices_df: ", paste(missing_nodes, collapse = ", "))
   }
   if (length(missing_results) > 0) {
     stop("Missing columns in results_combined: ", paste(missing_results, collapse = ", "))
@@ -50,14 +50,14 @@ add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
 
   # Subset nodes to those with valid ids_for_mapping
   ids_nodes_to_check <- which(
-    !is.na(nodes_df$ids_for_mapping) & nodes_df$ids_for_mapping != ""
+    !is.na(vertices_df$ids_for_mapping) & vertices_df$ids_for_mapping != ""
   )
-  nodes_to_check <- nodes_df[ids_nodes_to_check, , drop = FALSE]
+  nodes_to_check <- vertices_df[ids_nodes_to_check, , drop = FALSE]
 
   # If no nodes to check, return original
   if (nrow(nodes_to_check) == 0) {
     warning("No nodes with valid 'ids_for_mapping' found.")
-    return(nodes_df)
+    return(vertices_df)
   }
 
   if (verbose) {
@@ -94,7 +94,7 @@ add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
     if (verbose) {
       message("No matches found between nodes and results.")
     }
-    return(nodes_df)
+    return(vertices_df)
   } else {
     if (verbose) {
       message("Found ", nrow(mapping), " matches between nodes and results.")
@@ -155,15 +155,16 @@ add_results_nodes <- function(nodes_df, results_combined, verbose = FALSE) {
   }
 
   # Update original dataframe
-  nodes_df$de_value[ids_nodes_to_check] <- nodes_to_check$de_value
-  nodes_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
-  nodes_df$text[ids_nodes_to_check] <- nodes_to_check$text
+  vertices_df$de_value[ids_nodes_to_check] <- nodes_to_check$de_value
+  vertices_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
+  vertices_df$text[ids_nodes_to_check] <- nodes_to_check$text
+  vertices_df$de_text[ids_nodes_to_check] <- format(round(as.numeric(vertices_df$de_value), 3), nsmall = 3)
 
   if (verbose) {
     message("Successfully added results to ", length(idx), " nodes.")
   }
 
-  return(nodes_df)
+  return(vertices_df)
 }
 
 #' Combine multiple differential expression results into a single data frame
@@ -215,17 +216,17 @@ combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
 }
 
 #' Add color palettes
-#' @param nodes_df Data frame of nodes with 'de_value' and 'de_source' columns.
+#' @param vertices_df Data frame of nodes with 'de_value' and 'de_source' columns.
 #' @param palettes A vector of color palette names from RColorBrewer.
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stats setNames na.omit
-#' @return nodes_df with colored nodes based on their values.
+#' @return vertices_df with colored nodes based on their values.
 #' @noRd
-add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu"), verbose = FALSE) {
-  sources <- unique(na.omit(nodes_df$de_source))
-  valid_nodes <- nodes_df[!is.na(nodes_df$de_source), , drop = FALSE]
+add_colors_to_nodes <- function(vertices_df, palettes = c("RdBu"), verbose = FALSE) {
+  sources <- unique(na.omit(vertices_df$de_source))
+  valid_nodes <- vertices_df[!is.na(vertices_df$de_source), , drop = FALSE]
 
   for (source_index in seq_along(sources)) {
     palette <- palettes[[((source_index - 1) %% length(palettes)) + 1]]
@@ -275,7 +276,7 @@ add_colors_to_nodes <- function(nodes_df, palettes = c("RdBu"), verbose = FALSE)
       )
     }
   }
-
-  nodes_df$vertex.color[!is.na(nodes_df$de_source)] <- valid_nodes$vertex.color
-  return(nodes_df)
+  
+  vertices_df$vertex.color[!is.na(vertices_df$de_source)] <- valid_nodes$vertex.color
+  return(vertices_df)
 }

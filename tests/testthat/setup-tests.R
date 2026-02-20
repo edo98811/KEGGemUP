@@ -79,7 +79,7 @@ expected_graphs <- readRDS(system.file("extdata", "kegg_to_graph_expected.rds", 
 bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
 bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
 
-nodes_df_basic <- data.frame(
+vertices_df_basic <- data.frame(
   id = c("n1", "n2", "n3", "n4", "n5", "n6"),
   type = c("gene", "compound", "compound", "compound", "compound", "gene"),
   KEGG = c(NA, "C00001", "C99999", "G00001", "G99999", "00001"),

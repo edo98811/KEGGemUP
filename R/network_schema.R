@@ -23,6 +23,7 @@ kegg_node_defaults <- function() {
 
     # Data mapping attributes
     de_value = NA_real_,
+    de_text = NA_character_,
     de_source = NA_character_,
     ids_for_mapping = "",
 

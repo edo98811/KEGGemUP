@@ -5,7 +5,7 @@
 #' @param xml XML document object representing the KGML pathway
 #' @param defaults A list of default node attributes
 #' @param verbose Logical indicating whether to print verbose messages
-#' @return nodes_df Data frame of nodes with visNetwork-compatible styling columns
+#' @return vertices_df Data frame of nodes with visNetwork-compatible styling columns
 #' @noRd
 parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
   # Find all entries that are not group or line (line is an attribute in graphics)
@@ -20,16 +20,16 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
     n_rows <- max(length(graphics_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
-    entry_nodes_df <- as.data.frame(
+    entry_vertices_df <- as.data.frame(
       lapply(defaults, function(x) rep(x, n_rows)),
       stringsAsFactors = FALSE
     )
 
     # Fill static attributes from entry
-    entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
-    entry_nodes_df$type <- xml2::xml_attr(node, "type")
-    entry_nodes_df$link <- xml2::xml_attr(node, "link")
-    entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
+    entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
+    entry_vertices_df$type <- xml2::xml_attr(node, "type")
+    entry_vertices_df$link <- xml2::xml_attr(node, "link")
+    entry_vertices_df$reaction <- xml2::xml_attr(node, "reaction")
 
     # Fill attributes from graphics nodes
     if (length(graphics_nodes) > 0) {
@@ -40,21 +40,21 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
 
         g <- graphics_nodes[i]
         if (length(graphics_nodes) > 1) {
-          entry_nodes_df$name[i] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
+          entry_vertices_df$name[i] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
         } else {
-          entry_nodes_df$name[i] <- as.character(xml2::xml_attr(node, "id"))
+          entry_vertices_df$name[i] <- as.character(xml2::xml_attr(node, "id"))
         }
-        entry_nodes_df$graphics_name[i] <- xml2::xml_attr(g, "name")
-        entry_nodes_df$x[i] <- as.integer(xml2::xml_attr(g, "x"))
-        entry_nodes_df$y[i] <- as.integer(xml2::xml_attr(g, "y"))
-        entry_nodes_df$graphics_type[i] <- xml2::xml_attr(g, "type")
-        entry_nodes_df$width[i] <- as.integer(xml2::xml_attr(g, "width"))
-        entry_nodes_df$height[i] <- as.integer(xml2::xml_attr(g, "height"))
-        entry_nodes_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
-        entry_nodes_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
+        entry_vertices_df$graphics_name[i] <- xml2::xml_attr(g, "name")
+        entry_vertices_df$x[i] <- as.integer(xml2::xml_attr(g, "x"))
+        entry_vertices_df$y[i] <- as.integer(xml2::xml_attr(g, "y"))
+        entry_vertices_df$graphics_type[i] <- xml2::xml_attr(g, "type")
+        entry_vertices_df$width[i] <- as.integer(xml2::xml_attr(g, "width"))
+        entry_vertices_df$height[i] <- as.integer(xml2::xml_attr(g, "height"))
+        entry_vertices_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
+        entry_vertices_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
       }
     }
-    entry_nodes_df
+    entry_vertices_df
   })
 
   # Combine all entries into a single data frame
@@ -67,7 +67,7 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
 #' @param xml XML document object representing the KGML pathway
 #' @param defaults A list of default node attributes
 #' @param verbose Logical indicating whether to print verbose messages
-#' @return nodes_df Data frame of group nodes
+#' @return vertices_df Data frame of group nodes
 #' @noRd
 parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
   # Find all group entries
@@ -80,29 +80,29 @@ parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
     n_rows <- 1 # keep the group node itself
 
     # Pre-allocate a data.frame for this entry
-    entry_nodes_df <- as.data.frame(
+    entry_vertices_df <- as.data.frame(
       lapply(defaults, function(x) rep(x, n_rows)),
       stringsAsFactors = FALSE
     )
 
     # Fill static attributes from entry
-    entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
-    entry_nodes_df$type <- xml2::xml_attr(node, "type")
-    entry_nodes_df$link <- xml2::xml_attr(node, "link")
-    entry_nodes_df$graphics_type <- "group"
-    entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
-    entry_nodes_df$name <- as.character(xml2::xml_attr(node, "id"))
+    entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
+    entry_vertices_df$type <- xml2::xml_attr(node, "type")
+    entry_vertices_df$link <- xml2::xml_attr(node, "link")
+    entry_vertices_df$graphics_type <- "group"
+    entry_vertices_df$reaction <- xml2::xml_attr(node, "reaction")
+    entry_vertices_df$name <- as.character(xml2::xml_attr(node, "id"))
 
     components_nodes <- xml2::xml_find_all(node, ".//component")
     # Fill attributes from graphics nodes
     if (length(components_nodes) > 0) {
       for (i in seq_along(components_nodes)) {
-        entry_nodes_df$components <-
+        entry_vertices_df$components <-
           paste(xml2::xml_attr(components_nodes, "id"), collapse = ";")
       }
     }
 
-    entry_nodes_df
+    entry_vertices_df
   })
 
   # Combine all entries into a single data frame
@@ -143,34 +143,34 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
     }
 
     # Pre-allocate a data.frame for this entry
-    entry_nodes_df <- as.data.frame(
+    entry_vertices_df <- as.data.frame(
       lapply(defaults, function(x) rep(x, n_rows)),
       stringsAsFactors = FALSE
     )
 
     # Fill static attributes from entry
-    entry_nodes_df$line_id <- xml2::xml_attr(node, "id")
-    entry_nodes_df$name <- as.character(xml2::xml_attr(node, "id"))
-    entry_nodes_df$KEGG <- xml2::xml_attr(node, "name")
-    entry_nodes_df$type <- xml2::xml_attr(node, "type")
-    entry_nodes_df$link <- xml2::xml_attr(node, "link")
-    entry_nodes_df$reaction <- xml2::xml_attr(node, "reaction")
+    entry_vertices_df$line_id <- xml2::xml_attr(node, "id")
+    entry_vertices_df$name <- as.character(xml2::xml_attr(node, "id"))
+    entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
+    entry_vertices_df$type <- xml2::xml_attr(node, "type")
+    entry_vertices_df$link <- xml2::xml_attr(node, "link")
+    entry_vertices_df$reaction <- xml2::xml_attr(node, "reaction")
 
     # Fill attributes from graphics nodes (if at least two nodes for line, 4 coords)
     if (n_rows > 1 && !is.null(g)) { # checking g as well, just in case
       for (i in seq_len(n_rows)) {
-        entry_nodes_df$point_index[i] <- i
-        entry_nodes_df$name[i] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
-        entry_nodes_df$x[i] <- coords[i * 2 - 1] # x coord first of each pair (2n-1 -> odd indexes)
-        entry_nodes_df$y[i] <- coords[i * 2] # y coord second of each pair (2n -> even indexes)
-        entry_nodes_df$graphics_type[i] <- "line"
-        entry_nodes_df$graphics_name[i] <- xml2::xml_attr(g, "name")
-        entry_nodes_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
-        entry_nodes_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
+        entry_vertices_df$point_index[i] <- i
+        entry_vertices_df$name[i] <- paste0(xml2::xml_attr(node, "id"), "_", i) # name must be unique
+        entry_vertices_df$x[i] <- coords[i * 2 - 1] # x coord first of each pair (2n-1 -> odd indexes)
+        entry_vertices_df$y[i] <- coords[i * 2] # y coord second of each pair (2n -> even indexes)
+        entry_vertices_df$graphics_type[i] <- "line"
+        entry_vertices_df$graphics_name[i] <- xml2::xml_attr(g, "name")
+        entry_vertices_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
+        entry_vertices_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
       }
     }
 
-    entry_nodes_df
+    entry_vertices_df
   })
 
   # Combine all entries into a single data frame
@@ -180,26 +180,26 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
 }
 
 #' Parse line edges from KGML line nodes
-#' @param line_nodes_df Data frame of line nodes extracted from parse_kgml_lines
+#' @param line_vertices_df Data frame of line nodes extracted from parse_kgml_lines
 #' @param defaults A list of default edge attributes
 #' @param verbose Logical indicating whether to print verbose messages
 #' @return edges_df Data frame of edges created from line nodes
 #' @noRd
-parse_kgml_lines_edges <- function(line_nodes_df, defaults, verbose = FALSE) {
+parse_kgml_lines_edges <- function(line_vertices_df, defaults, verbose = FALSE) {
   # Handle empty input
-  if (is.null(line_nodes_df) || nrow(line_nodes_df) == 0) {
+  if (is.null(line_vertices_df) || nrow(line_vertices_df) == 0) {
     return(NULL)
   }
 
   # Ensure correct order (by line_id and point_index)
-  line_nodes_df <- line_nodes_df[
-    order(line_nodes_df$line_id, line_nodes_df$point_index),
+  line_vertices_df <- line_vertices_df[
+    order(line_vertices_df$line_id, line_vertices_df$point_index),
   ]
 
   # Total edges = sum(points - 1) per line
   n_edges <- sum(
     vapply(
-      split(line_nodes_df$point_index, line_nodes_df$line_id),
+      split(line_vertices_df$point_index, line_vertices_df$line_id),
       function(x) max(length(x) - 1L, 0L),
       integer(1)
     )
@@ -221,17 +221,17 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults, verbose = FALSE) {
   # Fill edges by connecting consecutive points of the same line
   row <- 1L
   # Iterate over unique line IDs
-  for (id in unique(line_nodes_df$line_id)) {
+  for (id in unique(line_vertices_df$line_id)) {
     # Get indices of points for this line
-    idx <- which(line_nodes_df$line_id == id)
+    idx <- which(line_vertices_df$line_id == id)
     if (length(idx) < 2) next
 
     # Iterate over consecutive points (l-1 edges)
     for (i in seq_len(length(idx) - 1)) {
-      edges_df$from[row] <- line_nodes_df$name[idx[i]]
-      edges_df$to[row] <- line_nodes_df$name[idx[i + 1]]
+      edges_df$from[row] <- line_vertices_df$name[idx[i]]
+      edges_df$to[row] <- line_vertices_df$name[idx[i + 1]]
       edges_df$type[row] <- "line"
-      edges_df$reaction_name[row] <- line_nodes_df$reaction[idx[i]]
+      edges_df$reaction_name[row] <- line_vertices_df$reaction[idx[i]]
       row <- row + 1L
     }
   }
@@ -368,13 +368,13 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
 
 
 #' Add compound names to compound nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type.
+#' @param vertices_df Data frame of nodes with a column 'type' indicating node type.
 #' @param bfc BiocFileCache object for caching KEGG compound mappings.
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @return Updated nodes data frame with compound names added to compound nodes.
 #' @importFrom BiocFileCache BiocFileCache
 #' @noRd
-add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
+add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
 
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc, verbose = verbose)
@@ -389,9 +389,9 @@ add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
   enzymes_lookup <- setNames(as.character(enzymes_db[, 2]), enzymes_db[, 1])
 
   # Initialize labels
-  map_ids <- sub("[;].*", "", nodes_df$ids_for_mapping)
-  ids <- nodes_df$KEGG
-  labels <- sub("[;,].*", "", nodes_df$graphics_name)
+  map_ids <- sub("[;].*", "", vertices_df$ids_for_mapping)
+  ids <- vertices_df$KEGG
+  labels <- sub("[;,].*", "", vertices_df$graphics_name)
   labels[is.na(labels)] <- map_ids[is.na(labels)]
 
   # Compounds
@@ -427,23 +427,23 @@ add_node_labels <- function(nodes_df, bfc, verbose = FALSE) {
   if (verbose) message("Mapped ", sum(!na_pos & is_e), " enzymes.")
 
   # Assign node labels
-  nodes_df$label <- labels
-  nodes_df
+  vertices_df$label <- labels
+  vertices_df
 }
 
 #' Add reaction labels to reaction nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'reaction' containing reaction IDs.
+#' @param vertices_df Data frame of nodes with a column 'reaction' containing reaction IDs.
 #' @param bfc BiocFileCache object for caching KEGG reaction mappings.
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @return Updated nodes data frame with reaction labels added to reaction nodes.
 #' @noRd
-add_reaction_labels <- function(nodes_df, bfc, verbose = FALSE) {
+add_reaction_labels <- function(vertices_df, bfc, verbose = FALSE) {
   # Load reaction database
   reactions_db <- get_kegg_db(db_name = "reaction", bfc = bfc)
   reactions_lookup <- setNames(as.character(reactions_db[, 2]), reactions_db[, 1])
 
   # Extract reaction IDs
-  reaction_ids <- vapply(nodes_df$reaction, remove_kegg_prefix_str, character(1))
+  reaction_ids <- vapply(vertices_df$reaction, remove_kegg_prefix_str, character(1))
   is_r <- grepl("^R", reaction_ids)
 
   # Lookup labels
@@ -457,8 +457,8 @@ add_reaction_labels <- function(nodes_df, bfc, verbose = FALSE) {
   reaction_labels[!is_r] <- NA_character_
 
   # Assign columns
-  nodes_df$reaction_label <- reaction_labels
-  nodes_df$reaction_link <- ifelse(
+  vertices_df$reaction_label <- reaction_labels
+  vertices_df$reaction_link <- ifelse(
     is_r,
     paste0("https://www.kegg.jp/dbget-bin/www_bget?", reaction_ids),
     NA_character_
@@ -468,63 +468,63 @@ add_reaction_labels <- function(nodes_df, bfc, verbose = FALSE) {
     message("Mapped ", sum(!na_pos), " reactions.")
   }
 
-  nodes_df
+  vertices_df
 }
 
 #' Add group labels and coordinates to group nodes in the nodes data frame.
-#' @param nodes_df Data frame of nodes with a column 'type' indicating node type
+#' @param vertices_df Data frame of nodes with a column 'type' indicating node type
 #' and a column 'components' listing component node IDs.
 #' @return Updated nodes data frame with group labels and coordinates added to group nodes.
 #' @noRd
-add_group <- function(nodes_df, verbose = FALSE) {
+add_group <- function(vertices_df, verbose = FALSE) {
   # Identify undefined nodes (group nodes)
-  group_idx <- which(nodes_df$type == "group")
+  group_idx <- which(vertices_df$type == "group")
   if (length(group_idx) == 0) {
-    return(nodes_df)
+    return(vertices_df)
   }
 
   # Loop only over group nodes with non-empty components
   for (i in group_idx) {
-    comps <- nodes_df$components[i]
+    comps <- vertices_df$components[i]
     if (is.na(comps) || comps == "") next
 
     # Split components and include the group node itself
-    ids <- c(strsplit(comps, ";", fixed = TRUE)[[1]], nodes_df$name[i])
+    ids <- c(strsplit(comps, ";", fixed = TRUE)[[1]], vertices_df$name[i])
 
     # Get indices of all nodes in this group
-    node_idx <- match(ids, nodes_df$name)
+    node_idx <- match(ids, vertices_df$name)
 
     # just to be safe (should not happen)
     if (any(is.na(node_idx))) {
       warning(
-        "add_group: Some component IDs not found in nodes_df: ",
+        "add_group: Some component IDs not found in vertices_df: ",
         paste(ids[is.na(node_idx)], collapse = ", ")
       )
       node_idx <- node_idx[!is.na(node_idx)]
     }
 
     # Build group label from component labels (exclude the last one, which is the group node itself)
-    comp_labels <- nodes_df$label[node_idx[-length(node_idx)]]
+    comp_labels <- vertices_df$label[node_idx[-length(node_idx)]]
     group_label <- paste(comp_labels, collapse = ", ")
 
     # Assign group label to all nodes in this group
-    nodes_df$group[node_idx] <- group_label
+    vertices_df$group[node_idx] <- group_label
 
     # Compute average x and y coordinates of all component nodes
-    avg_x <- round(mean(as.numeric(nodes_df$x[node_idx]), na.rm = TRUE))
-    avg_y <- round(mean(as.numeric(nodes_df$y[node_idx]), na.rm = TRUE))
+    avg_x <- round(mean(as.numeric(vertices_df$x[node_idx]), na.rm = TRUE))
+    avg_y <- round(mean(as.numeric(vertices_df$y[node_idx]), na.rm = TRUE))
 
     # Assign average coordinates to the group node itself
-    nodes_df$x[i] <- avg_x
-    nodes_df$y[i] <- avg_y
+    vertices_df$x[i] <- avg_x
+    vertices_df$y[i] <- avg_y
 
     if (verbose) {
       message(
-        "Group node '", nodes_df$name[i], "' assigned label: '",
+        "Group node '", vertices_df$name[i], "' assigned label: '",
         group_label, "' at (", avg_x, ", ", avg_y, ")"
       )
     }
   }
 
-  nodes_df
+  vertices_df
 }
