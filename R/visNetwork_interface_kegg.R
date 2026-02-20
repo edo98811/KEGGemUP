@@ -97,8 +97,13 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
   nodes_df$shape[nodes_df$graphics_type == "rectangle"] <- "box"
   nodes_df$shape[nodes_df$graphics_type == "circle"] <- "dot"
   nodes_df$shape[nodes_df$graphics_type == "roundrectangle"] <- "box"
-  nodes_df$shape[nodes_df$graphics_type == "line"] <- "ellipse"
+  nodes_df$shape[nodes_df$graphics_type == "line"] <- "text"
   nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
+
+  nodes_df$font.size[nodes_df$graphics_type == "line"] <- 6 # adjust size based on label length 
+
+  nodes_df$font.multi <- FALSE
+
   nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
   nodes_df$widthConstraint <- nodes_df$width
 
@@ -106,12 +111,15 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
   nodes_df$heightConstraint <- nodes_df$height
   nodes_df$id <- as.character(nodes_df$name)
   nodes_df$borderWidth <- 2
+  nodes_df$widthConstraint[nodes_df$graphics_type == "line"] <- nchar(as.character(
+    nodes_df[nodes_df$graphics_type == "line", ]$label )) * 4 
+  nodes_df$font.background[nodes_df$graphics_type == "line"] <- "white"
 
   # Set border color normally black and red on hover (except for line nodes)
   nodes_df$color <- lapply(seq_len(nrow(nodes_df)), function(i) {
     border_color <-
       if (#nodes_df$graphics_type[i] == "line" || 
-      nodes_df$graphics_type[i] == "group") {
+      nodes_df$graphics_type[i] %in% c("group", "line")) {
         "transparent"
       } else {
         "black"

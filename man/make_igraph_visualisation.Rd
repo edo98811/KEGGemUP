@@ -7,7 +7,6 @@
 make_igraph_visualisation(
   g,
   eliminate_distance_outliers = TRUE,
-  dist_multiplier = 1.5,
   size_multiplier = 0.3,
   text_dist = 1.1,
   text_cex = 0.5
@@ -18,8 +17,6 @@ make_igraph_visualisation(
 
 \item{eliminate_distance_outliers}{Logical, if TRUE, replaces outlier node positions with
 mean positions to improve layout visualization (default: TRUE).}
-
-\item{dist_multiplier}{Numeric multiplier to adjust node distances in the layout (default: 1.5).}
 
 \item{size_multiplier}{Numeric multiplier to adjust node sizes in the plot (default:
 0.3).}

@@ -184,6 +184,7 @@ make_kegg_visNetwork <- function(g) {
 #' @param eliminate_distance_outliers Logical, if TRUE, replaces outlier node positions with
 #' mean positions to improve layout visualization (default: TRUE).
 #' @return A plot of the igraph object with improved layout.
+#' @details All the edges between the vertices are plotted automatically.
 #' @export
 make_graph_subset <- function(g, ids_to_include) {
   ids_for_mapping <- unlist(

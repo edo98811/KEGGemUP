@@ -136,14 +136,13 @@ regular_node_html <- function(nodes_df) {
 }
 
 
-
 #' Add tooltips to edges for visNetwork visualization.
 #' @param edges_df Data frame of edges with columns: relation_subtype, type, label.
 #' @return edges_df with added 'title' column for tooltips.
 #' @noRd
 add_edge_tooltip <- function(edges_df) {
   base_url <- "https://www.genome.jp/dbget-bin/www_bget?"
-    button_html_reaction <- ifelse(
+  button_html_reaction <- ifelse(
     is.na(edges_df$reaction_name),
     "",
     paste0(
@@ -167,7 +166,7 @@ add_edge_tooltip <- function(edges_df) {
     ifelse(
       edges_df$type == "reaction",
       paste0(
-            "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
+        "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
         "<table>",
         "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id, "</td></tr>",
         "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type, "</td></tr>",
@@ -175,7 +174,17 @@ add_edge_tooltip <- function(edges_df) {
         "</table>",
         button_html_reaction
       ),
-      ""
+      ifelse(
+        edges_df$type == "line",
+        paste0(
+          "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
+          "<table>",
+          "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name, "</td></tr>",
+          "</table>",
+          button_html_reaction
+        ),
+        ""
+      )
     )
   )
 

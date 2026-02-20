@@ -7,7 +7,7 @@
 kegg_to_graph(
   pathway_id,
   kgml_file = NULL,
-  scaling_factor = 2,
+  scaling_factor = 3,
   verbose = FALSE
 )
 }

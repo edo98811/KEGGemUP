@@ -18,3 +18,6 @@ A plot of the igraph object with improved layout.
 \description{
 Create igraph visualization with improved layout
 }
+\details{
+All the edges between the vertices are plotted automatically.
+}

@@ -153,7 +153,7 @@ style_nodes <- function(nodes_df) {
   nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "circle" # ellipse?
   nodes_df$shape[nodes_df$graphics_type == "group"] <- "circle" # ellipse?
 
-  # Make line nodes fully transparent
+  # Make line nodes transparent
   nodes_df$vertex.color[nodes_df$graphics_type == "line"] <- "transparent"
   nodes_df$vertex.color[nodes_df$type == "group"] <- "transparent"
   nodes_df$size[nodes_df$type == "group"] <- 2

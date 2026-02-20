@@ -164,6 +164,7 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
         entry_nodes_df$x[i] <- coords[i * 2 - 1] # x coord first of each pair (2n-1 -> odd indexes)
         entry_nodes_df$y[i] <- coords[i * 2] # y coord second of each pair (2n -> even indexes)
         entry_nodes_df$graphics_type[i] <- "line"
+        entry_nodes_df$graphics_name[i] <- xml2::xml_attr(g, "name")
         entry_nodes_df$fgcolor[i] <- xml2::xml_attr(g, "fgcolor")
         entry_nodes_df$bgcolor[i] <- xml2::xml_attr(g, "bgcolor")
       }
@@ -230,6 +231,7 @@ parse_kgml_lines_edges <- function(line_nodes_df, defaults, verbose = FALSE) {
       edges_df$from[row] <- line_nodes_df$name[idx[i]]
       edges_df$to[row] <- line_nodes_df$name[idx[i + 1]]
       edges_df$type[row] <- "line"
+      edges_df$reaction_name[row] <- line_nodes_df$reaction[idx[i]]
       row <- row + 1L
     }
   }
