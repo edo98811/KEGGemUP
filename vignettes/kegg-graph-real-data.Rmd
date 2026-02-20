@@ -201,7 +201,7 @@ The workflow is as follows: first we build the graph from the KEGG pathway ID, t
 
 ```{r use-package, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 pathway <- "hsa00563"  
-graph <- kegg_to_graph(pathway)
+graph <- kegg_to_graph(pathway, scaling_factor = 10)
 graph <- map_results_to_graph(graph, de_results_list)
 graph_visnetwork <- plot_kegg_visNetwork(graph)
 graph_visnetwork
@@ -218,6 +218,7 @@ de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
 ```{r use-package-2, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
+devtools::load_all()
 graph <- kegg_to_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
 graph_visnetwork <- plot_kegg_visNetwork(graph)

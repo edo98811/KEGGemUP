@@ -3,6 +3,7 @@
 #' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
 #' @param kgml_file Optional local path to a KGML file.
 #' If provided, the function will use this file instead of downloading it.
+#' @param scaling_factor Numeric scaling factor for node sizes (default: 2).
 #' @param verbose Logical, if TRUE, print additional messages.
 #' @return An igraph object representing the KEGG pathway graph.
 #' @details This function downloads the KGML file for a given KEGG pathway ID,
@@ -13,9 +14,11 @@
 #' )
 #' @export
 kegg_to_graph <- function(
-    pathway_id,
-    kgml_file = NULL,
-    verbose = FALSE) {
+  pathway_id,
+  kgml_file = NULL,
+  scaling_factor = 3,
+  verbose = FALSE
+) {
   # Validate pathway ID format
   if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
@@ -45,8 +48,7 @@ kegg_to_graph <- function(
   g <- build_kegg_graph(kgml_file, pathway_name, bfc_map = bfc_map)
 
   # Style graph
-  g <- style_igraph_graph(g, bfc_map, scaling_factor = 1.5)
-
+  g <- style_igraph_graph(g, bfc_map, scaling_factor = scaling_factor)
   return(g)
 }
 
@@ -90,12 +92,13 @@ kegg_to_graph <- function(
 #'
 #' @export
 map_results_to_graph <- function(
-    g,
-    de_results,
-    feature_column = NULL,
-    value_column = NULL,
-    palette = "RdBu",
-    verbose = FALSE) {
+  g,
+  de_results,
+  feature_column = NULL,
+  value_column = NULL,
+  palette = "RdBu",
+  verbose = FALSE
+) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }
@@ -135,7 +138,7 @@ map_results_to_graph <- function(
   # Update graph attributes
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
-  igraph::vertex_attr(g, "vertex.color") <- nodes_updated$vertex.color
+  igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "text") <- nodes_updated$text
 
   return(g)
@@ -151,12 +154,12 @@ map_results_to_graph <- function(
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
 #' graph <- kegg_to_graph(pathway_id = pathway)
-#' plot <- plot_kegg_visNetwork(graph)
+#' plot <- make_kegg_visNetwork(graph)
 #'
 #' plot
 #'
 #' @export
-plot_kegg_visNetwork <- function(g) {
+make_kegg_visNetwork <- function(g) {
   # Convert igraph to data frames
   nodes_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
@@ -164,7 +167,7 @@ plot_kegg_visNetwork <- function(g) {
 
   # Style nodes and edges
   nodes_df <- kegg_nodes_to_visNetwork(nodes_df)
-  edges_df <- igraph_edges_to_visNetwork(edges_df)
+  if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df)
 
   # Add tooltips
   nodes_df <- add_node_tooltip(nodes_df)
@@ -174,4 +177,87 @@ plot_kegg_visNetwork <- function(g) {
   v <- make_vis_graph(nodes_df, edges_df, pathway_name)
 
   return(v)
+}
+
+#' Create igraph visualization with improved layout
+#' @param g An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.
+#' @param eliminate_distance_outliers Logical, if TRUE, replaces outlier node positions with
+#' mean positions to improve layout visualization (default: TRUE).
+#' @return A plot of the igraph object with improved layout.
+#' @export
+make_graph_subset <- function(g, ids_to_include) {
+  ids_for_mapping <- unlist(
+    lapply(1:length(c(V(g)$ids_for_mapping)), function(i) {
+      row <- V(g)$ids_for_mapping[i]
+      kegg_values <- unlist(strsplit(as.character(row), ";"))
+      setNames(rep(V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
+    })
+  )
+
+  nodes_to_include <- ids_for_mapping[ids_to_include]
+  nodes_to_include <- nodes_to_include[!is.na(nodes_to_include)]
+
+  subg <- induced_subgraph(g, V(g)[ids_for_mapping %in% nodes_to_include])
+
+  return(subg)
+}
+
+#' Plot igraph with improved layout and outlier handling
+#' @param g An igraph object to plot.
+#' @param eliminate_distance_outliers Logical, if TRUE, replaces outlier node positions with
+#' mean positions to improve layout visualization (default: TRUE).
+#' @param size_multiplier Numeric multiplier to adjust node sizes in the plot (default:
+#' 0.3).
+#' @param text_dist Numeric distance for node labels from the nodes (default: 1.1).
+#' @param text_cex Numeric scaling factor for node label text size (default
+#' @return A plot of the igraph object with improved layout.
+#' @export
+make_igraph_visualisation <- function(
+  g, 
+  eliminate_distance_outliers = TRUE,
+  size_multiplier = 0.3,
+  text_dist = 1.1,
+  text_cex = 0.5
+) {
+
+  V(g)$color <- V(g)$vertex.color
+  x_values <- V(g)$x
+  y_values <- V(g)$y
+
+  if (eliminate_distance_outliers) {
+    # Calculate means and standard deviations
+    x_mean <- mean(x_values, na.rm = TRUE)
+    y_mean <- mean(y_values, na.rm = TRUE)
+    x_sd <- sd(x_values, na.rm = TRUE)
+    y_sd <- sd(y_values, na.rm = TRUE)
+
+    # Identify outliers (3 std away from mean in either coordinate)
+    x_outliers <- abs(x_values - x_mean) > 3 * x_sd
+    y_outliers <- abs(y_values - y_mean) > 3 * y_sd
+    outlier_mask <- x_outliers | y_outliers
+
+    # Replace outliers with non-outlier mean values
+    if (any(outlier_mask)) {
+      x_values[outlier_mask] <- mean(x_values[!outlier_mask], na.rm = TRUE)
+      y_values[outlier_mask] <- mean(y_values[!outlier_mask], na.rm = TRUE)
+    }
+  }
+
+  V(g)$x <- x_values 
+  V(g)$y <- y_values 
+
+  layout_matrix <- cbind(V(g)$x, V(g)$y)
+
+  plot(
+    g,
+    layout = layout_matrix,
+    vertex.label.color = "black",
+    vertex.shape = V(g)$shape,
+    vertex.size2 = V(g)$height * size_multiplier,
+    vertex.size = V(g)$width * size_multiplier,
+    vertex.label.dist = text_dist,
+    vertex.label.cex = text_cex,
+    edge.label.cex = text_cex,
+    asp = FALSE
+  )
 }

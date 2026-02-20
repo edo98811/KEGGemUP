@@ -55,3 +55,27 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
 
   expect_equal(nodes_mapped$borderRadius[3], 10)
 })
+
+
+test_that("igraph_edges_to_visNetwork does not crashif edges_df empty", {
+  # Example edge data frame from igraph
+  edges_df <- data.frame(
+    from = character(0),
+    to = character(0),
+    arrow.mode = integer(0),
+    lty = integer(0),
+    stringsAsFactors = FALSE
+  )
+
+  edges_mapped <- igraph_edges_to_visNetwork(edges_df)
+  
+  # Check arrows mapping
+  expect_equal(edges_mapped$arrows, character(0))
+
+  # Check dashes mapping
+  expect_equal(edges_mapped$dashes, integer(0))
+
+  # Check default color and label
+  expect_equal(edges_mapped$color, character(0))
+  expect_equal(edges_mapped$label, character(0))
+})

@@ -63,9 +63,8 @@ igraph_edges_to_visNetwork <- function(edges_df) {
       "0" = "",
       "1" = "from",
       "2" = "to",
-      "3" = "to",
-      "4" = "to;from",
-      "" # default
+      "3" = "to;from",
+      "" 
     )
   }
   edges_df$arrows <- vapply(edges_df$arrow.mode, switch_arrow, character(1))
@@ -73,7 +72,7 @@ igraph_edges_to_visNetwork <- function(edges_df) {
   # Map lty (igraph) to dashes (visNetwork)
   # lty = 1 solid, lty = 2 dashed
   edges_df$dashes <- ifelse(is.na(edges_df$lty), FALSE, edges_df$lty != 1)
-
+  edges_df$dashes[edges_df$lty == 5] <- TRUE 
   # Ensure color and label exist
   if (!"color" %in% names(edges_df)) edges_df$color <- "gray"
   if (!"label" %in% names(edges_df)) edges_df$label <- ""
@@ -102,20 +101,17 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
   nodes_df$shape[nodes_df$graphics_type == "ellipse"] <- "dot"
   nodes_df$shape[nodes_df$graphics_type == "group"] <- "dot"
   nodes_df$widthConstraint <- nodes_df$width
-  # ifelse(
-  #   is.na(nodes_df$width), FALSE, nodes_df$width
-  # )
+
+  nodes_df$widthConstraint <- ifelse(nodes_df$shape == "dot", NA, nodes_df$width)
   nodes_df$heightConstraint <- nodes_df$height
-  # felse(
-  #   is.na(nodes_df$height), FALSE, nodes_df$height
-  # )
   nodes_df$id <- as.character(nodes_df$name)
   nodes_df$borderWidth <- 2
 
   # Set border color normally black and red on hover (except for line nodes)
   nodes_df$color <- lapply(seq_len(nrow(nodes_df)), function(i) {
     border_color <-
-      if (nodes_df$graphics_type[i] == "line" || nodes_df$graphics_type[i] == "group") {
+      if (#nodes_df$graphics_type[i] == "line" || 
+      nodes_df$graphics_type[i] == "group") {
         "transparent"
       } else {
         "black"
@@ -126,6 +122,9 @@ kegg_nodes_to_visNetwork <- function(nodes_df) {
       highlight = list(border = "red")
     )
   })
+
+  nodes_df <- scale_dimensions(nodes_df, factor = 0.4)
+  # nodes_df <- nodes_df[order(nodes_df$label), ]
 
   return(nodes_df)
 }

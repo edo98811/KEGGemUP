@@ -68,14 +68,14 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, ver
 #' @param pathway_name Name of the pathway for the graph title.
 #' @noRd
 make_igraph_graph <- function(nodes_df, edges_df, pathway_name, verbose = FALSE) {
-  nodes_df <- nodes_df[order(tolower(nodes_df$label)), ]
+  nodes_df <- nodes_df[order(tolower(nodes_df$label), tolower(nodes_df$name)), ]
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
     fake_edges <- data.frame(from = nodes_df$name[1], to = nodes_df$name[1])
     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = nodes_df)
     g <- igraph::delete_edges(g, igraph::E(g))
   } else {
-    g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
+    g <- igraph::graph_from_data_frame(edges_df, directed = TRUE, vertices = nodes_df)
   }
 
   if (verbose) {

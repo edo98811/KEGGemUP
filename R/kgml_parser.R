@@ -262,7 +262,8 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
     # Fill static attributes from entry
     entry_edges_df$from <- xml2::xml_attr(relation, "entry1")
     entry_edges_df$to <- xml2::xml_attr(relation, "entry2")
-    entry_edges_df$type <- xml2::xml_attr(relation, "type")
+    entry_edges_df$type <- "relation"
+    entry_edges_df$relation_type <- xml2::xml_attr(relation, "type")
 
     # Fill attributes from subtype nodes
     if (length(subtype_nodes) > 0) {
@@ -292,6 +293,7 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
 #' @return edges_df Data frame of reaction edges
 #' @noRd
 parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
+
   # Find all reaction entries
   reactions <- xml2::xml_find_all(xml, ".//reaction")
 
@@ -318,7 +320,6 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
     entry_edges_df$reaction_name <- xml2::xml_attr(reaction, "name")
     entry_edges_df$reaction_type <- xml2::xml_attr(reaction, "type")
     entry_edges_df$type <- "reaction"
-
 
     # Pre-extract substrate attributes
     sub_id <- xml2::xml_attr(substrates_nodes, "id")

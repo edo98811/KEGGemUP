@@ -87,6 +87,7 @@ nodes_df_basic <- data.frame(
   stringsAsFactors = FALSE
 )
 
+# devtools::load_all()
 
 # # Tests for expected outputs of kegg_to_graph and map_results_to_graph
 # kgml_steps <- list()

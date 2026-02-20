@@ -52,13 +52,14 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
 
 test_that("build_kegg_graph constructs the expected graph (pathway 02)", {
   g <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
+  all(sort(vertex_attr_names(g)) == sort(vertex_attr_names(kgml_steps$g_test_02))) &&
+    all(sort(edge_attr_names(g)) == sort(edge_attr_names(kgml_steps$g_test_02)))
   # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_02))
   expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
   expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 })
 
 test_that("add_group correctly assigns group labels", {
-
   nodes <- kgml_steps$all_nodes
   nodes$label <- nodes$name
   nodes_updated <- add_group(nodes)
@@ -82,7 +83,7 @@ test_that("add_labels works correctly", {
   nodes_df <- data.frame(
     KEGG = c("cpd:C00001", "cpd:C00099", "gl:G00001", "ko:K00001", "ko:K99999", "ec:1.1.1.1", "ec:9.9.9.9"),
     ids_for_mapping = c("C00001", "C00099", "G00001", "K00001", "K99999", "1.1.1.1", "9.9.9.9"),
-    graphics_name = c("Water", "beta-Alanine, No", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase",NA),
+    graphics_name = c("Water", "beta-Alanine, No", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
     stringsAsFactors = FALSE
   )
 

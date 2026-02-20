@@ -4,13 +4,20 @@
 \alias{kegg_to_graph}
 \title{Convert KEGG pathway to graph}
 \usage{
-kegg_to_graph(pathway_id, kgml_file = NULL, verbose = FALSE)
+kegg_to_graph(
+  pathway_id,
+  kgml_file = NULL,
+  scaling_factor = 2,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{pathway_id}{KEGG pathway ID (e.g., "hsa04110").}
 
 \item{kgml_file}{Optional local path to a KGML file.
 If provided, the function will use this file instead of downloading it.}
+
+\item{scaling_factor}{Numeric scaling factor for node sizes (default: 2).}
 
 \item{verbose}{Logical, if TRUE, print additional messages.}
 }

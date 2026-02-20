@@ -157,7 +157,7 @@ add_edge_tooltip <- function(edges_df) {
   edges_df$title <- ifelse(
     edges_df$type == "relation",
     paste0(
-          "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
+      "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
       "<table>",
       "<tr><th align='left'>Type: </th><td>", edges_df$relation_type, "</td></tr>",
       "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name, "</td></tr>",
