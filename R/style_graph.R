@@ -33,12 +33,13 @@ edge_style_map_relation <- list(
   PPrel = list(color = "#FF6347", lty = 1L, arrow.mode = 2L, label = "PP"),
   GErel = list(color = "#FFD700", lty = 1L, arrow.mode = 2L, label = "GE"),
   PCrel = list(color = "#20B2AA", lty = 1L, arrow.mode = 2L, label = "PC"),
-  maplink = list(color = "#FF4500", lty =  5L, arrow.mode = 1L, label = "→")
+  maplink = list(color = "#FF4500", lty =  5L, arrow.mode = 1L, label = "->")
 )
 
-  edge_style_map_reaction <- list(
-    reversible   = list(color = "#008000", lty = 2L, arrow.mode = 3L, label = "↔"),
-    irreversible = list(color = "#FF4500", lty = 2L, arrow.mode = 2L, label = "→")
+edge_style_map_reaction <-
+  list(
+    reversible   = list(color = "#008000", lty = 2L, arrow.mode = 3L, label = "<->"),
+    irreversible = list(color = "#FF4500", lty = 2L, arrow.mode = 2L, label = "->")
   )
 
   group_relation_style <- list(

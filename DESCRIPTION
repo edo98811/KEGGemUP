@@ -40,6 +40,7 @@ Suggests:
     knitr,
     macrophage,
     org.Hs.eg.db,
+    org.Mm.eg.db,
     SummarizedExperiment,
     AnnotationDbi,
     clusterProfiler,

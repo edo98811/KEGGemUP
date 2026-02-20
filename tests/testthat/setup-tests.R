@@ -149,8 +149,8 @@ vertices_df_basic <- data.frame(
 # expected$g_test_01_mapped <- g_test_01_mapped
 # expected$g_test_02_mapped <- g_test_02_mapped
 
-# vis_graph_01 <- plot_kegg_visNetwork(g_test_01_mapped)
-# vis_graph_02 <- plot_kegg_visNetwork(g_test_02_mapped)
+# vis_graph_01 <- make_kegg_visNetwork(g_test_01_mapped)
+# vis_graph_02 <- make_kegg_visNetwork(g_test_02_mapped)
 
 # expected$visNetwork_test_01_mapped <- vis_graph_01
 # expected$visNetwork_test_02_mapped <- vis_graph_02

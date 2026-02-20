@@ -121,7 +121,7 @@ map_results_to_graph <- function(
 
   # Get current nodes
   vertices_df <- igraph::as_data_frame(g, what = "vertices")
-  browser()
+
   # Merge results into nodes
   nodes_updated <- add_results_nodes(vertices_df, results_combined, verbose = verbose)
   nodes_updated <- add_colors_to_nodes(nodes_updated, palettes = palette, verbose = verbose)
@@ -138,7 +138,7 @@ map_results_to_graph <- function(
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
   igraph::vertex_attr(g, "vertex.color") <- nodes_updated$vertex.color
-  igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
+  # igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "text") <- nodes_updated$text
   igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
 
@@ -183,24 +183,24 @@ make_kegg_visNetwork <- function(g) {
 
 #' Create igraph visualization with improved layout
 #' @param g An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.
-#' @param eliminate_distance_outliers Logical, if TRUE, replaces outlier node positions with
-#' mean positions to improve layout visualization (default: TRUE).
+#' @param ids_to_include Character vector of KEGG IDs to include in the subset graph.
 #' @return A plot of the igraph object with improved layout.
 #' @details All the edges between the vertices are plotted automatically.
+#' @importFrom igraph V induced_subgraph
 #' @export
 make_graph_subset <- function(g, ids_to_include) {
   ids_for_mapping <- unlist(
-    lapply(1:length(c(V(g)$ids_for_mapping)), function(i) {
-      row <- V(g)$ids_for_mapping[i]
+    lapply(1:length(c(igraph::V(g)$ids_for_mapping)), function(i) {
+      row <- igraph::V(g)$ids_for_mapping[i]
       kegg_values <- unlist(strsplit(as.character(row), ";"))
-      setNames(rep(V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
+      setNames(rep(igraph::V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
     })
   )
 
   nodes_to_include <- ids_for_mapping[ids_to_include]
   nodes_to_include <- nodes_to_include[!is.na(nodes_to_include)]
 
-  subg <- induced_subgraph(g, V(g)[ids_for_mapping %in% nodes_to_include])
+  subg <- igraph::induced_subgraph(g, igraph::V(g)[ids_for_mapping %in% nodes_to_include])
 
   return(subg)
 }
@@ -214,6 +214,8 @@ make_graph_subset <- function(g, ids_to_include) {
 #' @param text_dist Numeric distance for node labels from the nodes (default: 1.1).
 #' @param text_cex Numeric scaling factor for node label text size (default
 #' @return A plot of the igraph object with improved layout.
+#' @importFrom igraph V
+#' @importFrom stats sd
 #' @export
 make_igraph_visualisation <- function(
   g, 
@@ -223,9 +225,9 @@ make_igraph_visualisation <- function(
   text_cex = 0.5
 ) {
 
-  V(g)$color <- V(g)$vertex.color
-  x_values <- V(g)$x
-  y_values <- V(g)$y
+  igraph::V(g)$color <- igraph::V(g)$vertex.color
+  x_values <- igraph::V(g)$x
+  y_values <- igraph::V(g)$y
 
   if (eliminate_distance_outliers) {
     # Calculate means and standard deviations
@@ -246,18 +248,18 @@ make_igraph_visualisation <- function(
     }
   }
 
-  V(g)$x <- x_values 
-  V(g)$y <- y_values 
+  igraph::V(g)$x <- x_values 
+  igraph::V(g)$y <- y_values 
 
-  layout_matrix <- cbind(V(g)$x, V(g)$y)
+  layout_matrix <- cbind(igraph::V(g)$x, igraph::V(g)$y)
 
   plot(
     g,
     layout = layout_matrix,
     vertex.label.color = "black",
-    vertex.shape = V(g)$shape,
-    vertex.size2 = V(g)$height * size_multiplier,
-    vertex.size = V(g)$width * size_multiplier,
+    vertex.shape = igraph::V(g)$shape,
+    vertex.size2 = igraph::V(g)$height * size_multiplier,
+    vertex.size = igraph::V(g)$width * size_multiplier,
     vertex.label.dist = text_dist,
     vertex.label.cex = text_cex,
     edge.label.cex = text_cex,

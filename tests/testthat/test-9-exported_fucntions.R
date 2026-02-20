@@ -73,7 +73,7 @@ test_that("kegg_to_graph returns correct igraph using local KGML", {
   expect_true(!all(nchar(ids_mapping[!is.na(ids_mapping)]) == 0))
 })
 
-test_that("plot_kegg_visNetwork works correctly", {
+test_that("make_kegg_visNetwork works correctly", {
   # Your input igraph
   g_input <- expected_graphs$g_test_01_mapped
 
@@ -81,7 +81,7 @@ test_that("plot_kegg_visNetwork works correctly", {
   v_expected <- expected_graphs$visNetwork_test_01_mapped
 
   # Run the function
-  v_actual <- plot_kegg_visNetwork(g_input)
+  v_actual <- make_kegg_visNetwork(g_input)
 
   # Basic type check
   expect_s3_class(v_actual, "visNetwork")
@@ -97,7 +97,7 @@ test_that("plot_kegg_visNetwork works correctly", {
   v_expected <- expected_graphs$visNetwork_test_02_mapped
 
   # Run the function
-  v_actual <- plot_kegg_visNetwork(g_input)
+  v_actual <- make_kegg_visNetwork(g_input)
 
   # Basic type check
   expect_s3_class(v_actual, "visNetwork")

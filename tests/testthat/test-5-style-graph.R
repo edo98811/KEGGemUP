@@ -91,7 +91,7 @@ test_style_igraph_graph <- function() {
   stopifnot(all(c("shape","color","size","label") %in% node_attrs))
 
   # Check node shapes
-  v <- V(g_styled)
+  v <- igraph::V(g_styled)
   stopifnot(v$shape[1] == "vrectangle")  # rectangle mapped to vrectangle
   stopifnot(v$shape[2] == "circle")      # circle stays circle
   stopifnot(v$shape[3] == "dot")         # line mapped to dot

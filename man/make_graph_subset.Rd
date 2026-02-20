@@ -9,8 +9,7 @@ make_graph_subset(g, ids_to_include)
 \arguments{
 \item{g}{An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.}
 
-\item{eliminate_distance_outliers}{Logical, if TRUE, replaces outlier node positions with
-mean positions to improve layout visualization (default: TRUE).}
+\item{ids_to_include}{Character vector of KEGG IDs to include in the subset graph.}
 }
 \value{
 A plot of the igraph object with improved layout.
