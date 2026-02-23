@@ -1,13 +1,15 @@
 #' Convert KEGG pathway ID to readable pathway name
 #'
 #' @param id KEGG pathway ID (e.g., 'hsa04110')
+#' @param verbose Logical, if TRUE, print additional messages.
 #' @return A character string with the readable pathway name
 #' @importFrom KEGGREST keggGet
 #' @noRd
-get_pathway_name <- function(id) {
+get_pathway_name <- function(id, verbose = FALSE) {
   tryCatch(
     {
       res <- KEGGREST::keggGet(id)
+      if (verbose) message("Retrieved pathway name for ID: ", id)
       res[[1]]$NAME
     },
     error = function(e) {
@@ -21,6 +23,7 @@ get_pathway_name <- function(id) {
 #' @param pathway_id KEGG pathway ID (e.g., 'hsa04110').
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
 #' @param directory Optional directory to save the KGML file if not using cache.
+#' @param verbose Logical, if TRUE, print additional messages.
 #' @return Path to the cached KGML file.
 #'
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
@@ -29,61 +32,54 @@ get_pathway_name <- function(id) {
 #'
 #' @examples
 #' data_dir <- tempdir()
-#' kgml_path <- download_kgml("hsa04110", directory = data_dir)
+#' kgml_path <- download_kgml("hsa04110", directory = data_dir, verbose = TRUE)
 #' @export
-download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
+download_kgml <- function(pathway_id, bfc = NULL, directory = NULL, verbose = FALSE) {
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either 'bfc' OR 'directory', not both.")
   } else if (!is.null(bfc)) {
-    # Check that bfc is a BiocFileCache object
     if (!inherits(bfc, "BiocFileCache")) {
       stop("'bfc' must be a valid BiocFileCache object.")
     }
     mode <- "cache"
   } else if (!is.null(directory)) {
-    # Check that directory is a single string
     if (!is.character(directory) || length(directory) != 1) {
       stop("'directory' must be a single string specifying a valid path.")
     }
-    # Optionally, create the directory if it does not exist
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
-      message("Created directory: ", directory)
+      if (verbose) message("Created directory: ", directory)
     }
     mode <- "dir"
   } else {
     directory <- getwd()
-    message("No 'bfc' or 'directory' provided. Using current working directory: ", directory)
+    if (verbose) message("No 'bfc' or 'directory' provided. Using current working directory: ", directory)
     mode <- "dir"
   }
 
-  # Validate pathway ID format
   if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
   }
 
-  # Cache key / name
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
-  message("Downloading KGML from: ", url)
+  if (verbose) message("Downloading KGML from: ", url)
 
   if (mode == "cache") {
     path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
-
-    message("Downloaded & cached: ", pathway_id)
+    if (verbose) message("Cached: ", pathway_id)
     return(path)
   } else {
     file_name <-
       if (grepl("\\.[^/\\\\]+$", directory)) {
         directory
       } else {
-        file.path(path.expand(directory), paste0(pathway_id, ".xml")) # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/path.expand
+        file.path(path.expand(directory), paste0(pathway_id, ".xml"))
       }
     resp <- request(url) |>
       req_retry(max_tries = 3) |>
       req_perform()
 
-    # Check success
     if (resp_is_error(resp)) {
       warning(
         "Failed to download KGML from URL: ", url, " (HTTP status ", resp_status(resp),
@@ -92,11 +88,9 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
       return(NULL)
     }
 
-    # Get content as raw vector and check
     kgml_xml <- resp_body_xml(resp)
-
     write_xml(kgml_xml, file_name)
-    message("Downloaded & saved in: ", file_name)
+    if (verbose) message("Downloaded & saved in: ", file_name)
 
     return(file_name)
   }
@@ -107,41 +101,47 @@ download_kgml <- function(pathway_id, bfc = NULL, directory = NULL) {
 #' @param db_name Name of the KEGG database to retrieve (default: "compound").
 #' @param bfc BiocFileCache object for caching KEGG database files.
 #' @param directory Optional directory to save the KEGG database file if not using cache.
+#' @param verbose Logical, if TRUE, print additional messages.
 #' @return A data frame with KEGG IDs and names.
 #' @details The valid KEGG database names are:
 #' kegg | pathway | brite | module | ko | genes | <org> | vg | vp | ag |
 #' genome | ligand | compound | glycan | reaction | rclass | enzyme |
 #' network | variant | disease | drug | dgroup
-#' @details If neither 'bfc' nor 'directory' is provided, the KEGG database
-#' will be downloaded but not saved. It will be returned as a data frame.
 #' @importFrom KEGGREST keggList
 #' @importFrom utils read.table write.table
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
 #' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
+#' @examples
+#' # Saving in directory
+#' data_dir <- tempdir()
+#' kegg_compounds <- get_kegg_db("compound", directory = data_dir, verbose = TRUE)
+#' # Just returning without saving
+#' kegg_genes <- get_kegg_db("compound", verbose = TRUE)
 #' @export
-get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
-  # check input validity
+get_kegg_db <- function(
+    db_name = "compound",
+    directory = NULL,
+    bfc = NULL,
+    verbose = FALSE) {
+  if (verbose) message("Retrieving KEGG database: ", db_name)
   if (!is.null(bfc) && !is.null(directory)) {
     stop("Provide either 'bfc' OR 'directory', not both.")
   } else if (!is.null(bfc)) {
-    # Check that bfc is a BiocFileCache object
     if (!inherits(bfc, "BiocFileCache")) {
       stop("'bfc' must be a valid BiocFileCache object.")
     }
     mode <- "cache"
   } else if (!is.null(directory)) {
-    # Check that directory is a single string
     if (!is.character(directory) || length(directory) != 1) {
       stop("'directory' must be a single string specifying a valid path.")
     }
-    # Create the directory if it does not exist
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
-      message("Created directory: ", directory)
+      if (verbose) message("Created directory: ", directory)
     }
     mode <- "dir"
   } else {
-    message("No 'bfc' or 'directory' provided. Not saving KEGG database only downloading and returning.")
+    if (verbose) message("No 'bfc' or 'directory' provided. Not saving KEGG database only downloading and returning.")
     mode <- "none"
   }
 
@@ -149,7 +149,7 @@ get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
 
   if (mode == "cache") {
     path <- BiocFileCache::bfcrpath(bfc, url, ext = ".tsv")
-    message("Downloaded & cached KEGG database: ", db_name)
+    if (verbose) message("Cached KEGG database: ", db_name)
     con <- path
   } else {
     resp <- request(url) |>
@@ -191,7 +191,7 @@ get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
       col.names = TRUE,
       quote = FALSE
     )
-    message("Downloaded & saved KEGG database in: ", file_name)
+    if (verbose) message("Downloaded & saved KEGG database in: ", file_name)
   }
 
   return(kegg_db)
@@ -199,24 +199,28 @@ get_kegg_db <- function(db_name = "compound", directory = NULL, bfc = NULL) {
 
 #' Download all KEGG pathways for a given organism.
 #' @param org KEGG organism code (e.g., 'hsa' for human).
+#' @param verbose Logical, if TRUE, print additional messages.
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache
 #' @importFrom utils askYesNo
+#' @examples 
+#' # Download all pathways for human
+#' # download_all_pathways("hsa", verbose = TRUE)
 #' @export
-download_all_pathways <- function(org) {
+download_all_pathways <- function(org, verbose = FALSE) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
 
-  all_pathways <- get_kegg_db(bfc_map, paste0("pathway/", org))
+  all_pathways <- get_kegg_db(bfc_map, paste0("pathway/", org), verbose = verbose)
 
-  askYesNo("Download all ", nrow(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.") -> answer
+  answer <- askYesNo("Download all ", nrow(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.")
   if (!answer) {
-    message("Aborting download of all pathways.")
+    if (verbose) message("Aborting download of all pathways.")
     return(NULL)
   }
 
   for (pathway_id in all_pathways[, 1]) {
-    download_kgml(pathway_id, bfc = bfc_kegg)
+    download_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
   }
 }

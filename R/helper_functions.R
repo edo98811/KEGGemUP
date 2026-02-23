@@ -4,11 +4,12 @@
 #' @return Character string of KEGG IDs without prefixes, separated by ';'
 #' @noRd
 remove_kegg_prefix_str <- function(kegg_ids) {
-  # Remove prefix (e.g., 'cpd:', 'mmu:', 'ko:', 'path:')
-  separated_elements <- strsplit(kegg_ids, " ")
-  ids <- lapply(separated_elements, function(x) sub("^[a-z]+:", "", x))
-  ids <- paste(unlist(ids), collapse = ";")
-  return(ids)
+  sapply(kegg_ids, function(id) {
+    if (is.na(id)) return(NA_character_)        # preserve NA
+    elements <- strsplit(id, " ")[[1]]          # split by space
+    elements <- sub("^[a-z]+:", "", elements)   # remove prefix
+    paste(elements, collapse = ";")             # collapse back to single string
+  }, USE.NAMES = FALSE)
 }
 
 #' Convert KEGG IDs with prefixes to IDs without prefixes
@@ -49,6 +50,13 @@ expand_keggs <- function(kegg_df) {
 #' Return all cached KEGG and mapping files from BiocFileCache
 #' @return A list containing data frames of cached KEGG and mapping files
 #' @importFrom BiocFileCache BiocFileCache bfcinfo
+#' @details This function retrieves information about 
+#' all cached KEGG pathway files
+#' and mapping files stored using BiocFileCache.
+#' @examples
+#' cache_info <- return_all_cached()
+#' print(cache_info$kegg)      # View cached KEGG pathway files
+#' print(cache_info$mappings)  # View cached mapping files
 #' @export
 return_all_cached <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
@@ -65,6 +73,11 @@ return_all_cached <- function() {
 #' @return None
 #' @importFrom BiocFileCache BiocFileCache bfcinfo bfcremove
 #' @importFrom utils askYesNo
+#' @details This function deletes all cached KEGG pathway files
+#' and mapping files stored using BiocFileCache.
+#' It prompts the user for confirmation before proceeding with the deletion.
+#' @examples
+#' # reset_cache()
 #' @export
 reset_cache <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")

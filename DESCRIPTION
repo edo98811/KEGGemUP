@@ -40,6 +40,7 @@ Suggests:
     knitr,
     macrophage,
     org.Hs.eg.db,
+    org.Mm.eg.db,
     SummarizedExperiment,
     AnnotationDbi,
     clusterProfiler,
@@ -47,5 +48,6 @@ Suggests:
     edgeR,
     purrr,
     S4Vectors,
-    BiocStyle
+    BiocStyle,
+    DT
 Config/testthat/edition: 3

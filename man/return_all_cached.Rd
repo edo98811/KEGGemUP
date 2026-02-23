@@ -12,3 +12,13 @@ A list containing data frames of cached KEGG and mapping files
 \description{
 Return all cached KEGG and mapping files from BiocFileCache
 }
+\details{
+This function retrieves information about
+all cached KEGG pathway files
+and mapping files stored using BiocFileCache.
+}
+\examples{
+cache_info <- return_all_cached()
+print(cache_info$kegg)      # View cached KEGG pathway files
+print(cache_info$mappings)  # View cached mapping files
+}
