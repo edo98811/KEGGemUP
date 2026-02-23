@@ -34,7 +34,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Map differential expression results to nodes</h1>
-      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/ggkegg_to_visnetwork.R" class="external-link"><code>R/ggkegg_to_visnetwork.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/exported_functions.R" class="external-link"><code>R/exported_functions.R</code></a></small>
       <div class="d-none name"><code>map_results_to_graph.Rd</code></div>
     </div>
 
@@ -47,10 +47,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">map_results_to_graph</span><span class="op">(</span></span>
 <span>  <span class="va">g</span>,</span>
 <span>  <span class="va">de_results</span>,</span>
-<span>  return_type <span class="op">=</span> <span class="st">"visNetwork"</span>,</span>
 <span>  feature_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  value_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  palette <span class="op">=</span> <span class="st">"RdBu"</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"RdBu"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -66,10 +66,6 @@
 <dd><p>Named list of differential expression results.</p></dd>
 
 
-<dt id="arg-return-type">return_type<a class="anchor" aria-label="anchor" href="#arg-return-type"></a></dt>
-<dd><p>Output type: 'igraph' or 'visNetwork'.</p></dd>
-
-
 <dt id="arg-feature-column">feature_column<a class="anchor" aria-label="anchor" href="#arg-feature-column"></a></dt>
 <dd><p>Column name in de_table containing KEGG IDs
 (if de_results is a single data.frame).</p></dd>
@@ -83,6 +79,10 @@
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
 <dd><p>Color palette for node coloring (default: "RdBu").</p></dd>
 
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>Whether to print progress messages (default: TRUE).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -90,34 +90,35 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This functionmaps differential expression results onto the nodes of a KEGG pathway graph.
-The pathwhay given as input must be the output of the function <code>kegg_to_graph</code>.</p>
-<p>This function can be used to map the differential expression results to the graph,
+    <p>This function can be used to map the differential expression
+results to the graph,
 the input of the graph must be the output of the function
 <code>kegg_to_graph</code> in the igraph format. The results to be mapped can be
-provided either as a list or as a single data.frame. If a single data.frame is provided,
-the default column names for KEGG IDs and values are 'KEGG_ids' and 'log2FoldChange',
-respectively, but these can be changed using the <code>feature_column</code> and <code>value_column</code> parameters.</p>
+provided either as a list or as a single data.frame. If a single data.frame
+is provided,
+the default column names for KEGG IDs and values are
+'KEGG_ids' and 'log2FoldChange',
+respectively, but these can be changed using the
+<code>feature_column</code> and <code>value_column</code> parameters.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span> <span class="co"># Example pathway ID</span></span></span>
-<span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span>, return_type <span class="op">=</span> <span class="st">"igraph"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded &amp; cached: hsa04110</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parsed 134 nodes from KGML file.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parsed 119 relationship edges from KGML file.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parsed 0 reaction edges from KGML file.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Total edges parsed from KGML file: 119</span>
+<span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span>pathway_id <span class="op">=</span> <span class="va">pathway</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example differential expression results</span></span></span>
 <span class="r-in"><span><span class="va">de_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  KEGG_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hsa:1234"</span>, <span class="st">"hsa:5678"</span>, <span class="st">"cpd:C00022"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  log2FoldChange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="op">-</span><span class="fl">2.0</span>, <span class="fl">0.5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">vis_graph</span> <span class="op">&lt;-</span> <span class="fu">map_results_to_graph</span><span class="op">(</span><span class="va">graph</span>, <span class="va">de_results</span>, return_type <span class="op">=</span> <span class="st">"visNetwork"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Mapping differential expression results to nodes...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> de_results provided as a single data.frame. Using default column names: value_column = 'log2FoldChange', feature_column = 'KEGG_ids'.</span>
+<span class="r-in"><span><span class="va">vis_graph</span> <span class="op">&lt;-</span> <span class="fu">map_results_to_graph</span><span class="op">(</span><span class="va">graph</span>,</span></span>
+<span class="r-in"><span>  <span class="va">de_results</span>,</span></span>
+<span class="r-in"><span>  feature_column <span class="op">=</span> <span class="st">"KEGG_ids"</span>,</span></span>
+<span class="r-in"><span>  value_column <span class="op">=</span> <span class="st">"log2FoldChange"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using provided value_column: 'log2FoldChange'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  and provided feature_column: 'KEGG_ids'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> de_results provided as a single data.frame. </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -12,11 +12,10 @@
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/get_kegg_db.html</loc></url>
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/index.html</loc></url>
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/kegg_to_graph.html</loc></url>
+<url><loc>https://edo98811.github.io/KEGGemUP/reference/make_graph_subset.html</loc></url>
+<url><loc>https://edo98811.github.io/KEGGemUP/reference/make_igraph_visualisation.html</loc></url>
+<url><loc>https://edo98811.github.io/KEGGemUP/reference/make_kegg_visNetwork.html</loc></url>
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.html</loc></url>
-<url><loc>https://edo98811.github.io/KEGGemUP/reference/parse_kgml_edges.html</loc></url>
-<url><loc>https://edo98811.github.io/KEGGemUP/reference/parse_kgml_entries.html</loc></url>
-<url><loc>https://edo98811.github.io/KEGGemUP/reference/parse_kgml_reactions.html</loc></url>
-<url><loc>https://edo98811.github.io/KEGGemUP/reference/parse_kgml_relations.html</loc></url>
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/reset_cache.html</loc></url>
 <url><loc>https://edo98811.github.io/KEGGemUP/reference/return_all_cached.html</loc></url>
 </urlset>

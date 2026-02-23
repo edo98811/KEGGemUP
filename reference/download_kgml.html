@@ -34,7 +34,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Download and cache KEGG KGML files.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/api_calls.R" class="external-link"><code>R/api_calls.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/edo98811/KEGGemUP/blob/devel/R/api_interfaces.R" class="external-link"><code>R/api_interfaces.R</code></a></small>
       <div class="d-none name"><code>download_kgml.Rd</code></div>
     </div>
 
@@ -44,7 +44,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_kgml</span><span class="op">(</span><span class="va">pathway_id</span>, bfc <span class="op">=</span> <span class="cn">NULL</span>, directory <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_kgml</span><span class="op">(</span><span class="va">pathway_id</span>, bfc <span class="op">=</span> <span class="cn">NULL</span>, directory <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,6 +62,10 @@
 <dt id="arg-directory">directory<a class="anchor" aria-label="anchor" href="#arg-directory"></a></dt>
 <dd><p>Optional directory to save the KGML file if not using cache.</p></dd>
 
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>Logical, if TRUE, print additional messages.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -71,9 +75,9 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">kgml_path</span> <span class="op">&lt;-</span> <span class="fu">download_kgml</span><span class="op">(</span><span class="st">"hsa04110"</span>, directory <span class="op">=</span> <span class="va">data_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">kgml_path</span> <span class="op">&lt;-</span> <span class="fu">download_kgml</span><span class="op">(</span><span class="st">"hsa04110"</span>, directory <span class="op">=</span> <span class="va">data_dir</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded &amp; saved in: /tmp/RtmpDsZMp3/hsa04110.xml</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded &amp; saved in: /tmp/Rtmpf7h8iD/hsa04110.xml</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

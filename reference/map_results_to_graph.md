@@ -8,10 +8,10 @@ Map differential expression results to nodes
 map_results_to_graph(
   g,
   de_results,
-  return_type = "visNetwork",
   feature_column = NULL,
   value_column = NULL,
-  palette = "RdBu"
+  palette = "RdBu",
+  verbose = FALSE
 )
 ```
 
@@ -24,10 +24,6 @@ map_results_to_graph(
 - de_results:
 
   Named list of differential expression results.
-
-- return_type:
-
-  Output type: 'igraph' or 'visNetwork'.
 
 - feature_column:
 
@@ -43,15 +39,15 @@ map_results_to_graph(
 
   Color palette for node coloring (default: "RdBu").
 
+- verbose:
+
+  Whether to print progress messages (default: TRUE).
+
 ## Value
 
 An igraph or visNetwork object with mapped results.
 
 ## Details
-
-This functionmaps differential expression results onto the nodes of a
-KEGG pathway graph. The pathwhay given as input must be the output of
-the function `kegg_to_graph`.
 
 This function can be used to map the differential expression results to
 the graph, the input of the graph must be the output of the function
@@ -65,19 +61,18 @@ changed using the `feature_column` and `value_column` parameters.
 
 ``` r
 pathway <- "hsa04110" # Example pathway ID
-graph <- kegg_to_graph(pathway, return_type = "igraph")
-#> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml
-#> Downloaded & cached: hsa04110
-#> Parsed 134 nodes from KGML file.
-#> Parsed 119 relationship edges from KGML file.
-#> Parsed 0 reaction edges from KGML file.
-#> Total edges parsed from KGML file: 119
+graph <- kegg_to_graph(pathway_id = pathway)
 # Example differential expression results
 de_results <- data.frame(
   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
   log2FoldChange = c(1.5, -2.0, 0.5)
 )
-vis_graph <- map_results_to_graph(graph, de_results, return_type = "visNetwork")
-#> Mapping differential expression results to nodes...
-#> de_results provided as a single data.frame. Using default column names: value_column = 'log2FoldChange', feature_column = 'KEGG_ids'.
+vis_graph <- map_results_to_graph(graph,
+  de_results,
+  feature_column = "KEGG_ids",
+  value_column = "log2FoldChange"
+)
+#> Using provided value_column: 'log2FoldChange'
+#>  and provided feature_column: 'KEGG_ids'.
+#> de_results provided as a single data.frame. 
 ```
