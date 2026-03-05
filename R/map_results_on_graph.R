@@ -158,7 +158,7 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   vertices_df$de_value[ids_nodes_to_check] <- nodes_to_check$de_value
   vertices_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
   vertices_df$text[ids_nodes_to_check] <- nodes_to_check$text
-  vertices_df$de_text[ids_nodes_to_check] <- format(round(as.numeric(vertices_df$de_value), 3), nsmall = 3)
+  vertices_df$de_text[ids_nodes_to_check] <- format(round(as.numeric(nodes_to_check$de_value), 3), nsmall = 3)
 
   if (verbose) {
     message("Successfully added results to ", length(idx), " nodes.")
