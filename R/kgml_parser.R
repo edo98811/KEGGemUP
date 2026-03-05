@@ -20,10 +20,7 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
     n_rows <- max(length(graphics_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- as.data.frame(
-      lapply(defaults, function(x) rep(x, n_rows)),
-      stringsAsFactors = FALSE
-    )
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
 
     # Fill static attributes from entry
     entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
@@ -80,10 +77,8 @@ parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
     n_rows <- 1 # keep the group node itself
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- as.data.frame(
-      lapply(defaults, function(x) rep(x, n_rows)),
-      stringsAsFactors = FALSE
-    )
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+
 
     # Fill static attributes from entry
     entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
@@ -107,7 +102,7 @@ parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
 
   # Combine all entries into a single data frame
   df <- do.call(rbind, nodes_list)
-    if (verbose) message("Parsed ", nrow(df), " group nodes from KGML.")
+  if (verbose) message("Parsed ", nrow(df), " group nodes from KGML.")
   df
 }
 
@@ -143,10 +138,7 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
     }
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- as.data.frame(
-      lapply(defaults, function(x) rep(x, n_rows)),
-      stringsAsFactors = FALSE
-    )
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
 
     # Fill static attributes from entry
     entry_vertices_df$line_id <- xml2::xml_attr(node, "id")
@@ -256,10 +248,7 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
     n_rows <- max(length(subtype_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
-    entry_edges_df <- as.data.frame(
-      lapply(defaults, function(x) rep(x, n_rows)),
-      stringsAsFactors = FALSE
-    )
+    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
 
     # Fill static attributes from entry
     entry_edges_df$from <- xml2::xml_attr(relation, "entry1")
@@ -382,10 +371,7 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
     n_rows <- n_sub * n_prod
 
     # Pre-allocate a data.frame for this entry
-    entry_edges_df <- as.data.frame(
-      lapply(defaults, function(x) rep(x, n_rows)),
-      stringsAsFactors = FALSE
-    )
+    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
 
     # Fill static attributes from entry
     entry_edges_df$reaction_id <- xml2::xml_attr(reaction, "id")
@@ -445,7 +431,6 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
 #' @importFrom BiocFileCache BiocFileCache
 #' @noRd
 add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
-
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc, verbose = verbose)
   glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc, verbose = verbose)
