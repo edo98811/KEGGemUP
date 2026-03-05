@@ -88,9 +88,10 @@ igraph_edges_to_visNetwork <- function(edges_df) {
 
 #' Map KEGG-styled nodes to visNetwork attributes
 #' @param vertices_df Data frame of nodes extracted from igraph using as_data_frame(what="vertices")
+#' @param scaling_factor Numeric scaling factor for node sizes (default: 1.5)
 #' @return vertices_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
 #' @noRd
-kegg_nodes_to_visNetwork <- function(vertices_df) {
+kegg_nodes_to_visNetwork <- function(vertices_df, scaling_factor = 1.5) {
 
   if (is.null(vertices_df) || nrow(vertices_df) == 0) {
     return(vertices_df)
@@ -137,7 +138,7 @@ kegg_nodes_to_visNetwork <- function(vertices_df) {
     )
   })
 
-  vertices_df <- scale_dimensions(vertices_df, factor = 0.4)
+  vertices_df <- scale_dimensions(vertices_df, factor = scaling_factor)
   # vertices_df <- vertices_df[order(vertices_df$label), ]
 
   return(vertices_df)

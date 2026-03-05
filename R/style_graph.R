@@ -108,16 +108,14 @@ edge_style_map_reaction <-
 #' Style igraph graph nodes and edges
 #' @param g An igraph graph object
 #' @param bfc_map A BiocFileCache map (currently unused)
-#' @param scaling_factor Scaling factor for node dimensions (default: 1.5)
 #' @return The styled igraph graph object
 #' @noRd
-style_igraph_graph <- function(g, bfc_map, scaling_factor = 1.5) {
+style_igraph_graph <- function(g, bfc_map) {
   stopifnot(inherits(g, "igraph"))
 
   ## ---- Nodes ----
   vertices_df <- igraph::as_data_frame(g, what = "vertices")
   vertices_df <- style_nodes(vertices_df)
-  vertices_df <- scale_dimensions(vertices_df, factor = scaling_factor)
 
   # write vertex attributes back
   for (col in names(vertices_df)) {

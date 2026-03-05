@@ -4,10 +4,12 @@
 \alias{make_kegg_visNetwork}
 \title{Plot KEGG pathway graph using visNetwork}
 \usage{
-make_kegg_visNetwork(g)
+make_kegg_visNetwork(g, scaling_factor = 1.5)
 }
 \arguments{
 \item{g}{visNetwork object representing the pathway graph}
+
+\item{scaling_factor}{Numeric scaling factor for node sizes (default: 1.5)}
 }
 \value{
 visNetwork plot of the KEGG pathway

@@ -200,9 +200,9 @@ The workflow is as follows: first we build the graph from the KEGG pathway ID, t
 
 ```{r use-package, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 pathway <- "hsa00563"  
-graph <- kegg_to_graph(pathway, scaling_factor = 10)
+graph <- kegg_to_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_list)
-graph_visnetwork <- make_kegg_visNetwork(graph)
+graph_visnetwork <- make_kegg_visNetwork(graph, scaling_factor = 5)
 graph_visnetwork
 ```
 

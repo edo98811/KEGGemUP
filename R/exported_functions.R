@@ -3,7 +3,6 @@
 #' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
 #' @param kgml_file Optional local path to a KGML file.
 #' If provided, the function will use this file instead of downloading it.
-#' @param scaling_factor Numeric scaling factor for node sizes (default: 2).
 #' @param verbose Logical, if TRUE, print additional messages.
 #' @return An igraph object representing the KEGG pathway graph.
 #' @details This function downloads the KGML file for a given KEGG pathway ID,
@@ -16,7 +15,6 @@
 kegg_to_graph <- function(
   pathway_id,
   kgml_file = NULL,
-  scaling_factor = 3,
   verbose = FALSE
 ) {
   # Validate pathway ID format
@@ -48,7 +46,7 @@ kegg_to_graph <- function(
   g <- build_kegg_graph(kgml_file, pathway_name, bfc_map = bfc_map)
 
   # Style graph
-  g <- style_igraph_graph(g, bfc_map, scaling_factor = scaling_factor)
+  g <- style_igraph_graph(g, bfc_map)
   return(g)
 }
 
@@ -147,6 +145,7 @@ map_results_to_graph <- function(
 
 #' Plot KEGG pathway graph using visNetwork
 #' @param g visNetwork object representing the pathway graph
+#' @param scaling_factor Numeric scaling factor for node sizes (default: 1.5)
 #' @return visNetwork plot of the KEGG pathway
 #' @importFrom igraph as_data_frame graph_attr
 #' @details This function converts the igraph object
@@ -160,7 +159,7 @@ map_results_to_graph <- function(
 #' plot
 #'
 #' @export
-make_kegg_visNetwork <- function(g) {
+make_kegg_visNetwork <- function(g, scaling_factor = 1.5) {
    
   # Convert igraph to data frames
   vertices_df <- as_data_frame(g, what = "vertices")
@@ -168,7 +167,7 @@ make_kegg_visNetwork <- function(g) {
   pathway_name <- igraph::graph_attr(g, "title")
 
   # Style nodes and edges
-  vertices_df <- kegg_nodes_to_visNetwork(vertices_df)
+  vertices_df <- kegg_nodes_to_visNetwork(vertices_df, scaling_factor = scaling_factor)
   if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df)
 
   # Add tooltips
@@ -196,12 +195,27 @@ make_graph_subset <- function(g, ids_to_include) {
       setNames(rep(igraph::V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
     })
   )
+  
+  ids_for_mapping <- data.frame(
+    ids = ids_for_mapping,
+    names = names(ids_for_mapping)
+  )
 
-  nodes_to_include <- ids_for_mapping[ids_to_include]
+  # nodes_to_include <- as_data_frame(g, what = "vertices") %>% filter(label == "Pnp") %>% pull(ids_for_mapping)
+  
+  nodes_to_include <- unique(ids_for_mapping[ids_for_mapping$names %in% ids_to_include, "ids"])
   nodes_to_include <- nodes_to_include[!is.na(nodes_to_include)]
 
   subg <- igraph::induced_subgraph(g, igraph::V(g)[ids_for_mapping %in% nodes_to_include])
-
+  # 
+  # ids_for_mapping <- unlist(
+  #   lapply(1:length(c(igraph::V(subg)$ids_for_mapping)), function(i) {
+  #     row <- igraph::V(subg)$ids_for_mapping[i]
+  #     kegg_values <- unlist(strsplit(as.character(row), ";"))
+  #     setNames(rep(igraph::V(subg)$ids_for_mapping[i], length(kegg_values)), kegg_values)
+  #   })
+  # )
+  
   return(subg)
 }
 
