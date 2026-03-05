@@ -1,5 +1,5 @@
 suppressMessages({
-  library(KEGGemUP)
+  # library(KEGGemUP)
   library(igraph)
   library(xml2)
   library(BiocFileCache)
@@ -75,6 +75,7 @@ kgml_path_invalid <- system.file("extdata", "no_kgml.xml", package = "KEGGemUP")
 
 kgml_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 xml_example <- xml2::read_xml(kgml_path_02)
+xml_no_edges <- xml2::read_xml(kgml_path_no_edges)
 expected_graphs <- readRDS(system.file("extdata", "kegg_to_graph_expected.rds", package = "KEGGemUP"))
 bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
 bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
@@ -105,15 +106,18 @@ vertices_df_basic <- data.frame(
 # kgml_steps$relations_edges <- parse_kgml_relations(xml_example, kegg_edge_defaults())
 # kgml_steps$reactions_edges <- parse_kgml_reactions(xml_example, kegg_edge_defaults())
 # kgml_steps$line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
+# kgml_steps$all_reaction_edges  <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
 
 # kgml_steps$all_edges <- rbind(
 #   kgml_steps$relations_edges,
 #   kgml_steps$reactions_edges,
-#   kgml_steps$line_edges
+#   kgml_steps$line_edges,
+#   kgml_steps$all_reaction_edges
 # )
 
 # bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
 # bfc_map <- BiocFileCache(cache = file.path(bfc_path, "mappings"), ask = FALSE)
+
 # g_1 <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
 # g_2 <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
 
@@ -141,6 +145,7 @@ vertices_df_basic <- data.frame(
 #   g = g_test_01,
 #   de_results = de_results_list
 # )
+
 # g_test_02_mapped <- map_results_to_graph(
 #   g = g_test_02,
 #   de_results = de_results_list

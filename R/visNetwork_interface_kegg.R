@@ -53,6 +53,10 @@ make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
 #' @return edges_df with visNetwork-compatible styling columns: color, arrows, dashes, label
 #' @noRd
 igraph_edges_to_visNetwork <- function(edges_df) {
+
+  if (is.null(edges_df) || nrow(edges_df) == 0) {
+    return(edges_df)
+  }
   # Map arrow.mode from igraph to visNetwork arrows
   # igraph arrow.mode: 0 = none, 1 = back, 2 = to, 3 = tee, 4 = both (etc)
   switch_arrow <- function(mode) {
@@ -87,6 +91,11 @@ igraph_edges_to_visNetwork <- function(edges_df) {
 #' @return vertices_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
 #' @noRd
 kegg_nodes_to_visNetwork <- function(vertices_df) {
+
+  if (is.null(vertices_df) || nrow(vertices_df) == 0) {
+    return(vertices_df)
+  }
+
   # Set borderRadius for roundrectangle nodes
   vertices_df$borderRadius <- ifelse(vertices_df$graphics_type == "roundrectangle", 10, 0)
 
@@ -110,9 +119,8 @@ kegg_nodes_to_visNetwork <- function(vertices_df) {
   vertices_df$id <- as.character(vertices_df$name)
   vertices_df$borderWidth <- 2
   vertices_df$widthConstraint[vertices_df$graphics_type == "line"] <- nchar(as.character(
-    vertices_df[vertices_df$graphics_type == "line", ]$label )) * 4 
+    vertices_df$label[vertices_df$graphics_type == "line"] )) * 4 
   vertices_df$font.background[vertices_df$graphics_type == "line"] <- "white"
-
   # Set border color normally black and red on hover (except for line nodes)
   vertices_df$color <- lapply(seq_len(nrow(vertices_df)), function(i) {
     border_color <-

@@ -288,7 +288,7 @@ complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = F
   reaction_edges <- edges_df[edges_df$type == "reaction", ]
   other_edges <- edges_df[edges_df$type != "reaction", ]
 
-  if (nrow(reaction_edges) == 0) {
+  if (is.null(reaction_edges)) {
     if (verbose) message("No reaction edges to complete.")
     return(edges_df)
   }

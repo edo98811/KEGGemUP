@@ -169,6 +169,7 @@ style_nodes <- function(vertices_df) {
 #' @return vertices_df with scaled x and y coordinates.
 #' @noRd
 scale_dimensions <- function(vertices_df, factor = 10) {
+
   # Scale x and y coordinates to make the graph look nicer
   vertices_df$x <- as.numeric(vertices_df$x) * factor
   vertices_df$y <- as.numeric(vertices_df$y) * factor

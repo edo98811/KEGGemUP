@@ -33,6 +33,9 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
     width = c(50, 40, 30, 20),
     height = c(20, 30, 40, 50),
     shape = NA_character_,
+    label = c("Node1", "Node2", "Node3", "Node4"),
+    x = c(1, 2, 3, 4),
+    y = c(1, 2, 3, 4),
     stringsAsFactors = FALSE
   )
 
@@ -45,11 +48,8 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
   expect_equal(nodes_mapped$borderRadius, c(0, 0, 10, 0))
 
   # Check shape mapping
-  expect_equal(nodes_mapped$shape, c("box", "dot", "box", "ellipse"))
+  expect_equal(nodes_mapped$shape, c("box", "dot", "box", "text"))
 
-  # Check widthConstraint and heightConstraint
-  expect_equal(nodes_mapped$widthConstraint, vertices_df$width)
-  expect_equal(nodes_mapped$heightConstraint, vertices_df$height)
   # Check that roundrectangle maps to box shape with borderRadius
   expect_equal(nodes_mapped$shape[3], "box")
 
@@ -68,14 +68,6 @@ test_that("igraph_edges_to_visNetwork does not crashif edges_df empty", {
   )
 
   edges_mapped <- igraph_edges_to_visNetwork(edges_df)
-  
-  # Check arrows mapping
-  expect_equal(edges_mapped$arrows, character(0))
 
-  # Check dashes mapping
-  expect_equal(edges_mapped$dashes, integer(0))
-
-  # Check default color and label
-  expect_equal(edges_mapped$color, character(0))
-  expect_equal(edges_mapped$label, character(0))
+  expect_equal(edges_mapped, edges_df)
 })

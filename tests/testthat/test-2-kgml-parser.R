@@ -28,6 +28,26 @@ test_that("parse_kgml_reactions returns correct edges from reactions", {
   expect_equal(reactions_edges, kgml_steps$reactions_edges)
 })
 
+test_that("complete_kgml_reactions returns correct edges from reactions", {
+  all_reaction_edges  <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
+  expect_equal(all_reaction_edges, kgml_steps$all_reaction_edges)
+})
+
+test_that("parse_kgml_reactions returns correct edges from reactions if edges is NULL", {
+  reactions_edges  <- parse_kgml_reactions(xml_no_edges, kegg_edge_defaults())
+  expect_equal(reactions_edges, NULL)
+})
+
+test_that("parse_kgml_relations returns correct edges from relations if edges is NULL", {
+  relations_edges <- parse_kgml_relations(xml_no_edges, kegg_edge_defaults())
+  expect_equal(relations_edges, NULL)
+})
+
+test_that("complete_kgml_reactions returns correct edges from reactions if edges is NULL", {
+  all_reaction_edges  <- complete_kgml_reactions(kgml_steps$nodes, NULL, kegg_edge_defaults())
+  expect_equal(all_reaction_edges, NULL)
+})
+
 test_that("combined nodes (nodes + groups + lines) load correctly", {
   vertices_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
   vertices_df <- rbind(vertices_df, parse_kgml_groups(xml_example, kegg_node_defaults()))
@@ -53,7 +73,8 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
 test_that("build_kegg_graph constructs the expected graph (pathway 02)", {
   g <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
   all(sort(vertex_attr_names(g)) == sort(vertex_attr_names(kgml_steps$g_test_02))) &&
-    all(sort(edge_attr_names(g)) == sort(edge_attr_names(kgml_steps$g_test_02)))
+  all(sort(edge_attr_names(g)) == sort(edge_attr_names(kgml_steps$g_test_02)))
+
   # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_02))
   expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
   expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
