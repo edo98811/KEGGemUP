@@ -29,6 +29,7 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, ver
   edges_df <- parse_kgml_relations(xml, kegg_edge_defaults(), verbose = verbose)
   edges_df <- rbind(edges_df, parse_kgml_reactions(xml, kegg_edge_defaults(), verbose = verbose))
   edges_df <- rbind(edges_df, parse_kgml_lines_edges(line_nodes, kegg_edge_defaults(), verbose = verbose))
+  edges_df <- complete_kgml_reactions(vertices_df, edges_df, kegg_edge_defaults(), verbose = verbose)
 
   if (verbose) {
     message("Total nodes: ", nrow(vertices_df), ", Total edges: ", nrow(edges_df))

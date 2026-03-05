@@ -288,6 +288,76 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
   df
 }
 
+#' Complete reaction edges by connecting substrates and products to reaction nodes
+#' @param vertices_df Data frame of nodes with a column 'reaction' containing reaction IDs
+#' @param edges_df Data frame of edges with a column 'type' indicating edge type and columns 'from' and 'to' for node IDs
+#' @param defaults A list of default edge attributes
+#' @param verbose Logical indicating whether to print verbose messages
+#' @return edges_df Updated data frame of edges with reaction edges completed
+#' @noRd
+complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = FALSE) {
+  reaction_edges <- edges_df[edges_df$type == "reaction", ]
+  other_edges <- edges_df[edges_df$type != "reaction", ]
+
+  if (nrow(reaction_edges) == 0) {
+    if (verbose) message("No reaction edges to complete.")
+    return(edges_df)
+  }
+
+  # Collect all new edges in a list
+  new_edges_list <- lapply(seq_len(nrow(reaction_edges)), function(i) {
+    reaction_id <- reaction_edges$reaction_name[i]
+
+    if (is.na(reaction_id) || reaction_id == "") {
+      if (verbose) message("Skipping edge ", i, " with missing reaction name.")
+      return(NULL)
+    }
+
+    reaction_node_idx <- which(vertices_df$reaction == reaction_id)
+
+    if (length(reaction_node_idx) == 0) {
+      if (verbose) message("No node found for reaction ", reaction_id, " in edge ", i)
+      return(NULL)
+    }
+
+    n_rows <- length(reaction_node_idx) * 2
+    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows))
+
+    preserve_cols <- setdiff(names(reaction_edges), c("from", "to", "type"))
+    for (j in seq_along(reaction_node_idx)) {
+      row_offset <- (j - 1) * 2
+
+      # Substrate → Reaction
+      entry_edges_df[row_offset + 1, preserve_cols] <- reaction_edges[i, preserve_cols]
+      entry_edges_df[row_offset + 1, "from"] <- reaction_edges$from[i]
+      entry_edges_df[row_offset + 1, "to"] <- vertices_df$name[reaction_node_idx[j]]
+      entry_edges_df[row_offset + 1, "type"] <- "reaction_substrate"
+
+      # Reaction → Product
+      entry_edges_df[row_offset + 2, preserve_cols] <- reaction_edges[i, preserve_cols]
+      entry_edges_df[row_offset + 2, "from"] <- vertices_df$name[reaction_node_idx[j]]
+      entry_edges_df[row_offset + 2, "to"] <- reaction_edges$to[i]
+      entry_edges_df[row_offset + 2, "type"] <- "reaction_product"
+    }
+
+    entry_edges_df
+  })
+
+  # Filter NULL elements and combine
+  valid_edges <- Filter(Negate(is.null), new_edges_list)
+
+  if (length(valid_edges) == 0) {
+    if (verbose) message("No valid reaction edges to add.")
+    return(other_edges)
+  }
+
+  all_new_edges <- do.call(rbind, valid_edges)
+  result <- rbind(other_edges, all_new_edges)
+
+  if (verbose) message("Completed reaction edges. Total edges: ", nrow(result))
+  return(result)
+}
+
 #' Parse reaction edges from KGML XML
 #' @param xml XML document object representing the KGML pathway
 #' @param defaults A list of default edge attributes

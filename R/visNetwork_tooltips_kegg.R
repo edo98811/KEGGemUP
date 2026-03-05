@@ -164,7 +164,7 @@ add_edge_tooltip <- function(edges_df) {
       "</table>"
     ),
     ifelse(
-      edges_df$type == "reaction",
+      edges_df$type == "reaction_substrate" | edges_df$type == "reaction_product",
       paste0(
         "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
         "<table>",
