@@ -10,15 +10,10 @@ test_data/
 Example_data/
 relationships/
 inst/doc
-*.xml
 image.png
 kgml_cache/
 kegg_cache/
 docs
-
-!inst/extdata/hsa04010.xml
-!inst/extdata/test01.xml
-!inst/extdata/empty_edges.xml
 
 Users:.fileloc
 /doc/
