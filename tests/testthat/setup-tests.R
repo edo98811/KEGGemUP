@@ -87,75 +87,75 @@ vertices_df_basic <- data.frame(
   stringsAsFactors = FALSE
 )
 
-devtools::load_all()
+# devtools::load_all()
 
-# Tests for expected outputs of kegg_to_graph and map_results_to_graph
-kgml_steps <- list()
+# # Tests for expected outputs of kegg_to_graph and map_results_to_graph
+# kgml_steps <- list()
 
-kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
-kgml_steps$groups <- parse_kgml_groups(xml_example, kegg_node_defaults())
-kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
+# kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
+# kgml_steps$groups <- parse_kgml_groups(xml_example, kegg_node_defaults())
+# kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
 
-kgml_steps$all_nodes <- rbind(
-  kgml_steps$nodes,
-  kgml_steps$groups,
-  kgml_steps$line_nodes
-)
+# kgml_steps$all_nodes <- rbind(
+#   kgml_steps$nodes,
+#   kgml_steps$groups,
+#   kgml_steps$line_nodes
+# )
 
-kgml_steps$relations_edges <- parse_kgml_relations(xml_example, kegg_edge_defaults())
-kgml_steps$reactions_edges <- parse_kgml_reactions(xml_example, kegg_edge_defaults())
-kgml_steps$line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
+# kgml_steps$relations_edges <- parse_kgml_relations(xml_example, kegg_edge_defaults())
+# kgml_steps$reactions_edges <- parse_kgml_reactions(xml_example, kegg_edge_defaults())
+# kgml_steps$line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
 
-kgml_steps$all_edges <- rbind(
-  kgml_steps$relations_edges,
-  kgml_steps$reactions_edges,
-  kgml_steps$line_edges
-)
+# kgml_steps$all_edges <- rbind(
+#   kgml_steps$relations_edges,
+#   kgml_steps$reactions_edges,
+#   kgml_steps$line_edges
+# )
 
-bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
-bfc_map <- BiocFileCache(cache = file.path(bfc_path, "mappings"), ask = FALSE)
-g_1 <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
-g_2 <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
+# bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
+# bfc_map <- BiocFileCache(cache = file.path(bfc_path, "mappings"), ask = FALSE)
+# g_1 <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
+# g_2 <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
 
-kgml_steps$g_test_01 <- g_1
-kgml_steps$g_test_02 <- g_2
+# kgml_steps$g_test_01 <- g_1
+# kgml_steps$g_test_02 <- g_2
 
-saveRDS(kgml_steps, file = "inst/extdata/kgml_parsing_steps.rds")
+# saveRDS(kgml_steps, file = "inst/extdata/kgml_parsing_steps.rds")
 
-g_test_01 <- kegg_to_graph(
-  pathway_id = "hsa00001",
-  kgml_file = kgml_path_01
-)
+# g_test_01 <- kegg_to_graph(
+#   pathway_id = "hsa00001",
+#   kgml_file = kgml_path_01
+# )
 
-g_test_02 <- kegg_to_graph(
-  pathway_id = "hsa00001",
-  kgml_file = kgml_path_02
-)
+# g_test_02 <- kegg_to_graph(
+#   pathway_id = "hsa00001",
+#   kgml_file = kgml_path_02
+# )
 
-expected <- list(
-  g_test_01 = g_test_01,
-  g_test_02 = g_test_02
-)
+# expected <- list(
+#   g_test_01 = g_test_01,
+#   g_test_02 = g_test_02
+# )
 
-g_test_01_mapped <- map_results_to_graph(
-  g = g_test_01,
-  de_results = de_results_list
-)
-g_test_02_mapped <- map_results_to_graph(
-  g = g_test_02,
-  de_results = de_results_list
-)
+# g_test_01_mapped <- map_results_to_graph(
+#   g = g_test_01,
+#   de_results = de_results_list
+# )
+# g_test_02_mapped <- map_results_to_graph(
+#   g = g_test_02,
+#   de_results = de_results_list
+# )
 
-expected$g_test_01_mapped <- g_test_01_mapped
-expected$g_test_02_mapped <- g_test_02_mapped
+# expected$g_test_01_mapped <- g_test_01_mapped
+# expected$g_test_02_mapped <- g_test_02_mapped
 
-vis_graph_01 <- make_kegg_visNetwork(g_test_01_mapped)
-vis_graph_02 <- make_kegg_visNetwork(g_test_02_mapped)
+# vis_graph_01 <- make_kegg_visNetwork(g_test_01_mapped)
+# vis_graph_02 <- make_kegg_visNetwork(g_test_02_mapped)
 
-expected$visNetwork_test_01_mapped <- vis_graph_01
-expected$visNetwork_test_02_mapped <- vis_graph_02
+# expected$visNetwork_test_01_mapped <- vis_graph_01
+# expected$visNetwork_test_02_mapped <- vis_graph_02
 
-saveRDS(expected, file = "inst/extdata/kegg_to_graph_expected.rds")
+# saveRDS(expected, file = "inst/extdata/kegg_to_graph_expected.rds")
 
 
 
