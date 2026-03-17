@@ -312,21 +312,21 @@ complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = F
     n_rows <- length(reaction_node_idx) * 2
     entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
-    preserve_cols <- setdiff(names(reaction_edges), c("from", "to", "type"))
+    preserve_cols <- setdiff(names(reaction_edges), c("from", "to", "reaction_type"))
     for (j in seq_along(reaction_node_idx)) {
       row_offset <- (j - 1) * 2
 
-      # Substrate → Reaction
+      # Substrate -> Reaction
       entry_edges_df[row_offset + 1, preserve_cols] <- reaction_edges[i, preserve_cols]
       entry_edges_df[row_offset + 1, "from"] <- reaction_edges$from[i]
       entry_edges_df[row_offset + 1, "to"] <- vertices_df$name[reaction_node_idx[j]]
-      entry_edges_df[row_offset + 1, "type"] <- "reaction_substrate"
+      entry_edges_df[row_offset + 1, "reaction_type"] <- paste0("reaction_substrate_", reaction_edges$reaction_type[i])
 
-      # Reaction → Product
+      # Reaction -> Product
       entry_edges_df[row_offset + 2, preserve_cols] <- reaction_edges[i, preserve_cols]
       entry_edges_df[row_offset + 2, "from"] <- vertices_df$name[reaction_node_idx[j]]
       entry_edges_df[row_offset + 2, "to"] <- reaction_edges$to[i]
-      entry_edges_df[row_offset + 2, "type"] <- "reaction_product"
+      entry_edges_df[row_offset + 2, "reaction_type"] <- paste0("reaction_product_", reaction_edges$reaction_type[i])
     }
 
     entry_edges_df

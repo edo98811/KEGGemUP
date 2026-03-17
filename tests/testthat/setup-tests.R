@@ -93,9 +93,9 @@ vertices_df_basic <- data.frame(
 # # Tests for expected outputs of kegg_to_graph and map_results_to_graph
 # kgml_steps <- list()
 
-# kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_node_defaults())
-# kgml_steps$groups <- parse_kgml_groups(xml_example, kegg_node_defaults())
-# kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
+# kgml_steps$nodes <- parse_kgml_nodes(xml_example, kegg_vertex_defaults())
+# kgml_steps$groups <- parse_kgml_groups(xml_example, kegg_vertex_defaults())
+# kgml_steps$line_nodes <- parse_kgml_lines(xml_example, kegg_vertex_defaults())
 
 # kgml_steps$all_nodes <- rbind(
 #   kgml_steps$nodes,

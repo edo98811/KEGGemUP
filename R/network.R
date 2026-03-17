@@ -20,9 +20,9 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, ver
   }
 
   # Parse nodes
-  vertices_df <- parse_kgml_nodes(xml, kegg_node_defaults(), verbose = verbose)
-  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml, kegg_node_defaults(), verbose = verbose))
-  line_nodes <- parse_kgml_lines(xml, kegg_node_defaults(), verbose = verbose)
+  vertices_df <- parse_kgml_nodes(xml, kegg_vertex_defaults(), verbose = verbose)
+  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml, kegg_vertex_defaults(), verbose = verbose))
+  line_nodes <- parse_kgml_lines(xml, kegg_vertex_defaults(), verbose = verbose)
   vertices_df <- rbind(vertices_df, line_nodes)
 
   # Parse edges
@@ -85,3 +85,36 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 
   return(g)
 }
+
+# ' Create a visNetwork graph from nodes and edges data frames
+#' @param vertices_df Data frame of nodes.
+#' @param edges_df Data frame of edges.
+#' @param pathway_name Name of the pathway for the graph title.
+#' @return A visNetwork object representing the graph.
+#' @noRd
+make_tidygraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, verbose = FALSE) {
+  # Sort vertices
+  vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
+
+  # Check for empty edges
+  if (nrow(edges_df) == 0 || is.null(edges_df)) {
+    warning("No edges in graph. Creating a graph with isolated nodes.")
+    edges_df <- data.frame(from = character(), to = character())
+  }
+
+  # Create graph
+  g <- tidygraph::tbl_graph(nodes = vertices_df, edges = edges_df, directed = TRUE)
+
+  # Add pathway_name as graph attribute if provided
+  if (!is.null(pathway_name)) {
+    g <- g %>% activate(graph) %>% mutate(name = pathway_name)
+  }
+
+  # Verbose output
+  if (verbose) {
+    message("Graph created with ", nrow(vertices_df), " nodes and ", nrow(edges_df), " edges.")
+  }
+
+  return(g)
+}
+

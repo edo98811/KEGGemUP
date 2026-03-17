@@ -46,7 +46,7 @@ kegg_to_graph <- function(
   g <- build_kegg_graph(kgml_file, pathway_name, bfc_map = bfc_map)
 
   # Style graph
-  g <- style_igraph_graph(g, bfc_map)
+  g <- style_igraph_graph(g)
   return(g)
 }
 
@@ -94,8 +94,11 @@ map_results_to_graph <- function(
   de_results,
   feature_column = NULL,
   value_column = NULL,
-  palette = "RdBu",
-  verbose = FALSE
+  verbose = FALSE,
+  palette = NULL,
+  palette_limit = NULL,
+  palettes_limits_list = NULL,
+  palettes_list = NULL
 ) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
@@ -122,14 +125,23 @@ map_results_to_graph <- function(
 
   # Merge results into nodes
   nodes_updated <- add_results_nodes(vertices_df, results_combined, verbose = verbose)
-  nodes_updated <- add_colors_to_nodes(nodes_updated, palettes = palette, verbose = verbose)
+  return_list <- add_colors_to_nodes(
+    nodes_updated,
+    palette = palette,
+    palette_limit = palette_limit,
+    palettes_limits_list = palettes_limits_list,
+    palettes_list = palettes_list,
+    verbose = verbose
+  )
+
+  nodes_updated <- return_list$vertices_df
+  legend_plot <- return_list$legend_plot
 
   # Order nodes to match original graph
   nodes_updated <- nodes_updated[
     match(igraph::V(g)$name, nodes_updated$name), ,
     drop = FALSE
   ]
-
   # Safety check
   stopifnot(identical(nodes_updated$name, igraph::V(g)$name))
   # Update graph attributes
@@ -139,6 +151,7 @@ map_results_to_graph <- function(
   # igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "text") <- nodes_updated$text
   igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
+  igraph::graph_attr(g, "legend_plot") <- legend_plot
 
   return(g)
 }
@@ -146,6 +159,8 @@ map_results_to_graph <- function(
 #' Plot KEGG pathway graph using visNetwork
 #' @param g visNetwork object representing the pathway graph
 #' @param scaling_factor Numeric scaling factor for node sizes (default: 1.5)
+#' @param relationships Character vector specifying which relationships to include in the plot: "all", "reactions", or "relations" (default: "all")
+#' @param visualisation_type Character vector specifying the type of visualisation for nodes: "standard", "positions", "node_size" or "node_name" (default: "standard")
 #' @return visNetwork plot of the KEGG pathway
 #' @importFrom igraph as_data_frame graph_attr
 #' @details This function converts the igraph object
@@ -159,16 +174,26 @@ map_results_to_graph <- function(
 #' plot
 #'
 #' @export
-make_kegg_visNetwork <- function(g, scaling_factor = 1.5) {
-   
+make_kegg_visNetwork <- function(
+  g,
+  scaling_factor = 1.5,
+  relationships = c("all", "reactions", "relations", "none"),
+  visualisation_type = c("standard", "positions", "node_name", "node_size")
+) {
+  if (!inherits(g, "igraph")) {
+    stop("Input graph 'g' must be an igraph object.")
+  }
+
+  relationships <- match.arg(relationships)
+  visualisation_type <- match.arg(visualisation_type)
   # Convert igraph to data frames
   vertices_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
   pathway_name <- igraph::graph_attr(g, "title")
 
   # Style nodes and edges
-  vertices_df <- kegg_nodes_to_visNetwork(vertices_df, scaling_factor = scaling_factor)
-  if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df)
+  vertices_df <- kegg_nodes_to_visNetwork(vertices_df, scaling_factor = scaling_factor, visualisation_type = visualisation_type)
+  if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df, relationships = relationships)
 
   # Add tooltips
   vertices_df <- add_node_tooltip(vertices_df)
@@ -195,19 +220,19 @@ make_graph_subset <- function(g, ids_to_include) {
       setNames(rep(igraph::V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
     })
   )
-  
+
   ids_for_mapping <- data.frame(
     ids = ids_for_mapping,
     names = names(ids_for_mapping)
   )
 
   # nodes_to_include <- as_data_frame(g, what = "vertices") %>% filter(label == "Pnp") %>% pull(ids_for_mapping)
-  
+
   nodes_to_include <- unique(ids_for_mapping[ids_for_mapping$names %in% ids_to_include, "ids"])
   nodes_to_include <- nodes_to_include[!is.na(nodes_to_include)]
 
   subg <- igraph::induced_subgraph(g, igraph::V(g)[ids_for_mapping %in% nodes_to_include])
-  # 
+  #
   # ids_for_mapping <- unlist(
   #   lapply(1:length(c(igraph::V(subg)$ids_for_mapping)), function(i) {
   #     row <- igraph::V(subg)$ids_for_mapping[i]
@@ -215,7 +240,7 @@ make_graph_subset <- function(g, ids_to_include) {
   #     setNames(rep(igraph::V(subg)$ids_for_mapping[i], length(kegg_values)), kegg_values)
   #   })
   # )
-  
+
   return(subg)
 }
 
@@ -232,13 +257,12 @@ make_graph_subset <- function(g, ids_to_include) {
 #' @importFrom stats sd
 #' @export
 make_igraph_visualisation <- function(
-  g, 
+  g,
   eliminate_distance_outliers = TRUE,
   size_multiplier = 0.3,
   text_dist = 1.1,
   text_cex = 0.5
 ) {
-
   igraph::V(g)$color <- igraph::V(g)$vertex.color
   x_values <- igraph::V(g)$x
   y_values <- igraph::V(g)$y
@@ -262,8 +286,8 @@ make_igraph_visualisation <- function(
     }
   }
 
-  igraph::V(g)$x <- x_values 
-  igraph::V(g)$y <- y_values 
+  igraph::V(g)$x <- x_values
+  igraph::V(g)$y <- y_values
 
   layout_matrix <- cbind(igraph::V(g)$x, igraph::V(g)$y)
 

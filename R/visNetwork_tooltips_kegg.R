@@ -12,6 +12,7 @@ add_node_tooltip <- function(vertices_df) {
     function(i) {
       switch(tolower(vertices_df$type[i]),
         group = group_node_html(vertices_df[i, , drop = FALSE]),
+        ortholog = regular_node_html(vertices_df[i, , drop = FALSE]),
         gene = regular_node_html(vertices_df[i, , drop = FALSE]),
         enzyme = regular_node_html(vertices_df[i, , drop = FALSE]),
         compound = regular_node_html(vertices_df[i, , drop = FALSE]),
@@ -164,7 +165,7 @@ add_edge_tooltip <- function(edges_df) {
       "</table>"
     ),
     ifelse(
-      edges_df$type == "reaction_substrate" | edges_df$type == "reaction_product",
+      edges_df$type == "reaction",
       paste0(
         "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
         "<table>",

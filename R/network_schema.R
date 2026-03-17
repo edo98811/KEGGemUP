@@ -3,7 +3,7 @@
 #' Default KEGG node attributes
 #' @return A list of default KEGG node attributes
 #' @noRd
-kegg_node_defaults <- function() {
+kegg_vertex_defaults <- function() {
   list(
     # Core KGML attributes
     name = NA_character_,
@@ -77,3 +77,16 @@ kegg_edge_defaults <- function() {
   )
 }
 
+#' Return a template data frame for KEGG edges with default attributes
+#' @return A data frame with default KEGG edge attributes
+#' @export
+return_template_edges <- function(nrows = 1) {
+  data.frame(lapply(kegg_edge_defaults(), function(x) rep(x, nrows)), stringsAsFactors = FALSE)
+}
+
+#' Return a template data frame for KEGG vertices with default attributes
+#' @return A data frame with default KEGG vertex attributes
+#' @export
+return_template_vertices <- function(nrows = 1) {
+  data.frame(lapply(kegg_vertex_defaults(), function(x) rep(x, nrows)), stringsAsFactors = FALSE)
+}

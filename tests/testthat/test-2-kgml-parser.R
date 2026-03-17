@@ -1,15 +1,15 @@
 test_that("parse_kgml_nodes returns correct nodes", {
-  vertices_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
+  vertices_df <- parse_kgml_nodes(xml_example, kegg_vertex_defaults())
   expect_equal(vertices_df, kgml_steps$nodes)
 })
 
 test_that("parse_kgml_groups returns correct group nodes", {
-  groups_df <- parse_kgml_groups(xml_example, kegg_node_defaults())
+  groups_df <- parse_kgml_groups(xml_example, kegg_vertex_defaults())
   expect_equal(groups_df, kgml_steps$groups)
 })
 
 test_that("parse_kgml_lines returns correct line nodes", {
-  line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
+  line_nodes <- parse_kgml_lines(xml_example, kegg_vertex_defaults())
   expect_equal(line_nodes, kgml_steps$line_nodes)
 })
 
@@ -49,14 +49,14 @@ test_that("complete_kgml_reactions returns correct edges from reactions if edges
 })
 
 test_that("combined nodes (nodes + groups + lines) load correctly", {
-  vertices_df <- parse_kgml_nodes(xml_example, kegg_node_defaults())
-  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml_example, kegg_node_defaults()))
-  vertices_df <- rbind(vertices_df, parse_kgml_lines(xml_example, kegg_node_defaults()))
+  vertices_df <- parse_kgml_nodes(xml_example, kegg_vertex_defaults())
+  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml_example, kegg_vertex_defaults()))
+  vertices_df <- rbind(vertices_df, parse_kgml_lines(xml_example, kegg_vertex_defaults()))
   expect_equal(vertices_df, kgml_steps$all_nodes)
 })
 
 test_that("combined edges (relations + reactions + line edges) load correctly", {
-  line_nodes <- parse_kgml_lines(xml_example, kegg_node_defaults())
+  line_nodes <- parse_kgml_lines(xml_example, kegg_vertex_defaults())
   edges_df <- parse_kgml_relations(xml_example, kegg_edge_defaults())
   edges_df <- rbind(edges_df, parse_kgml_reactions(xml_example, kegg_edge_defaults()))
   edges_df <- rbind(edges_df, parse_kgml_lines_edges(line_nodes, kegg_edge_defaults()))

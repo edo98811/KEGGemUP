@@ -224,27 +224,129 @@ combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
 #' @importFrom stats setNames na.omit
 #' @return vertices_df with colored nodes based on their values.
 #' @noRd
-add_colors_to_nodes <- function(vertices_df, palettes = c("RdBu"), verbose = FALSE) {
+add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NULL, palettes_limits_list = NULL, palettes_list = NULL, verbose = FALSE) {
   sources <- unique(na.omit(vertices_df$de_source))
   valid_nodes <- vertices_df[!is.na(vertices_df$de_source), , drop = FALSE]
+  legend <- list()
+
+  # Checking the palette provided
+  if (!is.null(palettes_list)) {
+    if (!all(sources %in% names(palettes_list))) {
+      warning(
+        "Some sources do not have specified palettes defaulting to 'RdBu'.",
+      )
+      palettes_list <- NULL
+    }
+  }
+
+  palettes_list <- if (!is.null(palettes_list)) {
+    palettes_list
+  } else {
+    setNames(
+      rep("RdBu", length(sources)),
+      sources
+    )
+  }
+  
+  # Checking the palette limits provided
+  if (!is.null(palettes_limits_list)) {
+    if (!all(sources %in% names(palettes_limits_list))) {
+      warning(
+        "Some sources do not have specified palette limits. defaulting to max value",
+      )
+      palettes_limits_list <- NULL
+    }
+  }
+  palettes_limits_list <- if (!is.null(palettes_limits_list)) {
+    palettes_limits_list
+  } else {
+    setNames(
+      rep(palette_limit, length(sources)),
+      sources
+    )
+  }
 
   for (source_index in seq_along(sources)) {
-    palette <- palettes[[((source_index - 1) %% length(palettes)) + 1]]
-    palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
+    source_name <- sources[[source_index]]
+    
+    palette_limit <- palettes_limits_list[[source_name]]
+    palette <- palettes_list[[source_name]]
+
+    if (verbose) {
+      message("Processing source: ", source_name)
+    }
+    if (is.null(palette)) {
+      warning("Palette for source '", source_name, "' is NULL. Defaulting to 'RdBu'.")
+      palette <- "RdBu"
+    }
+    if (length(palette) == 1 && !palette %in% rownames(RColorBrewer::brewer.pal.info)) {
+      warning(
+        "Palette '", palette, "' is not a valid RColorBrewer palette. Defaulting to 'RdBu'."
+      )
+      palette <- "RdBu"
+      palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
+    } else if (length(palette) == 1) {
+      palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
+    } else {
+      palette_colors <- palette
+    }
+
     palette_ramp <- colorRampPalette(palette_colors)
 
     nodes_to_color <- valid_nodes[
-      valid_nodes$de_source == sources[source_index], ,
+      valid_nodes$de_source == source_name, ,
       drop = FALSE
     ]
 
-    if (nrow(nodes_to_color) > 1) {
+    # This makes the de values of the plot limited to the range specified in palette_limits, if provided. This is useful to avoid outliers dominating the color scale. If palette_limits is NULL or does not contain the source_name, no limits will be applied.
+    if (!is.null(palette_limit)) {
+      range_val <- palette_limit
+      if (verbose) {
+        message(
+          "Applying palette limits for source '", source_name,
+          "': [-", range_val, ", ", range_val, "]"
+        )
+      }
+      if (max(abs(nodes_to_color$de_value), na.rm = TRUE) > range_val) {
+        warning(
+          "Some de_value for source '", source_name,
+          "' exceed the specified palette limits. Values will be capped at [", -range_val, ", ", range_val, "]."
+        )
+      }
+      nodes_to_color$de_value <- pmax(pmin(nodes_to_color$de_value, range_val), -range_val)
+    } else if (nrow(nodes_to_color) > 1) {
+      if (verbose) {
+        message(
+          "Calculating color range for source '", source_name,
+          "' based on de_value range: [-", round(min(nodes_to_color$de_value, na.rm = TRUE), 3),
+          ", ", round(max(nodes_to_color$de_value, na.rm = TRUE), 3), "]"
+        )
+      }
       range_val <- max(abs(as.numeric(nodes_to_color$de_value)), na.rm = TRUE)
     } else if (nrow(nodes_to_color) == 1) {
+      if (verbose) {
+        message(
+          "Only one node with de_value for source '", source_name,
+          "'. Using absolute value of that node for color range: ", round(as.numeric(nodes_to_color$de_value[[1]]), 3)
+        )
+      }
       range_val <- abs(as.numeric(nodes_to_color$de_value[[1]]))
     } else {
       next
     }
+    if (!is.finite(range_val)){
+      warning(
+        "Range value for source '", source_name,
+        "' is not defined. Skipping color assignment for this source."
+      )
+      next
+    } 
+
+    legend[[source_name]] <- create_legend_single(
+      range_val = range_val,
+      palette_ramp = palette_ramp,
+      title = source_name
+    )
     # For ggplot:
     # https://stackoverflow.com/questions/79132520/symmetric-colorbar-for-values-but-print-colorbar-for-actual-observed-values
 
@@ -257,7 +359,7 @@ add_colors_to_nodes <- function(vertices_df, palettes = c("RdBu"), verbose = FAL
     # may be useful to add general info in the dataframe:
     # https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
 
-    nodes_to_color$vertex.color <- palette_ramp(100)[
+    nodes_to_color$vertex.color <- palette_ramp(100)  [
       as.numeric(cut(
         as.numeric(nodes_to_color$de_value),
         breaks = breaks_seq,
@@ -266,17 +368,64 @@ add_colors_to_nodes <- function(vertices_df, palettes = c("RdBu"), verbose = FAL
     ]
 
     valid_nodes$vertex.color[
-      valid_nodes$de_source == sources[source_index]
+      valid_nodes$de_source == source_name
     ] <- nodes_to_color$vertex.color
 
     if (verbose) {
       message(
-        "Assigned colors for source '", sources[source_index],
+        "Assigned colors for source '", source_name,
         "' using palette '", palette, "'."
       )
     }
   }
-  
+
+  # Create legend plot
+  legend_plot <- cowplot::plot_grid(
+    plotlist = legend,
+    ncol = length(legend)
+  )
+
   vertices_df$vertex.color[!is.na(vertices_df$de_source)] <- valid_nodes$vertex.color
-  return(vertices_df)
+  return_list <- list(
+    vertices_df = vertices_df,
+    legend_plot = legend_plot
+  )
+  return(return_list)
+}
+
+# Helper function to create a legend for a single source
+create_legend_single <- function(range_val, palette_ramp, title = "Legend", n_element = 7) {
+  # Reverse palette from RColorBrewer
+
+  # Compute breaks based on the range of the values
+  breaks_seq <- round(seq(-range_val, range_val, length.out = n_element), 1)
+
+  # Assign colors to breaks
+  legend_df <- data.frame(
+    value = breaks_seq,
+    color = palette_ramp(n_element)
+  )
+
+  # Create the legend plot
+  p <- ggplot(legend_df) +
+    geom_point(
+      aes(x = 1, y = seq_along(value), fill = value),
+      shape = 21,
+      size = 5,
+      color = "black"
+    ) +
+    scale_fill_gradientn(
+      colours = legend_df$color,
+      breaks = legend_df$value,
+      name = title
+    ) +
+    theme_void()
+
+  # Extract legend grob
+  get_legend <- function(plot) {
+    g <- ggplot_gtable(ggplot_build(plot))
+    g$grobs[[which(sapply(g$grobs, function(x) x$name) == "guide-box")]]
+  }
+
+  get_legend(p)
 }
