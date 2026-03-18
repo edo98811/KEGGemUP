@@ -73,7 +73,10 @@ kegg_edge_defaults <- function() {
     lty = 1,
     arrow.mode = "to",
     dashes = FALSE,
-    title = NA_character_
+    title = NA_character_,
+    font.face = "arial",
+    borderWidth = 1,
+    borderWidthSelected = 2
   )
 }
 

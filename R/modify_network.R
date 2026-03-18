@@ -59,8 +59,7 @@ add_vertices_kegg <- function(g, new_vertices) {
   # Get the number of new vertices to add and create a data frame with default attributes
   n_rows <- nrow(new_vertices)
   vertices_to_add <- data.frame(
-    lapply(kegg_vertex_defaults(), rep, each = n_rows),
-    stringsAsFactors = FALSE
+    lapply(kegg_vertex_defaults(), rep, each = n_rows)
   )
 
   # Map new_vertices columns to vertices_to_add, ignoring unrecognized columns

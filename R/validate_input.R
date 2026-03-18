@@ -6,7 +6,8 @@
 #' @return TRUE if all checks pass, otherwise stops with an error
 #' @noRd
 is_valid_de_entry <- function(de_entry, name) {
-  # --- Structure checks ---
+
+  #  Structure checks
   if (!is.list(de_entry) || !all(c("de_table", "value_column", "feature_column") %in%
     names(de_entry))) {
     warning(
@@ -31,7 +32,7 @@ is_valid_de_entry <- function(de_entry, name) {
     return(FALSE)
   }
 
-  # --- Row check ---
+  #  Row check
 
   # if feature_column is not in the colnames, if it is null, if it is not
   # 'rownames' then error
@@ -44,7 +45,7 @@ is_valid_de_entry <- function(de_entry, name) {
     return(FALSE)
   }
 
-  # --- Check that table is correct ---
+  #  Check that table is correct
   if (is.null(de_entry$de_table) || !(de_entry$value_column %in% colnames(de_entry$de_table))) {
     warning("Invalid de_table or value_column in de_results: ", name)
     return(FALSE)
@@ -143,9 +144,31 @@ is_valid_dataframe <- function(obj, name = "object") {
 #' @return A named list of validated de_results entries, or NULL if invalid
 #' @noRd
 normalize_de_results <- function(
-    de_results,
-    value_column = NULL,
-    feature_column = NULL) {
+  de_results,
+  value_column = NULL,
+  feature_column = NULL
+) {
+  # if (
+  #   xor(
+  #     (is.data.frame(de_results) && is.character(value_column) && is.character(feature_column)),
+  #     (is.list(de_results) && is.null(value_column) && is.null(feature_column))
+  #   )
+  # ) {
+  #   warning("If de_results is a data.frame, value_column and feature_column must be provided as character strings.
+  #   If de_results is a list, value_column and feature_column should not be provided. Ignoring de_results.")
+  #   return(NULL)
+  # }
+
+  # if ((is.data.frame(de_results) && is.character(value_column) && is.character(feature_column))) {
+  #   if (all(
+  #     data_frame_has_columns(de_results, c(feature_column, value_column)),
+  #     dataframe_cols_are_of_type(de_results, c(feature_column = "character", value_column = "numeric"))
+  #   ))
+  # }
+  # if (!all(
+
+  #   de_results == NULL
+  # ))
   # NULL is a valid input
   if (is.null(de_results)) {
     return(NULL)
@@ -194,6 +217,16 @@ normalize_de_results <- function(
   # keep only valid entries
   keep <- vapply(
     names(de_results),
+    # function(name) {
+    #   de_entry <- de_results[[name]]
+    #   all(
+    #     inherits(de_entry, "list"),
+    #     list_has_names(de_entry, c("de_table", "value_column", "feature_column")),
+    #     list_elements_are_types(de_entry, c(de_table = "data.frame", value_column = "character", feature_column = "character")),
+    #     has_columns(de_entry$de_table, c(de_entry$feature_column, de_entry$value_column)),
+    #     dataframe_cols_are_of_type(de_entry$de_table, c(feature_column = "character", value_column = "numeric"))
+    #   )
+    # },
     function(name) {
       is_valid_de_entry(de_results[[name]], name)
     },
@@ -208,4 +241,114 @@ normalize_de_results <- function(
   }
 
   de_results
+}
+
+
+# Check that a data frame has required columns
+has_columns <- function(df, cols) {
+  missing <- setdiff(cols, names(df))
+  if (length(missing) > 0) {
+    warning("Missing required columns: ", paste(missing, collapse = ", "))
+    return(FALSE)
+  }
+  TRUE
+}
+
+# Check that a column has no NA or empty strings
+valid_column <- function(df, col) {
+  if (!col %in% names(df)) {
+    warning("Column '", col, "' not found in data frame.")
+    return(FALSE)
+  }
+  invalid <- is.na(df[[col]]) | df[[col]] == ""
+  if (any(invalid)) {
+    warning(
+      "Column '", col, "' contains NA or empty values at rows: ",
+      paste(which(invalid), collapse = ", ")
+    )
+    return(FALSE)
+  }
+  TRUE
+}
+
+# Check that a variable is not NULL
+not_null <- function(x, var_name = deparse(substitute(x))) {
+  if (is.null(x)) {
+    warning("Variable '", var_name, "' is NULL.")
+    return(FALSE)
+  }
+  TRUE
+}
+
+# Check that a vector column is numeric
+is_numeric_col <- function(df, col) {
+  if (!col %in% names(df)) {
+    warning("Column '", col, "' not found in data frame.")
+    return(FALSE)
+  }
+  if (!is.numeric(df[[col]])) {
+    warning("Column '", col, "' is not numeric.")
+    return(FALSE)
+  }
+  TRUE
+}
+
+# Check that a list has exactly the expected names
+list_has_names <- function(lst, expected_names) {
+  actual_names <- names(lst)
+  missing <- setdiff(expected_names, actual_names)
+  extra <- setdiff(actual_names, expected_names)
+
+  if (length(missing) > 0) {
+    warning("List is missing expected names: ", paste(missing, collapse = ", "))
+  }
+  if (length(extra) > 0) {
+    warning("List contains unexpected names: ", paste(extra, collapse = ", "))
+  }
+
+  return(length(missing) == 0 && length(extra) == 0)
+}
+
+# Check that each element of a list has the expected type
+# expected_types should be a named vector/list: names = list names, values = type as string
+list_elements_are_types <- function(lst, expected_types) {
+  all_ok <- TRUE
+  for (nm in names(expected_types)) {
+    expected_type <- expected_types[[nm]]
+    actual_type <- class(lst[[nm]])[1] # first class in case of multiple
+    if (actual_type != expected_type) {
+      warning(
+        "Element '", nm, "' has type '", actual_type,
+        "' but expected type '", expected_type, "'."
+      )
+      all_ok <- FALSE
+    }
+  }
+
+  return(all_ok)
+}
+
+data_frame_has_columns <- function(df, required_cols) {
+  missing <- setdiff(required_cols, names(df))
+  if (length(missing) > 0) {
+    warning("Data frame is missing required columns: ", paste(missing, collapse = ", "))
+    return(FALSE)
+  }
+  TRUE
+}
+
+dataframe_cols_are_of_type <- function(df, col_types) {
+  all_ok <- TRUE
+  for (col in names(col_types)) {
+    expected_type <- col_types[[col]]
+    actual_type <- class(df[[col]])[1] # first class in case of multiple
+    if (actual_type != expected_type) {
+      warning(
+        "Column '", col, "' has type '", actual_type,
+        "' but expected type '", expected_type, "'."
+      )
+      all_ok <- FALSE
+    }
+  }
+  return(all_ok)
 }

@@ -1,16 +1,14 @@
-#' Convert KEGG pathway to graph
-#'
-#' @param pathway_id KEGG pathway ID (e.g., "hsa04110").
-#' @param kgml_file Optional local path to a KGML file.
-#' If provided, the function will use this file instead of downloading it.
-#' @param verbose Logical, if TRUE, print additional messages.
-#' @return An igraph object representing the KEGG pathway graph.
-#' @details This function downloads the KGML file for a given KEGG pathway ID,
-#' parses it and constructs an igraph object.
+
+#' Convert KEGG pathway to igraph object
+#' @param pathway_id KEGG pathway ID (e.g., 'hsa04110') or NULL if using kgml_file
+#' @param kgml_file Path to a local KGML file (optional, if pathway_id is provided)
+#' @param verbose Logical indicating whether to print verbose messages (default: FALSE)
+#' @return An igraph object representing the KEGG pathway graph
+#' @importFrom BiocFileCache BiocFileCache bfcquery bfcadd 
 #' @examples
-#' pathway_graph <- kegg_to_graph(
-#'   pathway_id = "hsa04110"
-#' )
+#' pathway <- "hsa04110" # Example pathway ID
+#' graph <- kegg_to_graph(pathway_id = pathway, verbose = TRUE)
+#' plot(graph) # Plot the graph using igraph's plotting functions
 #' @export
 kegg_to_graph <- function(
   pathway_id,
@@ -51,25 +49,23 @@ kegg_to_graph <- function(
 }
 
 #' Map differential expression results to nodes
-#'
-#' @param g An igraph object representing the pathway.
-#' @param de_results Named list of differential expression results.
-#' @param feature_column Column name in de_table containing KEGG IDs
-#' (if de_results is a single data.frame).
-#' @param value_column Column name in de_table containing values to map
-#' (if de_results is a single data.frame).
-#' @param verbose Whether to print progress messages (default: TRUE).
-#' @param palette Color palette for node coloring (default: "RdBu").
-#' @return An igraph or visNetwork object with mapped results.
-#' @importFrom visNetwork visIgraph visPhysics visLegend visOptions
-#' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V E
+#' @param g An igraph object representing the KEGG pathway graph.
+#' @param de_results A data frame or a list of data frames containing differential expression results
+#' @param feature_column Name of the column in de_results that contains KEGG IDs 
+#' @param value_column Name of the column in de_results that contains values to map
+#' @param verbose Logical indicating whether to print verbose messages (default: FALSE)
+#' @param palette Optional color palette for mapping values (default: NULL, will use a default palette)
+#' @param palette_limit Optional numeric limit for the color palette (default: NULL, will be determined from data)
+#' @param palettes_limits_list Optional list of numeric limits for multiple palettes if de_results is a list (default: NULL)
+#' @param palettes_list Optional list of color palettes if de_results is a list (default: NULL)
+#' @return An igraph object with differential expression results mapped to node attributes
+#' @importFrom igraph V graph_attr vertex_attr
 #' @details This function can be used to map the differential expression
 #' results to the graph,
 #' the input of the graph must be the output of the function
 #' \code{kegg_to_graph} in the igraph format. The results to be mapped can be
 #' provided either as a list or as a single data.frame. If a single data.frame
-#' is provided,
-#' the default column names for KEGG IDs and values are
+#' is provided, the default column names that it will look for are KEGG IDs and values are
 #' 'KEGG_ids' and 'log2FoldChange',
 #' respectively, but these can be changed using the
 #' \code{feature_column} and \code{value_column} parameters.
@@ -117,6 +113,7 @@ map_results_to_graph <- function(
     Returning original graph.")
     return(g)
   }
+
   # Combine results into a single data frame
   results_combined <- combine_results_in_dataframe(de_results, verbose = verbose)
 
@@ -148,7 +145,6 @@ map_results_to_graph <- function(
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
   igraph::vertex_attr(g, "vertex.color") <- nodes_updated$vertex.color
-  # igraph::vertex_attr(g, "color") <- nodes_updated$vertex.color
   igraph::vertex_attr(g, "text") <- nodes_updated$text
   igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
   igraph::graph_attr(g, "legend_plot") <- legend_plot
@@ -157,25 +153,33 @@ map_results_to_graph <- function(
 }
 
 #' Plot KEGG pathway graph using visNetwork
-#' @param g visNetwork object representing the pathway graph
-#' @param scaling_factor Numeric scaling factor for node sizes (default: 1.5)
-#' @param relationships Character vector specifying which relationships to include in the plot: "all", "reactions", or "relations" (default: "all")
-#' @param visualisation_type Character vector specifying the type of visualisation for nodes: "standard", "positions", "node_size" or "node_name" (default: "standard")
-#' @return visNetwork plot of the KEGG pathway
-#' @importFrom igraph as_data_frame graph_attr
-#' @details This function converts the igraph object
-#' representing a KEGG pathway, generated by \code{kegg_to_graph},
-#' into a visNetwork plot.
+#' @param g An igraph object representing the KEGG pathway graph.
+#' @param scaling_factor Numeric factor to scale node sizes (default: 1.5).
+#' @param relationships Character specifying which relationships to include in edges 
+#' ("all", "reactions", "relations", "none"; default: "all").
+#' @param visualisation_type Character specifying the type of visualisation for nodes:
+#'  "standard", "positions", "node_name", or "node_size" (default: "standard").
+#' @return A visNetwork object representing the KEGG pathway graph with mapped results.
+#' @details This function takes an igraph object representing a KEGG pathway graph 
+#'  and creates a visNetwork visualization. It maps node attributes to visual properties
+#'  and allows for customization of node sizes and edge relationships. 
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
 #' graph <- kegg_to_graph(pathway_id = pathway)
-#' plot <- make_kegg_visNetwork(graph)
+#' # Example differential expression results
+#' de_results <- data.frame(
+#'  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+#' log2FoldChange = c(1.5, -2.0, 0.5)
+#' )
+#' graph <- map_results_to_graph(graph, de_results, feature_column = "KEGG_ids"),
+#' value_column = "log2FoldChange")
 #'
-#' plot
+#' vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, relationships = "all", visualisation_type = "standard")
+#' @importFrom igraph as_data_frame graph_from_data_frame graph_attr permute V
 #'
 #' @export
 make_kegg_visNetwork <- function(
-  g,
+  g, 
   scaling_factor = 1.5,
   relationships = c("all", "reactions", "relations", "none"),
   visualisation_type = c("standard", "positions", "node_name", "node_size")
@@ -213,35 +217,54 @@ make_kegg_visNetwork <- function(
 #' @importFrom igraph V induced_subgraph
 #' @export
 make_graph_subset <- function(g, ids_to_include) {
-  ids_for_mapping <- unlist(
-    lapply(1:length(c(igraph::V(g)$ids_for_mapping)), function(i) {
-      row <- igraph::V(g)$ids_for_mapping[i]
-      kegg_values <- unlist(strsplit(as.character(row), ";"))
-      setNames(rep(igraph::V(g)$ids_for_mapping[i], length(kegg_values)), kegg_values)
-    })
-  )
 
-  ids_for_mapping <- data.frame(
-    ids = ids_for_mapping,
-    names = names(ids_for_mapping)
-  )
+  # Get vertex data frame and create mapping for subgraph extraction
+  vertices_df <- as_data_frame(g, what = "vertices")
+  mapping <- make_mapping_df(vertices_df)
 
-  # nodes_to_include <- as_data_frame(g, what = "vertices") %>% filter(label == "Pnp") %>% pull(ids_for_mapping)
-
-  nodes_to_include <- unique(ids_for_mapping[ids_for_mapping$names %in% ids_to_include, "ids"])
+  # Subset nodes based on provided KEGG IDs
+  nodes_to_include <- unique(mapping[mapping$matched_id %in% ids_to_include, "name"])
   nodes_to_include <- nodes_to_include[!is.na(nodes_to_include)]
 
-  subg <- igraph::induced_subgraph(g, igraph::V(g)[ids_for_mapping %in% nodes_to_include])
-  #
-  # ids_for_mapping <- unlist(
-  #   lapply(1:length(c(igraph::V(subg)$ids_for_mapping)), function(i) {
-  #     row <- igraph::V(subg)$ids_for_mapping[i]
-  #     kegg_values <- unlist(strsplit(as.character(row), ";"))
-  #     setNames(rep(igraph::V(subg)$ids_for_mapping[i], length(kegg_values)), kegg_values)
-  #   })
-  # )
+  # Make induced subgraph with the selected nodes
+  subg <- igraph::induced_subgraph(g, nodes_to_include)
 
   return(subg)
+}
+
+#' Highlight a subset of the graph based on KEGG IDs
+#' @param g An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.
+#' @param ids_to_include Character vector of KEGG IDs to include in the highlighted subset.
+#' @return An igraph object with highlighted nodes and faded non-highlighted nodes and edges.
+#' @details This function highlights the nodes corresponding to the provided KEGG IDs and fades the rest of the graph. 
+#' It modifies vertex attributes to achieve this effect.
+#' @importFrom igraph V set_vertex_attr set_edge_attr incident
+#' @export  
+highlight_graph_subset <- function(g, ids_to_include) {
+
+  # Get vertex data frame and create mapping for subgraph extraction
+  vertices_df <- as_data_frame(g, what = "vertices")
+  mapping <- make_mapping_df(vertices_df)
+
+  # Subset nodes based on provided KEGG IDs
+  nodes_to_highlight <- unique(mapping[mapping$matched_id %in% ids_to_include, "name"])
+  nodes_to_highlight <- nodes_to_highlight[!is.na(nodes_to_highlight)]
+
+  nodes_to_fade <- setdiff(igraph::V(g)$name, nodes_to_highlight)
+
+  #  =Vertex attributes
+  g <- set_vertex_attr(g, "borderWidth", index = fade_vertices, value = 0)
+  g <- set_vertex_attr(g, "borderWidthSelected", index = fade_vertices, value = 0)
+  g <- set_vertex_attr(g, "vertex.color", index = fade_vertices, value = "rgba(200,200,200,0.4)")
+  
+  # Edge attributes 
+  # Select all edges incident to any faded vertex
+  edges_to_fade <- unique(unlist(lapply(fade_vertices, function(v) incident(g, v, mode = "all"))))
+  
+  g <- set_edge_attr(g, "color", index = edges_to_fade, value = "rgba(200,200,200,0.4)")
+  g <- set_edge_attr(g, "width", index = edges_to_fade, value = 1)
+  
+  return(g)
 }
 
 #' Plot igraph with improved layout and outlier handling

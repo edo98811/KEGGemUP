@@ -74,7 +74,7 @@ regular_node_html <- function(vertices_df) {
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$link, "' target='_blank'>",
       "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
-      "KEGG entry",
+      paste0(vertices_df$label, "on KEGG"),
       "</button></a></div>"
     )
   )
@@ -85,7 +85,7 @@ regular_node_html <- function(vertices_df) {
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$reaction_link, "' target='_blank'>",
       "<button type='button' style='color:#fff; background-color:#33b742; border-color:#2e6da4;'>",
-      "KEGG reaction",
+      paste0(vertices_df$reaction_name, "on KEGG"),
       "</button></a></div>"
     )
   )
@@ -95,12 +95,13 @@ regular_node_html <- function(vertices_df) {
     button_html_reaction,
     "</div>"
   )
-  paste0(
+  vertices_df$title <- paste0(
     "<h4 style='text-align: center;'>", vertices_df$label, "</h4>",
     "<table>",
     "<tr><th align='left'>KEGG ID</th><td>",
     ifelse(
-      is.na(vertices_df$KEGG), "N/A",
+      is.na(vertices_df$KEGG),
+      "N/A",
       ifelse(
         nchar(vertices_df$KEGG) > 50,
         substr(vertices_df$KEGG, 1, 50),
@@ -111,26 +112,39 @@ regular_node_html <- function(vertices_df) {
     "<tr><th align='left'>Name</th><td>",
     ifelse(is.na(vertices_df$graphics_name), "N/A", vertices_df$graphics_name),
     "</td></tr>",
-    "<tr><th align='left'>Source</th><td>",
-    ifelse(is.na(vertices_df$de_source), "N/A", vertices_df$de_source),
-    "</td></tr>",
-    "<tr><th align='left'>Value</th><td>",
-    if ("de_text" %in% names(vertices_df)) {
-      ifelse(
-        is.na(vertices_df$de_text), "",
-        vertices_df$de_text
+
+    # Source row
+    ifelse(
+      is.na(vertices_df$de_source) | vertices_df$de_source == "",
+      "",
+      paste0(
+        "<tr><th align='left'>Source</th><td>",
+        vertices_df$de_source,
+        "</td></tr>"
       )
-    } else {
-      "N/A"
-    },
-    "</td></tr>",
-    "<tr><th align='left'>Group</th><td>",
+    ),
+
+    # Value row
+    ifelse(
+      is.na(vertices_df$de_text) | vertices_df$de_text == "",
+      "",
+      paste0(
+        "<tr><th align='left'>", vertices_df$de_name, "</th><td>",
+        vertices_df$de_text,
+        "</td></tr>"
+      )
+    ),
+
+    # Group row
     ifelse(
       is.na(vertices_df$group) | vertices_df$group == "",
-      "Not belonging to any group",
-      vertices_df$group
+      "",
+      paste0(
+        "<tr><th align='left'>Group</th><td>",
+        vertices_df$group,
+        "</td></tr>"
+      )
     ),
-    "</td></tr>",
     "</table>",
     button_html
   )
@@ -143,6 +157,7 @@ regular_node_html <- function(vertices_df) {
 #' @noRd
 add_edge_tooltip <- function(edges_df) {
   base_url <- "https://www.genome.jp/dbget-bin/www_bget?"
+
   button_html_reaction <- ifelse(
     is.na(edges_df$reaction_name),
     "",
@@ -154,40 +169,42 @@ add_edge_tooltip <- function(edges_df) {
       "</button></a></div>"
     )
   )
-  edges_df$title <- ifelse(
-    edges_df$type == "relation",
-    paste0(
-      "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
-      "<table>",
-      "<tr><th align='left'>Type: </th><td>", edges_df$relation_type, "</td></tr>",
-      "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name, "</td></tr>",
-      "<tr><th align='left'>Label: </th><td>", edges_df$relation_subtype_value, "</td></tr>",
-      "</table>"
-    ),
-    ifelse(
-      edges_df$type == "reaction",
-      paste0(
-        "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
-        "<table>",
-        "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id, "</td></tr>",
-        "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type, "</td></tr>",
-        "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name, "</td></tr>",
-        "</table>",
-        button_html_reaction
-      ),
-      ifelse(
-        edges_df$type == "line",
-        paste0(
-          "<h4 style='text-align: center;'>", edges_df$type, "</h4>",
-          "<table>",
-          "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name, "</td></tr>",
-          "</table>",
-          button_html_reaction
-        ),
-        ""
-      )
-    )
+  # Initialize the title column
+  edges_df$title <- ""
+
+  # Relation edges
+  idx_relation <- edges_df$type == "relation"
+  edges_df$title[idx_relation] <- paste0(
+    "<h4 style='text-align: center;'>", edges_df$type[idx_relation], "</h4>",
+    "<table>",
+    "<tr><th align='left'>Type: </th><td>", edges_df$relation_type[idx_relation], "</td></tr>",
+    "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name[idx_relation], "</td></tr>",
+    "<tr><th align='left'>Label: </th><td>", edges_df$relation_subtype_value[idx_relation], "</td></tr>",
+    "</table>"
+  )
+
+  # Reaction edges
+  idx_reaction <- edges_df$type == "reaction"
+  edges_df$title[idx_reaction] <- paste0(
+    "<h4 style='text-align: center;'>", edges_df$type[idx_reaction], "</h4>",
+    "<table>",
+    "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id[idx_reaction], "</td></tr>",
+    "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
+    "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_reaction], "</td></tr>",
+    "</table>",
+    button_html_reaction
+  )
+
+  # Line edges
+  idx_line <- edges_df$type == "line"
+  edges_df$title[idx_line] <- paste0(
+    "<h4 style='text-align: center;'>", edges_df$type[idx_line], "</h4>",
+    "<table>",
+    "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_line], "</td></tr>",
+    "</table>",
+    button_html_reaction
   )
 
   return(edges_df)
 }
+

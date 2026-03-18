@@ -207,7 +207,7 @@ parse_kgml_lines_edges <- function(line_vertices_df, defaults, verbose = FALSE) 
   # Pre-allocate data.frame for edges
   edges_df <- as.data.frame(
     lapply(defaults, function(x) rep(x, n_edges)),
-    stringsAsFactors = FALSE
+  
   )
 
   # Fill edges by connecting consecutive points of the same line

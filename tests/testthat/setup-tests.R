@@ -85,7 +85,7 @@ vertices_df_basic <- data.frame(
   type = c("gene", "compound", "compound", "compound", "compound", "gene"),
   KEGG = c(NA, "C00001", "C99999", "G00001", "G99999", "00001"),
   label = c(NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_),
-  stringsAsFactors = FALSE
+
 )
 
 # devtools::load_all()

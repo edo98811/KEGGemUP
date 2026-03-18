@@ -5,10 +5,12 @@
 #' @noRd
 remove_kegg_prefix_str <- function(kegg_ids) {
   sapply(kegg_ids, function(id) {
-    if (is.na(id)) return(NA_character_)        # preserve NA
-    elements <- strsplit(id, " ")[[1]]          # split by space
-    elements <- sub("^[a-z]+:", "", elements)   # remove prefix
-    paste(elements, collapse = ";")             # collapse back to single string
+    if (is.na(id)) {
+      return(NA_character_)
+    } # preserve NA
+    elements <- strsplit(id, " ")[[1]] # split by space
+    elements <- sub("^[a-z]+:", "", elements) # remove prefix
+    paste(elements, collapse = ";") # collapse back to single string
   }, USE.NAMES = FALSE)
 }
 
@@ -50,13 +52,13 @@ expand_keggs <- function(kegg_df) {
 #' Return all cached KEGG and mapping files from BiocFileCache
 #' @return A list containing data frames of cached KEGG and mapping files
 #' @importFrom BiocFileCache BiocFileCache bfcinfo
-#' @details This function retrieves information about 
+#' @details This function retrieves information about
 #' all cached KEGG pathway files
 #' and mapping files stored using BiocFileCache.
 #' @examples
 #' cache_info <- return_all_cached()
-#' print(cache_info$kegg)      # View cached KEGG pathway files
-#' print(cache_info$mappings)  # View cached mapping files
+#' print(cache_info$kegg) # View cached KEGG pathway files
+#' print(cache_info$mappings) # View cached mapping files
 #' @export
 return_all_cached <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
@@ -67,6 +69,32 @@ return_all_cached <- function() {
     mappings = BiocFileCache::bfcinfo(bfc_map)
   )
   return(cache_info)
+}
+#' Create a mapping data frame from vertices_df for subgraph extraction
+#' @param vertices_df Data frame of graph vertices with columns 'name' and 'ids_for_mapping'
+#' @return A data frame with columns 'name' and 'matched_id'. 
+#' The 'matched_id' column contains individual KEGG IDs extracted from 'ids_for_mapping', which may contain multiple IDs separated by ';'.
+#' @details Example of output:
+#'   name matched_id
+#' 1  NodeA     K00001
+#' 2  NodeA     K00002 
+#' 3  NodeB     K00003
+#' @noRd
+make_mapping_df <- function(vertices_df) {
+  # Explode ids_for_mapping per node
+  mapping <- do.call(
+    rbind,
+    lapply(seq_len(nrow(vertices_df)), function(i) {
+      data.frame(
+        name = vertices_df$name[i],
+        matched_id = strsplit(
+          vertices_df$ids_for_mapping[i], ";",
+          fixed = TRUE
+        )[[1]]
+      )
+    })
+  )
+  return(mapping)
 }
 
 #' Reset KEGG and mapping caches by deleting all cached files

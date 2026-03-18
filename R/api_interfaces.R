@@ -172,7 +172,6 @@ get_kegg_db <- function(
     sep = "\t",
     quote = "",
     comment.char = "",
-    stringsAsFactors = FALSE,
     col.names = c("kegg_id", "description")
   ) |> as.data.frame()
 

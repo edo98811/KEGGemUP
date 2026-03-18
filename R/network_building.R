@@ -85,6 +85,36 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 
   return(g)
 }
+# make_igraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, verbose = FALSE) {
+#   # Sort vertices by label and name (case-insensitive)
+#   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
+# 
+#   # Create empty graph with vertices
+#   g <- igraph::make_empty_graph(n = nrow(vertices_df), directed = TRUE)
+#   igraph::vertex_attr(g) <- cbind(igraph::vertex_attr(g), vertices_df)
+#   igraph::V(g)$name <- vertices_df$name
+# 
+#   # Add edges if available
+#   if (!is.null(edges_df) && nrow(edges_df) > 0) {
+#     if (nrow(edges_df) > 0) {
+#       g <- igraph::add_edges(g, t(as.matrix(edges_df[, c("from", "to")])))
+#       # Add edge attributes
+#       for (col in setdiff(names(edges_df), c("from", "to"))) {
+#         igraph::edge_attr(g, col) <- edges_df[[col]]
+#       }
+#     } else if (verbose) {
+#       warning("Edges do not reference valid vertices. No edges added.")
+#     }
+#   } else if (verbose) {
+#     warning("No edges in graph. Creating vertex-only graph.")
+#   }
+# 
+#   if (verbose) {
+#     message("Graph created with ", igraph::vcount(g), " vertices and ", igraph::ecount(g), " edges.")
+#   }
+# 
+#   return(g)
+# }
 
 # ' Create a visNetwork graph from nodes and edges data frames
 #' @param vertices_df Data frame of nodes.

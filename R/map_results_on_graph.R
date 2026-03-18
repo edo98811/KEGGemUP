@@ -4,10 +4,37 @@
 #' ids_for_mapping, de_value, de_source
 #' @param verbose Logical, if TRUE, prints messages about the process.
 #' @return Updated nodes data frame with added columns: de_value, color, de_source, text
+#' @details
+#'   Example structure:
+#'   - vertices_df:
+#'     | ids_for_mapping |
+#'     |----------------|
+#'     | 1111           |
+#'     | 2222           |
+#'     | 3333;2222      |
+#'     | K00001         |
+#'     | tst00002       |
+#'     | 1111           |
+#'   - results_combined:
+#'     | ids_for_mapping | de_value | de_source |
+#'     |-----------------|----------|-----------|
+#'     | 1111            | 2.5      | de1       |
+#'     | 2222            | -1.2     | de2       |
+#'     | 3333            | 0.5      | de1       |
 #' @noRd
 add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
+  # Checks
+  if (!all(c(
+    not_null(vertices_df),
+    has_columns(vertices_df, c("name", "ids_for_mapping")),
+    has_columns(results_combined, c("ids_for_mapping", "de_value", "de_source")),
+    valid_column(vertices_df, "ids_for_mapping")
+  ))) {
+    stop("add_results_nodes: Invalid input")
+  }
+
   # If results is empty then return the original df
-  if (is.null(results_combined)) {
+  if (!not_null(results_combined)) {
     if (verbose) {
       message("results_combined is NULL; returning original vertices_df.")
     }
@@ -15,69 +42,14 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   }
 
   warn <- FALSE
-  # vertices_df has this structure:
-  # ids_for_mapping  | KEGG (id is the node id)
-  # 1      1111
-  # 2      2222
-  # 2      3333;2222
-  # 3    K00001
-  # 4  tst00002
-  # 5 undefined
-  # 6      1111
-
-  # results_combined has this structure:
-  # ids_for_mapping     | de_value | source
-  # 1111        2.5        de1
-  # 2222       -1.2        de2
-  # 3333        0.5        de1
-  # Ensure required columns exist
-  required_nodes <- c(
-    "name", "ids_for_mapping", "de_value", "de_source", "text", "type"
-  )
-  required_results <- c(
-    "ids_for_mapping", "de_value", "de_source"
-  )
-
-  missing_nodes <- setdiff(required_nodes, names(vertices_df))
-  missing_results <- setdiff(required_results, names(results_combined))
-
-  if (length(missing_nodes) > 0) {
-    stop("Missing columns in vertices_df: ", paste(missing_nodes, collapse = ", "))
-  }
-  if (length(missing_results) > 0) {
-    stop("Missing columns in results_combined: ", paste(missing_results, collapse = ", "))
-  }
-
-  # Subset nodes to those with valid ids_for_mapping
-  ids_nodes_to_check <- which(
-    !is.na(vertices_df$ids_for_mapping) & vertices_df$ids_for_mapping != ""
-  )
-  nodes_to_check <- vertices_df[ids_nodes_to_check, , drop = FALSE]
-
-  # If no nodes to check, return original
-  if (nrow(nodes_to_check) == 0) {
-    warning("No nodes with valid 'ids_for_mapping' found.")
-    return(vertices_df)
-  }
 
   if (verbose) {
     message("Found ", nrow(nodes_to_check), " nodes with valid 'ids_for_mapping'.")
   }
 
-  # Explode ids_for_mapping per node
-  mapping <- do.call(
-    rbind,
-    lapply(seq_len(nrow(nodes_to_check)), function(i) {
-      data.frame(
-        name = nodes_to_check$name[i],
-        matched_id = strsplit(
-          nodes_to_check$ids_for_mapping[i], ";",
-          fixed = TRUE
-        )[[1]],
-        stringsAsFactors = FALSE
-      )
-    })
-  )
+  ### MAIN LOGIC
+  # Create mapping data frame by exploding nodes with multiple ids_for_mapping
+  mapping <- make_mapping_df(nodes_to_check)
 
   # Join results onto exploded mapping
   mapping <- merge(
@@ -110,19 +82,28 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   first_hits <- mapping[!duplicated(mapping$name), ]
   idx <- match(first_hits$name, nodes_to_check$name)
 
+  # Update de_value and de_source for the first match (if multiple matches, only the first will be used for these columns)
   nodes_to_check$de_value[idx] <- ifelse(
     is.na(nodes_to_check$de_value[idx]),
     first_hits$de_value,
     nodes_to_check$de_value[idx]
   )
 
+  # Update de_source for the first match (if multiple matches, only the first will be used for this column)
   nodes_to_check$de_source[idx] <- ifelse(
     is.na(nodes_to_check$de_source[idx]),
     first_hits$de_source,
     nodes_to_check$de_source[idx]
   )
 
-  # Append text for all matches
+  # Update text
+  # Build the 'text' field for nodes:
+  # 1. For each matched ID of a node, create a small string summarizing that match
+  # 2. Group all strings by node name, concatenating them together so each node’s text
+  #    includes info for all its matched IDs.
+  # 3. Append this combined string to the node’s existing 'text' field.
+  # Result: the 'text' field contains a complete summary of all matches for that node,
+  # while numeric fields like de_value/de_source still only the first match.
   sep <- ","
   mapping$text_append <- paste0(
     "Source: ", mapping$de_source,
@@ -158,7 +139,7 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   vertices_df$de_value[ids_nodes_to_check] <- nodes_to_check$de_value
   vertices_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
   vertices_df$text[ids_nodes_to_check] <- nodes_to_check$text
-  vertices_df$de_text[ids_nodes_to_check] <- format(round(as.numeric(nodes_to_check$de_value), 3), nsmall = 3)
+  vertices_df$de_name[ids_nodes_to_check] <- nodes_to_check$de_name
 
   if (verbose) {
     message("Successfully added results to ", length(idx), " nodes.")
@@ -167,53 +148,6 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   return(vertices_df)
 }
 
-#' Combine multiple differential expression results into a single data frame
-#' @param results_list A named list where each element is a differential
-#' expression result
-#' @param verbose Logical, if TRUE, prints messages about the process.
-#' @return A combined data frame with columns:
-#' ids_for_mapping, de_value, de_source
-#' @noRd
-combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
-  if (is.null(results_list) || length(results_list) == 0) {
-    if (verbose) {
-      message("No results to combine; returning NULL.")
-    }
-    return(NULL)
-  }
-
-  results <- lapply(names(results_list), function(de_entry_name) {
-    if (verbose) {
-      message("Processing entry: ", de_entry_name)
-    }
-
-    de_entry <- results_list[[de_entry_name]]
-    de_table <- de_entry$de_table
-    value_column <- de_entry$value_column
-    feature_column <- de_entry$feature_column
-
-    if (feature_column == "rownames") {
-      de_table[[feature_column]] <- rownames(de_table)
-    }
-
-    ids <- remove_kegg_prefix(de_table[[feature_column]])
-
-    data.frame(
-      ids_for_mapping = ids,
-      de_value = de_table[[value_column]],
-      de_source = rep(de_entry_name, nrow(de_table)),
-      stringsAsFactors = FALSE
-    )
-  })
-
-  combined_results <- do.call(rbind, results)
-
-  if (verbose) {
-    message("Combined results data frame created with ", nrow(combined_results), " rows.")
-  }
-
-  return(combined_results)
-}
 
 #' Add color palettes
 #' @param vertices_df Data frame of nodes with 'de_value' and 'de_source' columns.
@@ -225,143 +159,82 @@ combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
 #' @return vertices_df with colored nodes based on their values.
 #' @noRd
 add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NULL, palettes_limits_list = NULL, palettes_list = NULL, verbose = FALSE) {
+  # Default values
   sources <- unique(na.omit(vertices_df$de_source))
   valid_nodes <- vertices_df[!is.na(vertices_df$de_source), , drop = FALSE]
   legend <- list()
+  default_palette <- "Spectral"
 
   # Checking the palette provided
-  if (!is.null(palettes_list)) {
-    if (!all(sources %in% names(palettes_list))) {
-      warning(
-        "Some sources do not have specified palettes defaulting to 'RdBu'.",
-      )
-      palettes_list <- NULL
-    }
+  #  Check palettes list
+  if (!all(c(
+    not_null(palettes_list),
+    list_has_names(palettes_list, sources)
+  ))) {
+    warning("Some sources do not have specified palettes. Defaulting all to '", default_palette, "'.")
+    palettes_list <- NULL
   }
 
+  #  Check palette limits list
+  if (!all(c(
+    not_null(palettes_limits_list),
+    list_has_names(palettes_limits_list, sources)
+  ))) {
+    warning("Some sources do not have specified palette limits. Defaulting all to ", palette_limit, ".")
+    palettes_limits_list <- NULL
+  }
+
+  # Assign final palettes
   palettes_list <- if (!is.null(palettes_list)) {
     palettes_list
   } else {
-    setNames(
-      rep("RdBu", length(sources)),
-      sources
-    )
+    setNames(rep(default_palette, length(sources)), sources)
   }
-  
-  # Checking the palette limits provided
-  if (!is.null(palettes_limits_list)) {
-    if (!all(sources %in% names(palettes_limits_list))) {
-      warning(
-        "Some sources do not have specified palette limits. defaulting to max value",
-      )
-      palettes_limits_list <- NULL
-    }
-  }
+
+  # Assign final palette limits
   palettes_limits_list <- if (!is.null(palettes_limits_list)) {
     palettes_limits_list
   } else {
-    setNames(
-      rep(palette_limit, length(sources)),
-      sources
-    )
+    setNames(rep(palette_limit, length(sources)), sources)
   }
 
   for (source_index in seq_along(sources)) {
+    # Extract source name and corresponding palette/limit
     source_name <- sources[[source_index]]
-    
     palette_limit <- palettes_limits_list[[source_name]]
     palette <- palettes_list[[source_name]]
 
-    if (verbose) {
-      message("Processing source: ", source_name)
-    }
-    if (is.null(palette)) {
-      warning("Palette for source '", source_name, "' is NULL. Defaulting to 'RdBu'.")
-      palette <- "RdBu"
-    }
-    if (length(palette) == 1 && !palette %in% rownames(RColorBrewer::brewer.pal.info)) {
-      warning(
-        "Palette '", palette, "' is not a valid RColorBrewer palette. Defaulting to 'RdBu'."
-      )
-      palette <- "RdBu"
-      palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
-    } else if (length(palette) == 1) {
-      palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
-    } else {
-      palette_colors <- palette
-    }
+    # Get paletteRamp for this source
+    colors <- get_palette_colors(palette_input, source_name, default_palette, verbose = TRUE)
+    palette_ramp <- colorRampPalette(colors)
 
-    palette_ramp <- colorRampPalette(palette_colors)
-
+    # Get valid nodes
     nodes_to_color <- valid_nodes[
       valid_nodes$de_source == source_name, ,
       drop = FALSE
     ]
 
-    # This makes the de values of the plot limited to the range specified in palette_limits, if provided. This is useful to avoid outliers dominating the color scale. If palette_limits is NULL or does not contain the source_name, no limits will be applied.
-    if (!is.null(palette_limit)) {
-      range_val <- palette_limit
-      if (verbose) {
-        message(
-          "Applying palette limits for source '", source_name,
-          "': [-", range_val, ", ", range_val, "]"
-        )
-      }
-      if (max(abs(nodes_to_color$de_value), na.rm = TRUE) > range_val) {
-        warning(
-          "Some de_value for source '", source_name,
-          "' exceed the specified palette limits. Values will be capped at [", -range_val, ", ", range_val, "]."
-        )
-      }
-      nodes_to_color$de_value <- pmax(pmin(nodes_to_color$de_value, range_val), -range_val)
-    } else if (nrow(nodes_to_color) > 1) {
-      if (verbose) {
-        message(
-          "Calculating color range for source '", source_name,
-          "' based on de_value range: [-", round(min(nodes_to_color$de_value, na.rm = TRUE), 3),
-          ", ", round(max(nodes_to_color$de_value, na.rm = TRUE), 3), "]"
-        )
-      }
-      range_val <- max(abs(as.numeric(nodes_to_color$de_value)), na.rm = TRUE)
-    } else if (nrow(nodes_to_color) == 1) {
-      if (verbose) {
-        message(
-          "Only one node with de_value for source '", source_name,
-          "'. Using absolute value of that node for color range: ", round(as.numeric(nodes_to_color$de_value[[1]]), 3)
-        )
-      }
-      range_val <- abs(as.numeric(nodes_to_color$de_value[[1]]))
-    } else {
-      next
-    }
-    if (!is.finite(range_val)){
+    # This makes the de values of the plot limited to the range specified in palette_limits, if provided.
+    range_val <- get_palette_range(nodes_to_color, source_name, palette_limit, verbose = TRUE)
+    if (is.na(range_val)) {
       warning(
-        "Range value for source '", source_name,
-        "' is not defined. Skipping color assignment for this source."
+        "Could not determine a valid range for source '", source_name,
+        "'. Skipping color assignment for this source."
       )
       next
-    } 
+    }
 
+    # Create legend for this source
     legend[[source_name]] <- create_legend_single(
       range_val = range_val,
       palette_ramp = palette_ramp,
       title = source_name
     )
-    # For ggplot:
-    # https://stackoverflow.com/questions/79132520/symmetric-colorbar-for-values-but-print-colorbar-for-actual-observed-values
 
-    # Cut values using real numeric range (from -range_val to +range_val)
-    # Generate breaks
     breaks_seq <- seq(-range_val, range_val, length.out = 101)
-    # Use the cut function to assign colors based on the breaks (cut
-    # retrieves the index of the corresponding bin) cut:
-    # https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut
-    # may be useful to add general info in the dataframe:
-    # https://stackoverflow.com/questions/42217741/how-do-i-add-an-attribute-to-an-r-data-frame-while-im-making-it-with-a-function
-
-    nodes_to_color$vertex.color <- palette_ramp(100)  [
+    nodes_to_color$vertex.color <- palette_ramp(100)[
       as.numeric(cut(
-        as.numeric(nodes_to_color$de_value),
+        winsorize(as.numeric(nodes_to_color$de_value), range_val),
         breaks = breaks_seq,
         include.lowest = TRUE
       ))
@@ -379,16 +252,16 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     }
   }
 
-  # Create legend plot
-  legend_plot <- cowplot::plot_grid(
-    plotlist = legend,
-    ncol = length(legend)
-  )
+  # Create legend plot (now return only the list, the user will decide how to plot it)
+  # legend_plot <- cowplot::plot_grid(
+  #   plotlist = legend,
+  #   ncol = length(legend)
+  # )
 
   vertices_df$vertex.color[!is.na(vertices_df$de_source)] <- valid_nodes$vertex.color
   return_list <- list(
     vertices_df = vertices_df,
-    legend_plot = legend_plot
+    legend_plot = legend
   )
   return(return_list)
 }
@@ -428,4 +301,156 @@ create_legend_single <- function(range_val, palette_ramp, title = "Legend", n_el
   }
 
   get_legend(p)
+}
+
+# Helper function to get palette colors for a source
+get_palette_colors <- function(palette, source_name, default_palette = "Spectral", verbose = FALSE) {
+  # Verbose message
+  if (verbose) {
+    message("Processing source: ", source_name)
+  }
+
+  # If palette is NULL, default
+  if (is.null(palette)) {
+    warning("Palette for source '", source_name, "' is NULL. Defaulting to '", default_palette, "'.")
+    palette <- default_palette
+  }
+
+  # If palette is a single name
+  if (length(palette) == 1) {
+    # Check if it is a valid RColorBrewer palette
+    if (!palette %in% rownames(RColorBrewer::brewer.pal.info)) {
+      warning(
+        "Palette '", palette, "' is not a valid RColorBrewer palette. Defaulting to '", default_palette, "'."
+      )
+      palette <- default_palette
+    }
+    # Get palette colors from RColorBrewer (11 colors, reversed)
+    palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
+  } else {
+    # If palette is already a vector of colors, use it directly
+    palette_colors <- palette
+  }
+
+  return(palette_colors)
+}
+
+# Helper function to determine color range for a source
+get_palette_range <- function(
+  nodes_to_color,
+  source_name,
+  palette_limit = NULL,
+  verbose = FALSE
+) {
+  # If a palette limit is provided
+  if (!is.null(palette_limit)) {
+    range_val <- palette_limit
+    if (verbose) {
+      message(
+        "Applying palette limits for source '", source_name,
+        "': [-", range_val, ", ", range_val, "]"
+      )
+    }
+    if (max(abs(nodes_to_color$de_value), na.rm = TRUE) > range_val) {
+      warning(
+        "Some de_value for source '", source_name,
+        "' exceed the specified palette limits. Values will be capped at [", -range_val, ", ", range_val, "]."
+      )
+    }
+
+    # If no limit, determine range from data
+  } else if (nrow(nodes_to_color) > 1) {
+    range_val <- max(abs(as.numeric(nodes_to_color$de_value)), na.rm = TRUE)
+    if (verbose) {
+      message(
+        "Calculating color range for source '", source_name,
+        "' based on de_value range: [-",
+        round(min(nodes_to_color$de_value, na.rm = TRUE), 3),
+        ", ",
+        round(max(nodes_to_color$de_value, na.rm = TRUE), 3),
+        "]"
+      )
+    }
+  } else if (nrow(nodes_to_color) == 1) {
+    range_val <- abs(as.numeric(nodes_to_color$de_value[[1]]))
+    if (verbose) {
+      message(
+        "Only one node with de_value for source '", source_name,
+        "'. Using absolute value of that node for color range: ",
+        round(range_val, 3)
+      )
+    }
+  } else {
+    # No nodes to process
+    return(NA_real_)
+  }
+
+  # Check if range_val is finite
+  if (!is.finite(range_val)) {
+    warning(
+      "Range value for source '", source_name,
+      "' is not defined. Skipping color assignment for this source."
+    )
+    return(NA_real_)
+  }
+
+  return(range_val)
+}
+
+winsorize <- function(x, range_val) {
+  if (!is.numeric(range_val) || length(range_val) != 1) stop("'range_val' must be a single numeric value")
+  pmax(pmin(x, range_val), -range_val)
+}
+
+
+#' Combine multiple differential expression results into a single data frame
+#' @param results_list A named list where each element is a differential
+#' expression result
+#' @param verbose Logical, if TRUE, prints messages about the process.
+#' @return A combined data frame with columns:
+#' ids_for_mapping, de_value, de_source
+#' @noRd
+combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
+  # Checks
+  if (is.null(results_list) || length(results_list) == 0) {
+    if (verbose) {
+      message("No results to combine; returning NULL.")
+    }
+    return(NULL)
+  }
+
+  # Validate each entry in the results list
+  results <- lapply(names(results_list), function(de_entry_name) {
+    if (verbose) {
+      message("Processing entry: ", de_entry_name)
+    }
+
+    # Validate the structure of each de_entry
+    de_entry <- results_list[[de_entry_name]]
+    de_table <- de_entry$de_table
+    value_column <- de_entry$value_column
+    feature_column <- de_entry$feature_column
+
+    if (feature_column == "rownames") {
+      de_table[[feature_column]] <- rownames(de_table)
+    }
+
+    ids <- remove_kegg_prefix(de_table[[feature_column]])
+
+    data.frame(
+      ids_for_mapping = ids,
+      de_value = de_table[[value_column]],
+      de_source = rep(de_entry_name, nrow(de_table)),
+      de_name = rep(value_column, nrow(de_table)),
+    )
+  })
+
+  # Combine all results into a single data frame
+  combined_results <- do.call(rbind, results)
+
+  if (verbose) {
+    message("Combined results data frame created with ", nrow(combined_results), " rows.")
+  }
+
+  return(combined_results)
 }

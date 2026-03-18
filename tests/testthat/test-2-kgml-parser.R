@@ -105,7 +105,7 @@ test_that("add_labels works correctly", {
     KEGG = c("cpd:C00001", "cpd:C00099", "gl:G00001", "ko:K00001", "ko:K99999", "ec:1.1.1.1", "ec:9.9.9.9"),
     ids_for_mapping = c("C00001", "C00099", "G00001", "K00001", "K99999", "1.1.1.1", "9.9.9.9"),
     graphics_name = c("Water", "beta-Alanine, No", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
-    stringsAsFactors = FALSE
+  
   )
 
   nodes_out <- add_node_labels(vertices_df, bfc = bfc)
@@ -121,7 +121,7 @@ test_that("add_labels works correctly", {
 test_that("add_reaction_labels works correctly", {
   vertices_df <- data.frame(
     reaction = c("rn:R00001", "rn:R00099", NA, "rn:R00002"),
-    stringsAsFactors = FALSE
+  
   )
 
   nodes_out <- add_reaction_labels(vertices_df, bfc = bfc)

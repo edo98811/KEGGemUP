@@ -6,7 +6,7 @@ test_that("igraph_edges_to_visNetwork correctly maps arrows, dashes, color, labe
     to = c("B", "C", "A"),
     arrow.mode = c(0, 2, NA),
     lty = c(1, 2, NA),
-    stringsAsFactors = FALSE
+  
   )
 
   edges_mapped <- igraph_edges_to_visNetwork(edges_df)
@@ -36,7 +36,7 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
     label = c("Node1", "Node2", "Node3", "Node4"),
     x = c(1, 2, 3, 4),
     y = c(1, 2, 3, 4),
-    stringsAsFactors = FALSE
+  
   )
 
   nodes_mapped <- kegg_nodes_to_visNetwork(vertices_df, visualisation_type = "standard", scaling_factor = 1)
@@ -64,7 +64,7 @@ test_that("igraph_edges_to_visNetwork does not crashif edges_df empty", {
     to = character(0),
     arrow.mode = integer(0),
     lty = integer(0),
-    stringsAsFactors = FALSE
+  
   )
 
   edges_mapped <- igraph_edges_to_visNetwork(edges_df)
