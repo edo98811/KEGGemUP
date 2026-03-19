@@ -5,7 +5,7 @@
 #' @noRd
 kegg_vertex_defaults <- function() {
   list(
-    # Core KGML attributes
+    # KGML attributes
     name = NA_character_,
     type = NA_character_,
     link = NA_character_,
@@ -25,6 +25,7 @@ kegg_vertex_defaults <- function() {
     de_value = NA_real_,
     de_text = NA_character_,
     de_source = NA_character_,
+    de_name = NA_character_,
     ids_for_mapping = "",
 
     # Visualization attributes
@@ -40,8 +41,7 @@ kegg_vertex_defaults <- function() {
     vertex.color = "white",
     size = 25,
     fixed = TRUE,
-    shape = "vrectangle",
-    text = ""
+    shape = "vrectangle"
   )
 }
 

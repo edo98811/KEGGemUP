@@ -558,7 +558,8 @@ add_group <- function(vertices_df, verbose = FALSE) {
       node_idx <- node_idx[!is.na(node_idx)]
     }
 
-    # Build group label from component labels (exclude the last one, which is the group node itself)
+    # Build group label from component labels 
+    # (exclude the last one, which is the group node itself)
     comp_labels <- vertices_df$label[node_idx[-length(node_idx)]]
     group_label <- paste(comp_labels, collapse = ", ")
 

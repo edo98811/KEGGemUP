@@ -1,8 +1,11 @@
 
 #' Convert KEGG pathway to igraph object
-#' @param pathway_id KEGG pathway ID (e.g., 'hsa04110') or NULL if using kgml_file
-#' @param kgml_file Path to a local KGML file (optional, if pathway_id is provided)
-#' @param verbose Logical indicating whether to print verbose messages (default: FALSE)
+#' @param pathway_id KEGG pathway ID (e.g., 'hsa04110') or 
+#' NULL if using kgml_file
+#' @param kgml_file Path to a local KGML file (optional, 
+#' if pathway_id is provided)
+#' @param verbose Logical indicating whether to print 
+#' verbose messages (default: FALSE)
 #' @return An igraph object representing the KEGG pathway graph
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcadd 
 #' @examples
@@ -22,8 +25,12 @@ kegg_to_graph <- function(
 
   # Setup BiocFileCache for caching downloads
   bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
-  bfc_kegg <- BiocFileCache(cache = file.path(bfc_path, "kegg_maps"), ask = FALSE)
-  bfc_map <- BiocFileCache(cache = file.path(bfc_path, "mappings"), ask = FALSE)
+  bfc_kegg <- BiocFileCache(
+    cache = file.path(bfc_path, "kegg_maps"), 
+  ask = FALSE)
+  bfc_map <- BiocFileCache(
+    cache = file.path(bfc_path, "mappings"),
+   ask = FALSE)
 
   # Download KGML file if not provided
   if (is.null(kgml_file)) {
@@ -50,22 +57,34 @@ kegg_to_graph <- function(
 
 #' Map differential expression results to nodes
 #' @param g An igraph object representing the KEGG pathway graph.
-#' @param de_results A data frame or a list of data frames containing differential expression results
-#' @param feature_column Name of the column in de_results that contains KEGG IDs 
-#' @param value_column Name of the column in de_results that contains values to map
-#' @param verbose Logical indicating whether to print verbose messages (default: FALSE)
-#' @param palette Optional color palette for mapping values (default: NULL, will use a default palette)
-#' @param palette_limit Optional numeric limit for the color palette (default: NULL, will be determined from data)
-#' @param palettes_limits_list Optional list of numeric limits for multiple palettes if de_results is a list (default: NULL)
-#' @param palettes_list Optional list of color palettes if de_results is a list (default: NULL)
-#' @return An igraph object with differential expression results mapped to node attributes
+#' @param de_results A data frame or a list of data frames containing
+#'  differential expression results
+#' @param feature_column Name of the column in 
+#' de_results that contains KEGG IDs 
+#' @param value_column Name of the column in de_results 
+#' that contains values to map
+#' @param verbose Logical indicating whether to print 
+#' verbose messages (default: FALSE)
+#' @param palette Optional color palette for mapping 
+#' values (default: NULL, will use a default palette)
+#' @param palette_limit Optional numeric limit for the color
+#'  palette (default: NULL, will be determined from data)
+#' @param palettes_limits_list Optional list of numeric limits 
+#' for multiple palettes if de_results is a list (default: NULL)
+#' @param palettes_list Optional list of color palettes if 
+#' de_results is a list (default: NULL)
+#' @return An igraph object with differential expression
+#' results mapped to node attributes
 #' @importFrom igraph V graph_attr vertex_attr
 #' @details This function can be used to map the differential expression
 #' results to the graph,
 #' the input of the graph must be the output of the function
-#' \code{kegg_to_graph} in the igraph format. The results to be mapped can be
-#' provided either as a list or as a single data.frame. If a single data.frame
-#' is provided, the default column names that it will look for are KEGG IDs and values are
+#' \code{kegg_to_graph} in the igraph format. 
+#' The results to be mapped can be
+#' provided either as a list or as a single data.frame.
+#' If a single data.frame
+#' is provided, the default column names 
+#' that it will look for are KEGG IDs and values are
 #' 'KEGG_ids' and 'log2FoldChange',
 #' respectively, but these can be changed using the
 #' \code{feature_column} and \code{value_column} parameters.
@@ -145,8 +164,9 @@ map_results_to_graph <- function(
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
   igraph::vertex_attr(g, "vertex.color") <- nodes_updated$vertex.color
-  igraph::vertex_attr(g, "text") <- nodes_updated$text
+  # igraph::vertex_attr(g, "text") <- nodes_updated$text
   igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
+  igraph::vertex_attr(g, "de_name") <- nodes_updated$de_name
   igraph::graph_attr(g, "legend_plot") <- legend_plot
 
   return(g)
@@ -196,8 +216,17 @@ make_kegg_visNetwork <- function(
   pathway_name <- igraph::graph_attr(g, "title")
 
   # Style nodes and edges
-  vertices_df <- kegg_nodes_to_visNetwork(vertices_df, scaling_factor = scaling_factor, visualisation_type = visualisation_type)
-  if (nrow(edges_df) > 0) edges_df <- igraph_edges_to_visNetwork(edges_df, relationships = relationships)
+  vertices_df <- kegg_nodes_to_visNetwork(
+    vertices_df, 
+    scaling_factor = scaling_factor, 
+    visualisation_type = visualisation_type
+    )
+
+  if (nrow(edges_df) > 0) 
+  edges_df <- igraph_edges_to_visNetwork(
+    edges_df, 
+    relationships = relationships
+    )
 
   # Add tooltips
   vertices_df <- add_node_tooltip(vertices_df)
@@ -210,7 +239,8 @@ make_kegg_visNetwork <- function(
 }
 
 #' Create igraph visualization with improved layout
-#' @param g An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.
+#' @param g An igraph object to visualize. 
+#' Must have vertex attributes 'x' and 'y' for layout.
 #' @param ids_to_include Character vector of KEGG IDs to include in the subset graph.
 #' @return A plot of the igraph object with improved layout.
 #' @details All the edges between the vertices are plotted automatically.
@@ -233,10 +263,14 @@ make_graph_subset <- function(g, ids_to_include) {
 }
 
 #' Highlight a subset of the graph based on KEGG IDs
-#' @param g An igraph object to visualize. Must have vertex attributes 'x' and 'y' for layout.
-#' @param ids_to_include Character vector of KEGG IDs to include in the highlighted subset.
-#' @return An igraph object with highlighted nodes and faded non-highlighted nodes and edges.
-#' @details This function highlights the nodes corresponding to the provided KEGG IDs and fades the rest of the graph. 
+#' @param g An igraph object to visualize. 
+#' Must have vertex attributes 'x' and 'y' for layout.
+#' @param ids_to_include Character vector of
+#'  KEGG IDs to include in the highlighted subset.
+#' @return An igraph object with highlighted nodes 
+#' and faded non-highlighted nodes and edges.
+#' @details This function highlights the nodes corresponding 
+#' to the provided KEGG IDs and fades the rest of the graph. 
 #' It modifies vertex attributes to achieve this effect.
 #' @importFrom igraph V set_vertex_attr set_edge_attr incident
 #' @export  
@@ -247,15 +281,32 @@ highlight_graph_subset <- function(g, ids_to_include) {
   mapping <- make_mapping_df(vertices_df)
 
   # Subset nodes based on provided KEGG IDs
-  nodes_to_highlight <- unique(mapping[mapping$matched_id %in% ids_to_include, "name"])
+  nodes_to_highlight <- unique(
+    mapping[mapping$matched_id %in% ids_to_include, "name"]
+    )
   nodes_to_highlight <- nodes_to_highlight[!is.na(nodes_to_highlight)]
 
   nodes_to_fade <- setdiff(igraph::V(g)$name, nodes_to_highlight)
 
   #  =Vertex attributes
-  g <- set_vertex_attr(g, "borderWidth", index = fade_vertices, value = 0)
-  g <- set_vertex_attr(g, "borderWidthSelected", index = fade_vertices, value = 0)
-  g <- set_vertex_attr(g, "vertex.color", index = fade_vertices, value = "rgba(200,200,200,0.4)")
+  g <- set_vertex_attr(
+    g, 
+    "borderWidth", 
+  index = fade_vertices, 
+  value = 0
+  )
+  g <- set_vertex_attr(
+    g,
+   "borderWidthSelected", 
+   index = fade_vertices, 
+   value = 0
+   )
+  g <- set_vertex_attr(
+    g, 
+  "vertex.color", 
+  index = fade_vertices, 
+  value = "rgba(200,200,200,0.4)"
+  )
   
   # Edge attributes 
   # Select all edges incident to any faded vertex

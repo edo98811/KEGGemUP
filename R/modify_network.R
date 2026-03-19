@@ -1,9 +1,12 @@
 
 #' Functions to modify KEGG pathway graphs by adding nodes, edges, or moving nodes.
 #' @param g An igraph object representing the KEGG pathway graph.
-#' @param new_vertices Data frame of new vertices to add, with necessary columns: name
-#' label, type, KEGG, graphics_type, x, y, width, height.
-#' @param new_vertices A data frame containing the new vertices to be added. It must have the following columns: name, label, type, KEGG, graphics_type, x, y, width, height.
+#' @param new_vertices Data frame of new vertices to add,
+#' with necessary columns: name, label, type, KEGG, 
+#' graphics_type, x, y, width, height.
+#' @param new_vertices A data frame containing the new 
+#' vertices to be added. It must have the following columns: 
+#' name, label, type, KEGG, graphics_type, x, y, width, height.
 #' @param node_positions Data frame of node positions to move nodes, with necessary columns: name, x, y.
 #' @return Modified igraph graph object with added nodes, edges, or moved nodes.
 #' @details These functions allow you to modify an existing KEGG pathway graph by adding new nodes or edges, 
@@ -209,7 +212,8 @@ add_edges_kegg <- function(g, new_edges) {
 
 #' Move nodes in an igraph graph object to new positions.
 #' @param g An igraph graph object whose nodes will be moved.
-#' @param node_positions A data frame containing the new positions for nodes. It must have the following columns: name, x, y.
+#' @param node_positions A data frame containing the new positions for nodes. 
+#' It must have the following columns: name, x, y.
 #' @return An igraph graph object with the specified nodes moved to new positions.
 #' @details This function updates the x and y coordinates of specified 
 #' nodes in an igraph graph object. It performs checks to ensure that 

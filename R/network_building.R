@@ -6,7 +6,12 @@
 #' @return An igraph object representing the KEGG pathway graph
 #' @importFrom xml2 read_xml
 #' @noRd
-build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, verbose = FALSE) {
+build_kegg_graph <- function(
+  file,
+  pathway_name = "Pathway",
+  bfc_map = NULL,
+  verbose = FALSE
+) {
   xml <- tryCatch(
     xml2::read_xml(file),
     error = function(e) {
@@ -20,20 +25,73 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, ver
   }
 
   # Parse nodes
-  vertices_df <- parse_kgml_nodes(xml, kegg_vertex_defaults(), verbose = verbose)
-  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml, kegg_vertex_defaults(), verbose = verbose))
-  line_nodes <- parse_kgml_lines(xml, kegg_vertex_defaults(), verbose = verbose)
-  vertices_df <- rbind(vertices_df, line_nodes)
+  vertices_df <- parse_kgml_nodes(
+    xml,
+    kegg_vertex_defaults(),
+    verbose = verbose
+  )
+
+  # Parse group nodes
+  vertices_df <- rbind(
+    vertices_df,
+    parse_kgml_groups(
+      xml,
+      kegg_vertex_defaults(),
+      verbose = verbose
+    )
+  )
+  
+  # Parse line nodes
+  line_nodes <- 
+    parse_kgml_lines(
+      xml,
+      kegg_vertex_defaults(),
+      verbose = verbose
+    )
+  vertices_df <- rbind(
+    vertices_df,
+    line_nodes
+  )
 
   # Parse edges
-  edges_df <- parse_kgml_relations(xml, kegg_edge_defaults(), verbose = verbose)
-  edges_df <- rbind(edges_df, parse_kgml_reactions(xml, kegg_edge_defaults(), verbose = verbose))
-  edges_df <- rbind(edges_df, parse_kgml_lines_edges(line_nodes, kegg_edge_defaults(), verbose = verbose))
-  edges_df <- complete_kgml_reactions(vertices_df, edges_df, kegg_edge_defaults(), verbose = verbose)
+  edges_df <- parse_kgml_relations(
+    xml,
+    kegg_edge_defaults(),
+    verbose = verbose
+  )
+
+  # Parse reactions edges
+  edges_df <- rbind(
+    edges_df,
+    parse_kgml_reactions(
+      xml,
+      kegg_edge_defaults(),
+      verbose = verbose
+    )
+  )
+
+  # Parse line edges
+  edges_df <- rbind(
+    edges_df,
+    parse_kgml_lines_edges(
+      line_nodes,
+      kegg_edge_defaults(),
+      verbose = verbose
+    )
+  )
+
+  # Complete reactions by adding missing substrate-product edges
+  edges_df <- complete_kgml_reactions(
+    vertices_df,
+    edges_df,
+    kegg_edge_defaults(),
+    verbose = verbose
+  )
 
   if (verbose) {
     message("Total nodes: ", nrow(vertices_df), ", Total edges: ", nrow(edges_df))
   }
+
   # I don't want to map results on line nodes
   # Indices to process
   indexes_to_map <- which(
@@ -56,9 +114,9 @@ build_kegg_graph <- function(file, pathway_name = "Pathway", bfc_map = NULL, ver
     warning("Failed to retrieve pathway name; using 'Pathway' as default.")
   }
 
-  g <- make_igraph_graph(vertices_df, edges_df, verbose = verbose)
-  igraph::graph_attr(g, "title") <- pathway_name
-  igraph::graph_attr(g, "type") <- "KEGG_Pathway" # open for extension with other types
+  g <- make_igraph_graph(vertices_df, edges_df, pathway_name, verbose = verbose)
+
+  igraph::graph_attr(g, "type") <- "KEGG_Pathway"
   return(g)
 }
 
@@ -83,17 +141,19 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
     message("Graph created with ", igraph::vcount(g), " vertices and ", igraph::ecount(g), " edges.")
   }
 
+  igraph::graph_attr(g, "title") <- pathway_name
+
   return(g)
 }
 # make_igraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, verbose = FALSE) {
 #   # Sort vertices by label and name (case-insensitive)
 #   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
-# 
+#
 #   # Create empty graph with vertices
 #   g <- igraph::make_empty_graph(n = nrow(vertices_df), directed = TRUE)
 #   igraph::vertex_attr(g) <- cbind(igraph::vertex_attr(g), vertices_df)
 #   igraph::V(g)$name <- vertices_df$name
-# 
+#
 #   # Add edges if available
 #   if (!is.null(edges_df) && nrow(edges_df) > 0) {
 #     if (nrow(edges_df) > 0) {
@@ -108,11 +168,13 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 #   } else if (verbose) {
 #     warning("No edges in graph. Creating vertex-only graph.")
 #   }
-# 
+#
 #   if (verbose) {
 #     message("Graph created with ", igraph::vcount(g), " vertices and ", igraph::ecount(g), " edges.")
 #   }
-# 
+#   
+#   igraph::graph_attr(g, "title") <- pathway_name
+#   
 #   return(g)
 # }
 
@@ -122,7 +184,12 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
 #' @noRd
-make_tidygraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, verbose = FALSE) {
+make_tidygraph_graph <- function(
+  vertices_df,
+  edges_df,
+  pathway_name = NULL,
+  verbose = FALSE
+) {
   # Sort vertices
   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
 
@@ -137,7 +204,9 @@ make_tidygraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, ver
 
   # Add pathway_name as graph attribute if provided
   if (!is.null(pathway_name)) {
-    g <- g %>% activate(graph) %>% mutate(name = pathway_name)
+    g <- g %>%
+      activate(graph) %>%
+      mutate(name = pathway_name)
   }
 
   # Verbose output
@@ -147,4 +216,3 @@ make_tidygraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, ver
 
   return(g)
 }
-

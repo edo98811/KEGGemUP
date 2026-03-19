@@ -46,9 +46,9 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
 
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     warning("No edges in graph.")
-    v <- visNetwork::visNetwork(nodes = vertices_df, main = pathway_name) # if graph has no edges
+    v <- visNetwork::visNetwork(nodes = vertices_df, main = pathway_name, background = "#F5F5F5") # if graph has no edges
   } else {
-    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name) # if graph has edges
+    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name, background = "#F5F5F5") # if graph has edges
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)

@@ -126,11 +126,11 @@ regular_node_html <- function(vertices_df) {
 
     # Value row
     ifelse(
-      is.na(vertices_df$de_text) | vertices_df$de_text == "",
+      is.na(vertices_df$de_value) | vertices_df$de_value == "",
       "",
       paste0(
         "<tr><th align='left'>", vertices_df$de_name, "</th><td>",
-        vertices_df$de_text,
+        round(as.numeric(vertices_df$de_value), 3),
         "</td></tr>"
       )
     ),

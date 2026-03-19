@@ -28,7 +28,7 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
     not_null(vertices_df),
     has_columns(vertices_df, c("name", "ids_for_mapping")),
     has_columns(results_combined, c("ids_for_mapping", "de_value", "de_source")),
-    valid_column(vertices_df, "ids_for_mapping")
+    valid_column(vertices_df, "ids_for_mapping", no_na = FALSE)
   ))) {
     stop("add_results_nodes: Invalid input")
   }
@@ -42,6 +42,18 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   }
 
   warn <- FALSE
+  
+  # Subset nodes to those with valid ids_for_mapping
+  ids_nodes_to_check <- which(
+    !is.na(vertices_df$ids_for_mapping) & vertices_df$ids_for_mapping != ""
+  )
+  nodes_to_check <- vertices_df[ids_nodes_to_check, , drop = FALSE]
+  
+  # If no nodes to check, return original
+  if (nrow(nodes_to_check) == 0) {
+    warning("No nodes with valid 'ids_for_mapping' found.")
+    return(vertices_df)
+  }
 
   if (verbose) {
     message("Found ", nrow(nodes_to_check), " nodes with valid 'ids_for_mapping'.")
@@ -90,10 +102,17 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   )
 
   # Update de_source for the first match (if multiple matches, only the first will be used for this column)
+  # If de source is NA, then assign the de source, otherwise keep it empty
   nodes_to_check$de_source[idx] <- ifelse(
     is.na(nodes_to_check$de_source[idx]),
     first_hits$de_source,
     nodes_to_check$de_source[idx]
+  )
+
+  nodes_to_check$de_name[idx] <- ifelse(
+    is.na(nodes_to_check$de_name[idx]),
+    first_hits$de_name,
+    nodes_to_check$de_name[idx]
   )
 
   # Update text
@@ -105,7 +124,7 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   # Result: the 'text' field contains a complete summary of all matches for that node,
   # while numeric fields like de_value/de_source still only the first match.
   sep <- ","
-  mapping$text_append <- paste0(
+  mapping$de_text_append <- paste0(
     "Source: ", mapping$de_source,
     sep, "Value: ", mapping$de_value,
     sep, "Id: ", mapping$matched_id,
@@ -113,17 +132,17 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   )
 
   text_by_node <- tapply(
-    mapping$text_append,
+    mapping$de_text_append,
     mapping$name,
     paste0
   )
 
   text_idx <- match(names(text_by_node), nodes_to_check$name)
-  nodes_to_check$text[text_idx] <- paste0(
-    nodes_to_check$text[text_idx],
+  nodes_to_check$de_text[text_idx] <- paste0(
+    nodes_to_check$de_text[text_idx],
     text_by_node
   )
-
+  
   # Warn if necessary
   if (warn) {
     warning(
@@ -138,7 +157,7 @@ add_results_nodes <- function(vertices_df, results_combined, verbose = FALSE) {
   # Update original dataframe
   vertices_df$de_value[ids_nodes_to_check] <- nodes_to_check$de_value
   vertices_df$de_source[ids_nodes_to_check] <- nodes_to_check$de_source
-  vertices_df$text[ids_nodes_to_check] <- nodes_to_check$text
+  vertices_df$de_text[ids_nodes_to_check] <- nodes_to_check$de_text
   vertices_df$de_name[ids_nodes_to_check] <- nodes_to_check$de_name
 
   if (verbose) {
@@ -171,7 +190,8 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     not_null(palettes_list),
     list_has_names(palettes_list, sources)
   ))) {
-    warning("Some sources do not have specified palettes. Defaulting all to '", default_palette, "'.")
+    warning("Some sources do not have specified palettes.
+    Defaulting all to '", default_palette, "'.")
     palettes_list <- NULL
   }
 
@@ -180,7 +200,8 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     not_null(palettes_limits_list),
     list_has_names(palettes_limits_list, sources)
   ))) {
-    warning("Some sources do not have specified palette limits. Defaulting all to ", palette_limit, ".")
+    warning("Some sources do not have specified palette limits.
+    Defaulting all to ", palette_limit, ".")
     palettes_limits_list <- NULL
   }
 
@@ -205,7 +226,13 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     palette <- palettes_list[[source_name]]
 
     # Get paletteRamp for this source
-    colors <- get_palette_colors(palette_input, source_name, default_palette, verbose = TRUE)
+    colors <- get_palette_colors(
+      palette,
+      source_name,
+      default_palette,
+      verbose = TRUE
+    )
+
     palette_ramp <- colorRampPalette(colors)
 
     # Get valid nodes
@@ -215,7 +242,12 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     ]
 
     # This makes the de values of the plot limited to the range specified in palette_limits, if provided.
-    range_val <- get_palette_range(nodes_to_color, source_name, palette_limit, verbose = TRUE)
+    range_val <- get_palette_range(
+      nodes_to_color,
+      source_name,
+      palette_limit,
+      verbose = TRUE
+    )
     if (is.na(range_val)) {
       warning(
         "Could not determine a valid range for source '", source_name,
@@ -232,6 +264,8 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
     )
 
     breaks_seq <- seq(-range_val, range_val, length.out = 101)
+
+    # Assign colors to nodes based on their de_value
     nodes_to_color$vertex.color <- palette_ramp(100)[
       as.numeric(cut(
         winsorize(as.numeric(nodes_to_color$de_value), range_val),
@@ -240,6 +274,7 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
       ))
     ]
 
+    # Update the colors in the valid_nodes data frame
     valid_nodes$vertex.color[
       valid_nodes$de_source == source_name
     ] <- nodes_to_color$vertex.color
@@ -257,8 +292,8 @@ add_colors_to_nodes <- function(vertices_df, palette = NULL, palette_limit = NUL
   #   plotlist = legend,
   #   ncol = length(legend)
   # )
-
   vertices_df$vertex.color[!is.na(vertices_df$de_source)] <- valid_nodes$vertex.color
+
   return_list <- list(
     vertices_df = vertices_df,
     legend_plot = legend
@@ -304,7 +339,12 @@ create_legend_single <- function(range_val, palette_ramp, title = "Legend", n_el
 }
 
 # Helper function to get palette colors for a source
-get_palette_colors <- function(palette, source_name, default_palette = "Spectral", verbose = FALSE) {
+get_palette_colors <- function(
+  palette,
+  source_name,
+  default_palette = "Spectral",
+  verbose = FALSE
+) {
   # Verbose message
   if (verbose) {
     message("Processing source: ", source_name)
@@ -312,7 +352,10 @@ get_palette_colors <- function(palette, source_name, default_palette = "Spectral
 
   # If palette is NULL, default
   if (is.null(palette)) {
-    warning("Palette for source '", source_name, "' is NULL. Defaulting to '", default_palette, "'.")
+    warning(
+      "Palette for source '", source_name,
+      "' is NULL. Defaulting to '", default_palette, "'."
+    )
     palette <- default_palette
   }
 
@@ -321,7 +364,8 @@ get_palette_colors <- function(palette, source_name, default_palette = "Spectral
     # Check if it is a valid RColorBrewer palette
     if (!palette %in% rownames(RColorBrewer::brewer.pal.info)) {
       warning(
-        "Palette '", palette, "' is not a valid RColorBrewer palette. Defaulting to '", default_palette, "'."
+        "Palette '", palette, "' is not a valid RColorBrewer palette.
+        Defaulting to '", default_palette, "'."
       )
       palette <- default_palette
     }
@@ -354,7 +398,8 @@ get_palette_range <- function(
     if (max(abs(nodes_to_color$de_value), na.rm = TRUE) > range_val) {
       warning(
         "Some de_value for source '", source_name,
-        "' exceed the specified palette limits. Values will be capped at [", -range_val, ", ", range_val, "]."
+        "' exceed the specified palette limits.
+        Values will be capped at [", -range_val, ", ", range_val, "]."
       )
     }
 
@@ -398,7 +443,9 @@ get_palette_range <- function(
 }
 
 winsorize <- function(x, range_val) {
-  if (!is.numeric(range_val) || length(range_val) != 1) stop("'range_val' must be a single numeric value")
+  if (!is.numeric(range_val) || length(range_val) != 1) {
+    stop("'range_val' must be a single numeric value")
+  }
   pmax(pmin(x, range_val), -range_val)
 }
 
@@ -411,6 +458,7 @@ winsorize <- function(x, range_val) {
 #' ids_for_mapping, de_value, de_source
 #' @noRd
 combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
+
   # Checks
   if (is.null(results_list) || length(results_list) == 0) {
     if (verbose) {
@@ -436,12 +484,13 @@ combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
     }
 
     ids <- remove_kegg_prefix(de_table[[feature_column]])
-
+    
+    # Create a data frame for this entry
     data.frame(
       ids_for_mapping = ids,
       de_value = de_table[[value_column]],
       de_source = rep(de_entry_name, nrow(de_table)),
-      de_name = rep(value_column, nrow(de_table)),
+      de_name = rep(value_column, nrow(de_table))
     )
   })
 

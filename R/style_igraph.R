@@ -106,15 +106,17 @@ scale_dimensions <- function(vertices_df, factor = 10) {
 
 #' @noRd
 apply_style_map <- function(df, column, style_map) {
+
   # What style columns are defined in the style map
   idx <- which(!is.na(df[[column]]) & df[[column]] %in% names(style_map))
   style_cols <- unique(unlist(lapply(style_map, names)))
   
   for (i in  names(style_map)) {
-    style <- style_map[[df[[column]][i]]]
-    if (is.null(style)) next
+    style <- style_map[[i]]
+    indexes <- df[[column]] == i
+    indexes[is.na(indexes)] <- FALSE
     for (sc in style_cols) {
-      df[[sc]][i] <- style[[sc]]
+      df[[sc]][indexes] <- style[[sc]]
     }
   }
   

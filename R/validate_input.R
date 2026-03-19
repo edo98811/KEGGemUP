@@ -6,7 +6,6 @@
 #' @return TRUE if all checks pass, otherwise stops with an error
 #' @noRd
 is_valid_de_entry <- function(de_entry, name) {
-
   #  Structure checks
   if (!is.list(de_entry) || !all(c("de_table", "value_column", "feature_column") %in%
     names(de_entry))) {
@@ -255,19 +254,25 @@ has_columns <- function(df, cols) {
 }
 
 # Check that a column has no NA or empty strings
-valid_column <- function(df, col) {
+valid_column <- function(df, col, no_na = TRUE) {
   if (!col %in% names(df)) {
     warning("Column '", col, "' not found in data frame.")
     return(FALSE)
   }
-  invalid <- is.na(df[[col]]) | df[[col]] == ""
-  if (any(invalid)) {
-    warning(
-      "Column '", col, "' contains NA or empty values at rows: ",
-      paste(which(invalid), collapse = ", ")
-    )
-    return(FALSE)
+
+  if (no_na) {
+    invalid <- is.na(df[[col]]) | df[[col]] == ""
+    if (any(invalid)) {
+      return(FALSE)
+      warning(
+        "Column '", col, "' contains NA or empty values at rows: ",
+        paste(which(invalid), collapse = ", ")
+      )
+    } else {
+      return(TRUE)
+    }
   }
+  
   TRUE
 }
 
