@@ -2,8 +2,11 @@
 #'
 #' @param id KEGG pathway ID (e.g., 'hsa04110')
 #' @param verbose Logical, if TRUE, print additional messages.
+#'
 #' @return A character string with the readable pathway name
+#'
 #' @importFrom KEGGREST keggGet
+#'
 #' @noRd
 get_pathway_name <- function(id, verbose = FALSE) {
   tryCatch(
@@ -20,20 +23,23 @@ get_pathway_name <- function(id, verbose = FALSE) {
 }
 
 #' Download and cache KEGG KGML files.
+#'
 #' @param pathway_id KEGG pathway ID (e.g., 'hsa04110').
 #' @param bfc BiocFileCache object for caching KEGG KGML files.
 #' @param directory Optional directory to save the KGML file if not using cache.
 #' @param verbose Logical, if TRUE, print additional messages.
+#'
 #' @return Path to the cached KGML file.
 #'
 #' @importFrom httr2 request req_perform resp_status resp_body_xml resp_is_error req_retry
 #' @importFrom BiocFileCache bfcquery bfcpath bfcadd
 #' @importFrom xml2 write_xml
 #'
+#' @export
+#'
 #' @examples
 #' data_dir <- tempdir()
 #' kgml_path <- download_kgml("hsa04110", directory = data_dir, verbose = TRUE)
-#' @export
 download_kgml <- function(pathway_id, bfc = NULL, directory = NULL, verbose = FALSE) {
   # check input validity
   if (!is.null(bfc) && !is.null(directory)) {
@@ -196,30 +202,59 @@ get_kegg_db <- function(
   return(kegg_db)
 }
 
-#' Download all KEGG pathways for a given organism.
+#' Download all pathways
+#'
+#' Download all KEGG pathways for a given organism
+#'
+#' @details
+#' This function can take a while to run completely, but is an efficient way
+#' to retrieve all the kgml files encoding for the KEGG pathways.
+#' Some failures could be triggered by a rate limitation imposed by the KEGG
+#' website. Since this caches the files locally, it is safe to rerun to complete
+#' the operation without extra unneeded requests to the API
+#'
 #' @param org KEGG organism code (e.g., 'hsa' for human).
 #' @param verbose Logical, if TRUE, print additional messages.
-#' @return None
+#'
+#' @return The BiocFileCache object is returned invisibly
+#'
 #' @importFrom BiocFileCache BiocFileCache
 #' @importFrom utils askYesNo
-#' @examples 
+#'
+#' @export
+#'
+#' @examples
 #' # Download all pathways for human
 #' # download_all_pathways("hsa", verbose = TRUE)
-#' @export
 download_all_pathways <- function(org, verbose = FALSE) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
 
-  all_pathways <- get_kegg_db(bfc_map, paste0("pathway/", org), verbose = verbose)
+  all_pathways_df <- get_kegg_db(bfc = bfc_map,
+                                 db_name = paste0("pathway/", org),
+                                 verbose = verbose)
 
-  answer <- askYesNo("Download all ", nrow(all_pathways), "KEGG pathways for organism '", org, "'? This may take a while.")
+  answer <- askYesNo(
+    msg = paste0("Download all ", nrow(all_pathways_df),
+                 " KEGG pathways for organism '", org, "'? This may take a while."))
+
   if (!answer) {
     if (verbose) message("Aborting download of all pathways.")
     return(NULL)
   }
 
-  for (pathway_id in all_pathways[, 1]) {
+  tot_pathways <- nrow(all_pathways_df)
+
+  for (i in seq_len(tot_pathways)) {
+    pathway_id <- all_pathways_df$kegg_id[i]
+    pathway_desc <- all_pathways_df$description[i]
+    if (verbose) message(i, "/", tot_pathways, " - ", pathway_id, "|", pathway_desc)
     download_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
   }
+
+  message("Done retrieving all pathways for ", org, "!")
+
+  # return invisibly the BFC object, enabling further processing
+  invisible(bfc_kegg)
 }
