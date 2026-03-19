@@ -19,6 +19,6 @@ and mapping files stored using BiocFileCache.
 }
 \examples{
 cache_info <- return_all_cached()
-print(cache_info$kegg)      # View cached KEGG pathway files
-print(cache_info$mappings)  # View cached mapping files
+print(cache_info$kegg) # View cached KEGG pathway files
+print(cache_info$mappings) # View cached mapping files
 }
