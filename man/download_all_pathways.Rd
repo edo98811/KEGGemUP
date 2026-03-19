@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_interfaces.R
 \name{download_all_pathways}
 \alias{download_all_pathways}
-\title{Download all KEGG pathways for a given organism.}
+\title{Download all pathways}
 \usage{
 download_all_pathways(org, verbose = FALSE)
 }
@@ -12,10 +12,17 @@ download_all_pathways(org, verbose = FALSE)
 \item{verbose}{Logical, if TRUE, print additional messages.}
 }
 \value{
-None
+The BiocFileCache object is returned invisibly
 }
 \description{
-Download all KEGG pathways for a given organism.
+Download all KEGG pathways for a given organism
+}
+\details{
+This function can take a while to run completely, but is an efficient way
+to retrieve all the kgml files encoding for the KEGG pathways.
+Some failures could be triggered by a rate limitation imposed by the KEGG
+website. Since this caches the files locally, it is safe to rerun to complete
+the operation without extra unneeded requests to the API
 }
 \examples{
 # Download all pathways for human
