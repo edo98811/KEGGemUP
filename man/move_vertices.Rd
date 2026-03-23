@@ -9,7 +9,8 @@ move_vertices(g, node_postions)
 \arguments{
 \item{g}{An igraph graph object whose nodes will be moved.}
 
-\item{node_positions}{A data frame containing the new positions for nodes. It must have the following columns: name, x, y.}
+\item{node_positions}{A data frame containing the new positions for nodes.
+It must have the following columns: name, x, y.}
 }
 \value{
 An igraph graph object with the specified nodes moved to new positions.

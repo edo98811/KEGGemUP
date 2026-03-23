@@ -51,7 +51,7 @@ style_edges_igraph <- function(edges_df) {
     reaction_substrate_irreversible = list(color = "#FF4500", lty = 1L, arrow.mode = 0L, label = "→"),
     reaction_product_irreversible = list(color = "#FF4500", lty = 1L, arrow.mode = 2L, label = "→")
   )
- edge_style_map_type <- list(
+  edge_style_map_type <- list(
     line  = list(color = "black", lty = 1L, arrow.mode = 0L, label = ""),
     group = list(color = "transparent", lty = 2L, arrow.mode = 0L, label = "")
   )
@@ -107,11 +107,10 @@ scale_dimensions <- function(vertices_df, factor = 10) {
 #' @noRd
 apply_style_map <- function(df, column, style_map) {
 
-  # What style columns are defined in the style map
-  idx <- which(!is.na(df[[column]]) & df[[column]] %in% names(style_map))
+  # What style columns are defined in the style mapping?
   style_cols <- unique(unlist(lapply(style_map, names)))
-  
-  for (i in  names(style_map)) {
+
+  for (i in names(style_map)) {
     style <- style_map[[i]]
     indexes <- df[[column]] == i
     indexes[is.na(indexes)] <- FALSE
@@ -119,6 +118,6 @@ apply_style_map <- function(df, column, style_map) {
       df[[sc]][indexes] <- style[[sc]]
     }
   }
-  
+
   df
 }

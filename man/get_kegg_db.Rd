@@ -4,17 +4,12 @@
 \alias{get_kegg_db}
 \title{Get KEGG db with caching.}
 \usage{
-get_kegg_db(
-  db_name = "compound",
-  directory = NULL,
-  bfc = NULL,
-  verbose = FALSE
-)
+get_kegg_db(db_name = "compound", path = NULL, bfc = NULL, verbose = FALSE)
 }
 \arguments{
 \item{db_name}{Name of the KEGG database to retrieve (default: "compound").}
 
-\item{directory}{Optional directory to save the KEGG database file if not using cache.}
+\item{path}{Optional path to save the KEGG database file if not using cache.}
 
 \item{bfc}{BiocFileCache object for caching KEGG database files.}
 
@@ -33,9 +28,9 @@ genome | ligand | compound | glycan | reaction | rclass | enzyme |
 network | variant | disease | drug | dgroup
 }
 \examples{
-# Saving in directory
+# Saving in path
 data_dir <- tempdir()
-kegg_compounds <- get_kegg_db("compound", directory = data_dir, verbose = TRUE)
+kegg_compounds <- get_kegg_db("compound", path = data_dir, verbose = TRUE)
 # Just returning without saving
 kegg_genes <- get_kegg_db("compound", verbose = TRUE)
 }

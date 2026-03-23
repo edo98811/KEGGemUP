@@ -19,24 +19,33 @@ map_results_to_graph(
 \arguments{
 \item{g}{An igraph object representing the KEGG pathway graph.}
 
-\item{de_results}{A data frame or a list of data frames containing differential expression results}
+\item{de_results}{A data frame or a list of data frames containing
+differential expression results}
 
-\item{feature_column}{Name of the column in de_results that contains KEGG IDs}
+\item{feature_column}{Name of the column in
+de_results that contains KEGG IDs}
 
-\item{value_column}{Name of the column in de_results that contains values to map}
+\item{value_column}{Name of the column in de_results
+that contains values to map}
 
-\item{verbose}{Logical indicating whether to print verbose messages (default: FALSE)}
+\item{verbose}{Logical indicating whether to print
+verbose messages (default: FALSE)}
 
-\item{palette}{Optional color palette for mapping values (default: NULL, will use a default palette)}
+\item{palette}{Optional color palette for mapping
+values (default: NULL, will use a default palette)}
 
-\item{palette_limit}{Optional numeric limit for the color palette (default: NULL, will be determined from data)}
+\item{palette_limit}{Optional numeric limit for the color
+palette (default: NULL, will be determined from data)}
 
-\item{palettes_limits_list}{Optional list of numeric limits for multiple palettes if de_results is a list (default: NULL)}
+\item{palettes_limits_list}{Optional list of numeric limits
+for multiple palettes if de_results is a list (default: NULL)}
 
-\item{palettes_list}{Optional list of color palettes if de_results is a list (default: NULL)}
+\item{palettes_list}{Optional list of color palettes if
+de_results is a list (default: NULL)}
 }
 \value{
-An igraph object with differential expression results mapped to node attributes
+An igraph object with differential expression
+results mapped to node attributes
 }
 \description{
 Map differential expression results to nodes
@@ -45,9 +54,12 @@ Map differential expression results to nodes
 This function can be used to map the differential expression
 results to the graph,
 the input of the graph must be the output of the function
-\code{kegg_to_graph} in the igraph format. The results to be mapped can be
-provided either as a list or as a single data.frame. If a single data.frame
-is provided, the default column names that it will look for are KEGG IDs and values are
+\code{kegg_to_graph} in the igraph format.
+The results to be mapped can be
+provided either as a list or as a single data.frame.
+If a single data.frame
+is provided, the default column names
+that it will look for are KEGG IDs and values are
 'KEGG_ids' and 'log2FoldChange',
 respectively, but these can be changed using the
 \code{feature_column} and \code{value_column} parameters.

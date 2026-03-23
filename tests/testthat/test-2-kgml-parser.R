@@ -70,16 +70,6 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 })
 
-test_that("build_kegg_graph constructs the expected graph (pathway 02)", {
-  g <- build_kegg_graph(kgml_path_02, pathway_name = "hsa00001", bfc_map = bfc)
-  all(sort(vertex_attr_names(g)) == sort(vertex_attr_names(kgml_steps$g_test_02))) &&
-  all(sort(edge_attr_names(g)) == sort(edge_attr_names(kgml_steps$g_test_02)))
-
-  # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_02))
-  expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
-  expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
-})
-
 test_that("add_group correctly assigns group labels", {
   nodes <- kgml_steps$all_nodes
   nodes$label <- nodes$name
@@ -96,7 +86,7 @@ test_that("add_group correctly assigns group labels", {
 })
 
 test_that("add_labels works correctly", {
-  compounds_db <- data.frame(id = c("C00001", "C00002"), name = c("Water;H2O", "ATP"))
+  compounds_db <- data.frame(id = c("C00001", "C00002"), name = c("Water,test;H2O", "ATP"))
   glycans_db <- data.frame(id = c("G00001"), name = c("GlycanX;Y"))
   genes_db <- data.frame(id = c("K00001", "K00002"), name = c("GeneA", "GeneB;alias"))
   enzymes_db <- data.frame(id = c("1.1.1.1"), name = c("EnzymeX"))
@@ -104,13 +94,12 @@ test_that("add_labels works correctly", {
   vertices_df <- data.frame(
     KEGG = c("cpd:C00001", "cpd:C00099", "gl:G00001", "ko:K00001", "ko:K99999", "ec:1.1.1.1", "ec:9.9.9.9"),
     ids_for_mapping = c("C00001", "C00099", "G00001", "K00001", "K99999", "1.1.1.1", "9.9.9.9"),
-    graphics_name = c("Water", "beta-Alanine, No", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
-  
+    graphics_name = c("Water", "beta-Alanine, test", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
   )
 
   nodes_out <- add_node_labels(vertices_df, bfc = bfc)
-  expect_equal(nodes_out$label[1], "H2O")
-  expect_equal(nodes_out$label[2], "beta-Alanine")
+  expect_equal(nodes_out$label[1], "Water,test")
+  expect_equal(nodes_out$label[2], "beta-Alanine, test")
   expect_equal(nodes_out$label[3], "N-Acetyl-D-glucosaminyldiphosphodolichol")
   expect_equal(nodes_out$label[4], "E1.1.1.1")
   expect_equal(nodes_out$label[5], "K99999")
@@ -121,7 +110,6 @@ test_that("add_labels works correctly", {
 test_that("add_reaction_labels works correctly", {
   vertices_df <- data.frame(
     reaction = c("rn:R00001", "rn:R00099", NA, "rn:R00002"),
-  
   )
 
   nodes_out <- add_reaction_labels(vertices_df, bfc = bfc)

@@ -40,9 +40,9 @@ build_kegg_graph <- function(
       verbose = verbose
     )
   )
-  
+
   # Parse line nodes
-  line_nodes <- 
+  line_nodes <-
     parse_kgml_lines(
       xml,
       kegg_vertex_defaults(),
@@ -89,13 +89,16 @@ build_kegg_graph <- function(
   )
 
   if (verbose) {
-    message("Total nodes: ", nrow(vertices_df), ", Total edges: ", nrow(edges_df))
+    message(
+      "Total nodes: ", nrow(vertices_df), ", Total edges: ", nrow(edges_df)
+    )
   }
 
   # I don't want to map results on line nodes
   # Indices to process
   indexes_to_map <- which(
-    vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
+    vertices_df$graphics_type != "line" &
+      vertices_df$graphics_type != "group"
   )
 
   # Apply remove_kegg_prefix_str to the selected rows
@@ -106,15 +109,29 @@ build_kegg_graph <- function(
   )
 
   # Add informations to nodes
-  vertices_df <- add_node_labels(vertices_df, bfc_map, verbose = verbose)
-  vertices_df <- add_reaction_labels(vertices_df, bfc_map, verbose = verbose)
+  vertices_df <- add_node_labels(
+    vertices_df,
+    bfc_map,
+    verbose = verbose
+  )
+  vertices_df <- add_reaction_labels(
+    vertices_df,
+    bfc_map,
+    verbose = verbose
+  )
+
   vertices_df <- add_group(vertices_df, verbose = verbose)
 
   if (pathway_name == "") {
     warning("Failed to retrieve pathway name; using 'Pathway' as default.")
   }
 
-  g <- make_igraph_graph(vertices_df, edges_df, pathway_name, verbose = verbose)
+  g <- make_igraph_graph(
+    vertices_df,
+    edges_df,
+    pathway_name,
+    verbose = verbose
+  )
 
   igraph::graph_attr(g, "type") <- "KEGG_Pathway"
   return(g)
@@ -145,15 +162,22 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 
   return(g)
 }
+
+# Logic make empty graph ->
+# if vertices and nodes present than use graph_from_data_frame
+# If only vertices, make empty graph and add vertices and then vertices attributes
+
+
 # make_igraph_graph <- function(vertices_df, edges_df, pathway_name = NULL, verbose = FALSE) {
 #   # Sort vertices by label and name (case-insensitive)
 #   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
-#
+
 #   # Create empty graph with vertices
 #   g <- igraph::make_empty_graph(n = nrow(vertices_df), directed = TRUE)
 #   igraph::vertex_attr(g) <- cbind(igraph::vertex_attr(g), vertices_df)
+#   igraph::set_vertex_attrs(g) <- cbind(igraph::vertex_attr(g), vertices_df)
 #   igraph::V(g)$name <- vertices_df$name
-#
+
 #   # Add edges if available
 #   if (!is.null(edges_df) && nrow(edges_df) > 0) {
 #     if (nrow(edges_df) > 0) {
@@ -162,19 +186,18 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 #       for (col in setdiff(names(edges_df), c("from", "to"))) {
 #         igraph::edge_attr(g, col) <- edges_df[[col]]
 #       }
-#     } else if (verbose) {
-#       warning("Edges do not reference valid vertices. No edges added.")
-#     }
+#         # igraph::edge_attr(g) <- cbind(igraph::edge_attr(g), edges_df)
+
 #   } else if (verbose) {
 #     warning("No edges in graph. Creating vertex-only graph.")
 #   }
-#
+
 #   if (verbose) {
 #     message("Graph created with ", igraph::vcount(g), " vertices and ", igraph::ecount(g), " edges.")
 #   }
-#   
+
 #   igraph::graph_attr(g, "title") <- pathway_name
-#   
+
 #   return(g)
 # }
 
@@ -191,7 +214,9 @@ make_tidygraph_graph <- function(
   verbose = FALSE
 ) {
   # Sort vertices
-  vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
+  vertices_df <- vertices_df[
+    order(tolower(vertices_df$label), tolower(vertices_df$name)),
+  ]
 
   # Check for empty edges
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
@@ -200,7 +225,11 @@ make_tidygraph_graph <- function(
   }
 
   # Create graph
-  g <- tidygraph::tbl_graph(nodes = vertices_df, edges = edges_df, directed = TRUE)
+  g <- tidygraph::tbl_graph(
+    nodes = vertices_df,
+    edges = edges_df,
+    directed = TRUE
+  )
 
   # Add pathway_name as graph attribute if provided
   if (!is.null(pathway_name)) {
@@ -211,7 +240,10 @@ make_tidygraph_graph <- function(
 
   # Verbose output
   if (verbose) {
-    message("Graph created with ", nrow(vertices_df), " nodes and ", nrow(edges_df), " edges.")
+    message(
+      "Graph created with ",
+      nrow(vertices_df), " nodes and ", nrow(edges_df), " edges."
+    )
   }
 
   return(g)

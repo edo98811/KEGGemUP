@@ -121,12 +121,14 @@ map_results_to_graph <- function(
 
   if (verbose) message("Mapping differential expression results to nodes...")
 
-  de_results <- normalize_de_results(
+  # Standardize de_results to a list of data frames with consistent column names
+  de_results <- standardize_de_results(
     de_results,
     value_column = value_column,
     feature_column = feature_column
   )
 
+  # In case of empty or NULL results, return original graph with a warning
   if (is.null(de_results) || length(de_results) == 0) {
     warning("No valid differential expression results provided.
     Returning original graph.")
@@ -139,7 +141,7 @@ map_results_to_graph <- function(
   # Get current nodes
   vertices_df <- igraph::as_data_frame(g, what = "vertices")
 
-  # Merge results into nodes
+  # Merge results into nodes data frame and add colors for visualization
   nodes_updated <- add_results_nodes(vertices_df, results_combined, verbose = verbose)
   return_list <- add_colors_to_nodes(
     nodes_updated,

@@ -34,6 +34,13 @@
              type="roundrectangle" x="400" y="100" width="100" height="25"/>
     </entry>
 
+    <!-- Compound -->
+    <entry id="10" name="cpd:C00001" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00001">
+        <graphics name="COMPOUND1" fgcolor="#000000" bgcolor  ="#FFFFCC"
+             type="circle" x="100" y="200" width="30" height="30"/>
+    </entry>
+
     <!-- Line node -->
     <entry id="41" name="tst:1111 tst:2222 tst:3333" type="gene" reaction="rn:R00001" link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111+tst:2222+tst:3333">
       <graphics name="GENE1, GENE2, GENE3..." fgcolor="#66CC66" bgcolor="#FFFFFF" type="line" coords="100,150,200,150"/>
@@ -72,6 +79,7 @@
         <subtype name="feedback" value="--o"/>
     </relation>
 
+    <!-- Reactions -->
     <reaction id="7" name="rn:R00001" type="irreversible">
       <substrate id="1" name="cpd:C00001"/>
       <product id="2" name="cpd:C00002"/>
@@ -82,11 +90,6 @@
       <substrate id="3" name="cpd:C00004"/>
       <product id="4" name="cpd:C00005"/>
       <product id="5" name="cpd:C00006"/>
-    </reaction>
-
-    <reaction id="9" name="rn:R00003" type="irreversible">
-      <substrate id="5" name="cpd:C00007"/>
-      <product id="6" name="cpd:C00008"/>
     </reaction>
 
 </pathway>

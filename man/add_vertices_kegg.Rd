@@ -9,7 +9,9 @@ add_vertices_kegg(g, new_vertices)
 \arguments{
 \item{g}{An igraph object representing the KEGG pathway graph.}
 
-\item{new_vertices}{A data frame containing the new vertices to be added. It must have the following columns: name, label, type, KEGG, graphics_type, x, y, width, height.}
+\item{new_vertices}{A data frame containing the new
+vertices to be added. It must have the following columns:
+name, label, type, KEGG, graphics_type, x, y, width, height.}
 
 \item{node_positions}{Data frame of node positions to move nodes, with necessary columns: name, x, y.}
 }

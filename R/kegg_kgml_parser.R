@@ -454,7 +454,7 @@ add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
   found_c <- compounds_lookup[map_ids[is_c]]
   na_pos <- is.na(found_c)
   found_c[na_pos] <- labels[is_c][na_pos]
-  labels[is_c] <- sub("[;,].*", "", found_c)
+  labels[is_c] <- sub("[;].*", "", found_c)
   if (verbose) message("Mapped ", sum(!na_pos & is_c), " compounds.")
 
   # Glycans
@@ -462,7 +462,7 @@ add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
   found_g <- glycans_lookup[map_ids[is_g]]
   na_pos <- is.na(found_g)
   found_g[na_pos] <- labels[is_g][na_pos]
-  labels[is_g] <- sub("[;,].*", "", found_g)
+  labels[is_g] <- sub("[;].*", "", found_g)
   if (verbose) message("Mapped ", sum(!na_pos & is_g), " glycans.")
 
   # Genes
@@ -470,7 +470,7 @@ add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
   found_k <- genes_lookup[map_ids[is_k]]
   na_pos <- is.na(found_k)
   found_k[na_pos] <- labels[is_k][na_pos]
-  labels[is_k] <- sub("[;,].*", "", found_k)
+  labels[is_k] <- sub("[;].*", "", found_k)
   if (verbose) message("Mapped ", sum(!na_pos & is_k), " genes.")
 
   # Enzymes
@@ -478,7 +478,7 @@ add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
   found_e <- enzymes_lookup[map_ids[is_e]]
   na_pos <- is.na(found_e)
   found_e[na_pos] <- labels[is_e][na_pos]
-  labels[is_e] <- sub("[;,].*", "", found_e)
+  labels[is_e] <- sub("[;].*", "", found_e)
   if (verbose) message("Mapped ", sum(!na_pos & is_e), " enzymes.")
 
   # Assign node labels

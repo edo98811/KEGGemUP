@@ -7,11 +7,14 @@
 kegg_to_graph(pathway_id, kgml_file = NULL, verbose = FALSE)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110') or NULL if using kgml_file}
+\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110') or
+NULL if using kgml_file}
 
-\item{kgml_file}{Path to a local KGML file (optional, if pathway_id is provided)}
+\item{kgml_file}{Path to a local KGML file (optional,
+if pathway_id is provided)}
 
-\item{verbose}{Logical indicating whether to print verbose messages (default: FALSE)}
+\item{verbose}{Logical indicating whether to print
+verbose messages (default: FALSE)}
 }
 \value{
 An igraph object representing the KEGG pathway graph
