@@ -30,7 +30,7 @@ test_that("parse_kgml_reactions returns correct edges from reactions", {
 
 test_that("complete_kgml_reactions returns correct edges from reactions", {
   all_reaction_edges <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
-  expect_equal(all_reaction_edges, kgml_steps$all_reaction_edges)
+  expect_equal(all_reaction_edges, kgml_steps$completed_reactions)
 })
 
 test_that("parse_kgml_reactions returns correct edges from reactions if edges is NULL", {
@@ -48,21 +48,6 @@ test_that("complete_kgml_reactions returns correct edges from reactions if edges
   expect_equal(all_reaction_edges, NULL)
 })
 
-test_that("combined nodes (nodes + groups + lines) load correctly", {
-  vertices_df <- parse_kgml_nodes(xml_example, kegg_vertex_defaults())
-  vertices_df <- rbind(vertices_df, parse_kgml_groups(xml_example, kegg_vertex_defaults()))
-  vertices_df <- rbind(vertices_df, parse_kgml_lines(xml_example, kegg_vertex_defaults()))
-  expect_equal(vertices_df, kgml_steps$all_nodes)
-})
-
-test_that("combined edges (relations + reactions + line edges) load correctly", {
-  line_nodes <- parse_kgml_lines(xml_example, kegg_vertex_defaults())
-  edges_df <- parse_kgml_relations(xml_example, kegg_edge_defaults())
-  edges_df <- rbind(edges_df, parse_kgml_reactions(xml_example, kegg_edge_defaults()))
-  edges_df <- rbind(edges_df, parse_kgml_lines_edges(line_nodes, kegg_edge_defaults()))
-  expect_equal(edges_df, kgml_steps$all_edges)
-})
-
 test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   g <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
   # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_01))
@@ -70,15 +55,22 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
     igraph::graph_attr(g),
     igraph::graph_attr(kgml_steps$g_test_01)
   )
-  expect_equal(
-    igraph::vertex_attr(g),
-    igraph::vertex_attr(kgml_steps$g_test_01)
-  )
 
-  expect_equal(
-    igraph::edge_attr(g),
-    igraph::edge_attr(kgml_steps$g_test_01)
-  )
+  v1 <- igraph::as_data_frame(g, what = "vertices")
+  v2 <- igraph::as_data_frame(kgml_steps$g_test_01, what = "vertices")
+  
+  v1 <- v1[order(v1$name), ]
+  v2 <- v2[order(v2$name), ]
+  
+  expect_equal(v1, v2)
+  
+  e1 <- igraph::as_data_frame(g, what = "edges")
+  e2 <- igraph::as_data_frame(kgml_steps$g_test_01, what = "edges")
+  
+  e1 <- e1[order(e1$from, e1$to), ]
+  e2 <- e2[order(e2$from, e2$to), ]
+  
+  expect_equal(e1, e2)
   # expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
   # expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 })

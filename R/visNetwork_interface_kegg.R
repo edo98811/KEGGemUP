@@ -5,7 +5,15 @@
 #' @return A visNetwork object representing the graph.
 #' @noRd
 make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
-  # Different handling if no edges
+
+# if using an external file
+# renderer_dep <- htmltools::htmlDependency(
+#   name = "custom-renderer",
+#   version = "1.0.0",
+#   src = system.file("htmlwidgets", package = "yourpackage"),
+#   script = "custom_renderer.js"
+# )
+# custom_renderer <- htmlwidgets::JS("customRenderer")
 
   custom_renderer <- htmlwidgets::JS("
 function({ ctx, x, y, state: { selected, hover }, style, label }) {
@@ -58,6 +66,7 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
     widthConstraint = FALSE,
     ctxRenderer = custom_renderer
   )
+  # v <- htmltools::attachDependencies(v, renderer_dep)
 
   v <- visNetwork::visOptions(v,
     highlightNearest = list(

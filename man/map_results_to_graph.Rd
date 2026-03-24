@@ -12,8 +12,8 @@ map_results_to_graph(
   verbose = FALSE,
   palette = NULL,
   palette_limit = NULL,
-  palettes_limits_list = NULL,
-  palettes_list = NULL
+  palettes_limits_list = c(NA_real_),
+  palettes_list = c(NA_character_)
 )
 }
 \arguments{

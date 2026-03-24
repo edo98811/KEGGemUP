@@ -160,7 +160,7 @@ add_results_nodes <- function(
     nodes_to_check$de_text[text_idx],
     text_by_node
   )
-
+  
   # Warn if necessary
   if (warn) {
     warning(

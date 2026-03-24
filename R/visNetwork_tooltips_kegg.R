@@ -192,7 +192,7 @@ add_edge_tooltip <- function(edges_df) {
     "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_reaction], "</td></tr>",
     "</table>",
-    button_html_reaction
+    button_html_reaction[idx_reaction] 
   )
 
   # Line edges
@@ -202,7 +202,7 @@ add_edge_tooltip <- function(edges_df) {
     "<table>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_line], "</td></tr>",
     "</table>",
-    button_html_reaction
+    button_html_reaction[idx_line] 
   )
 
   return(edges_df)

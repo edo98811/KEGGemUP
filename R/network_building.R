@@ -146,7 +146,7 @@ build_kegg_graph <- function(
 make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FALSE) {
   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
-    warning("No edges in graph.")
+    message("No edges in graph.")
     fake_edges <- data.frame(from = vertices_df$name[1], to = vertices_df$name[1])
     g <- igraph::graph_from_data_frame(fake_edges, directed = FALSE, vertices = vertices_df)
     g <- igraph::delete_edges(g, igraph::E(g))

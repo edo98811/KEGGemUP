@@ -85,10 +85,12 @@ make_mapping_df <- function(vertices_df) {
   mapping <- do.call(
     rbind,
     lapply(seq_len(nrow(vertices_df)), function(i) {
+      ids <- vertices_df$ids_for_mapping[i]
+      if (ids == "") return(NULL)
       data.frame(
         name = vertices_df$name[i],
         matched_id = strsplit(
-          vertices_df$ids_for_mapping[i], ";",
+          ids, ";",
           fixed = TRUE
         )[[1]]
       )

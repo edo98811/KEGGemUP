@@ -12,26 +12,32 @@ make_kegg_visNetwork(
 )
 }
 \arguments{
-\item{g}{An igraph object representing the KEGG pathway graph.}
+\item{g}{An igraph object representing the
+KEGG pathway graph.}
 
-\item{scaling_factor}{Numeric factor to scale node sizes (default: 1.5).}
+\item{scaling_factor}{Numeric factor to scale
+node sizes (default: 1.5).}
 
-\item{relationships}{Character specifying which relationships to include in edges
+\item{relationships}{Character specifying which
+relationships to include in edges
 ("all", "reactions", "relations", "none"; default: "all").}
 
-\item{visualisation_type}{Character specifying the type of visualisation for nodes:
+\item{visualisation_type}{Character specifying the type of
+visualisation for nodes:
 "standard", "positions", "node_name", or "node_size" (default: "standard").}
 }
 \value{
-A visNetwork object representing the KEGG pathway graph with mapped results.
+A visNetwork object representing the KEGG pathway
+graph with mapped results.
 }
 \description{
 Plot KEGG pathway graph using visNetwork
 }
 \details{
-This function takes an igraph object representing a KEGG pathway graph
-and creates a visNetwork visualization. It maps node attributes to visual properties
-and allows for customization of node sizes and edge relationships.
+This function takes an igraph object representing a
+KEGG pathway graph
+and creates a visNetwork visualization.
+It maps node attributes to visual properties.
 }
 \examples{
 pathway <- "hsa04110" # Example pathway ID
@@ -41,8 +47,13 @@ de_results <- data.frame(
  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
 log2FoldChange = c(1.5, -2.0, 0.5)
 )
-graph <- map_results_to_graph(graph, de_results, feature_column = "KEGG_ids"),
+graph <- map_results_to_graph(
+graph, 
+de_results, 
+feature_column = "KEGG_ids"
+),
 value_column = "log2FoldChange")
 
-vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, relationships = "all", visualisation_type = "standard")
+vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, 
+relationships = "all", visualisation_type = "standard")
 }

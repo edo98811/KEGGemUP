@@ -16,9 +16,11 @@ kgml_cache/
 kegg_cache/
 docs
 
-!inst/extdata/hsa04010.xml
+# !inst/extdata/hsa04010.xml
 !inst/extdata/test01.xml
-!inst/extdata/empty_edges.xml
+!inst/extdata/no_edges.xml
+!inst/extdata/empty.xml
+!inst/extdata/broken.xml
 
 Users:.fileloc
 /doc/

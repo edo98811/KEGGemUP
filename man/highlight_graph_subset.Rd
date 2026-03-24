@@ -4,13 +4,13 @@
 \alias{highlight_graph_subset}
 \title{Highlight a subset of the graph based on KEGG IDs}
 \usage{
-highlight_graph_subset(g, ids_to_include)
+highlight_graph_subset(g, ids_to_highlight)
 }
 \arguments{
 \item{g}{An igraph object to visualize.
 Must have vertex attributes 'x' and 'y' for layout.}
 
-\item{ids_to_include}{Character vector of
+\item{nodes_to_highlight}{Character vector of
 KEGG IDs to include in the highlighted subset.}
 }
 \value{

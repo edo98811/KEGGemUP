@@ -95,7 +95,22 @@ style_vertices_igraph <- function(vertices_df) {
 #'
 #' @return vertices_df with scaled x and y coordinates.
 #' @noRd
-scale_dimensions <- function(vertices_df, factor = 10) {
+scale_dimensions <- function(vertices_df, factor = 5) {
+
+  # Validate factor input
+  default_factor <- 5
+  if (!is.numeric(factor) || length(factor) != 1) {
+    warning("Scaling factor should be a single numeric value. Using default value of", default_factor)
+    factor <- default_factor
+  } else if (factor <= 0) {
+    warning("Scaling factor should be positive. Using default value of", default_factor)
+    factor <- default_factor
+  }
+  if (factor <= 0) {
+    warning("Scaling factor should be positive. Using default value of", default_factor)
+    factor <- default_factor
+  }
+
   # Scale x and y coordinates to make the graph look nicer
   vertices_df$x <- as.numeric(vertices_df$x) * factor
   vertices_df$y <- as.numeric(vertices_df$y) * factor

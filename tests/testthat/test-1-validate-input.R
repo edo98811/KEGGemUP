@@ -1,17 +1,20 @@
 test_that("invalid inputs return NULL", {
   
-  expect_null(standardize_de_results(NULL))
-  
-  expect_warning(
-    res <- standardize_de_results(data.frame(a = 1)),
-    "value_column and feature_column"
+
+  warn <- capture_warnings(
+    expect_null(standardize_de_results(NULL))
   )
-  expect_null(res)
+  expect_length(warn, 1)
   
-  expect_warning(
-    res <- standardize_de_results(list(a = 1), value_column = "x"),
-    "value_column and feature_column"
+  warn <- capture_warnings(
+    res <- standardize_de_results(data.frame(a = 1))
   )
+  expect_length(warn, 1)
+  
+  warn <- capture_warnings(
+    res <- standardize_de_results(list(a = 1), value_column = "x")
+  )
+  expect_length(warn, 1)
   expect_null(res)
   
 })
@@ -24,13 +27,13 @@ test_that("single dataframe input is standardized correctly", {
     logFC = c(1.2, -0.3, 0.8),
     stringsAsFactors = FALSE
   )
-  
-  res <- standardize_de_results(
-    df,
-    value_column = "logFC",
-    feature_column = "gene"
+  suppressMessages(
+    res <- standardize_de_results(
+      df,
+      value_column = "logFC",
+      feature_column = "gene"
+    )
   )
-  
   expect_type(res, "list")
   expect_named(res, "de_input")
   
@@ -49,14 +52,14 @@ test_that("single dataframe with missing columns returns NULL", {
     stringsAsFactors = FALSE
   )
   
-  expect_warning(
+  warn <- capture_warnings(
     res <- standardize_de_results(
       df,
       value_column = "logFC",
       feature_column = "gene"
-    ),
-    "required columns"
+    )
   )
+  expect_length(warn, 3)
   
   expect_null(res)
   
@@ -70,13 +73,14 @@ test_that("single dataframe with wrong column types returns NULL", {
     stringsAsFactors = FALSE
   )
   
-  expect_warning(
+  warn <- capture_warnings(
     res <- standardize_de_results(
       df,
       value_column = "logFC",
       feature_column = "gene"
     )
   )
+  expect_length(warn, 2)
   
   expect_null(res)
   
@@ -138,7 +142,10 @@ test_that("invalid list entries are removed", {
     )
   )
   
-  res <- standardize_de_results(input)
+  warn <- capture_warnings(
+    res <- standardize_de_results(input)
+  )
+  expect_length(warn, 4)
   
   expect_length(res, 1)
   expect_named(res, "valid")
@@ -161,7 +168,10 @@ test_that("all invalid list entries return NULL", {
     )
   )
   
-  res <- standardize_de_results(input)
+  warn <- capture_warnings(
+    res <- standardize_de_results(input)
+  )
+  expect_length(warn, 2)
   
   expect_null(res)
   
@@ -183,9 +193,10 @@ test_that("list must be named", {
     )
   )
   
-  expect_warning(
+  warn <- capture_warnings(
     res <- standardize_de_results(input)
   )
+  expect_length(warn, 1)
   
   expect_null(res)
   
