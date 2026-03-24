@@ -1,7 +1,7 @@
 suppressMessages({
-  # library(KEGGemUP)
+  library(KEGGemUP)
   library(igraph)
-  library(xml2)
+  library(xml2) 
   library(BiocFileCache)
 })
 

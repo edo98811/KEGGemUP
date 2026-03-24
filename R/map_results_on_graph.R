@@ -200,10 +200,10 @@ add_results_nodes <- function(
 #' @noRd
 add_colors_to_nodes <- function(
   vertices_df,
+  palettes_limits_list = c(NA_real_),
+  palettes_list = c(NA_character_),
   palette = NULL,
   palette_limit = NULL,
-  palettes_limits_list = NULL,
-  palettes_list = NULL,
   verbose = FALSE
 ) {
   # Default values
@@ -239,16 +239,9 @@ add_colors_to_nodes <- function(
 
     ## from here to map to continous value (make function)
     # Get paletteRamp for this source
-    colors <- get_palette_colors(
-      palette,
-      source_name,
-      default_palette,
-      verbose = TRUE
-    )
-
     tryCatch(
       {
-        palette_ramp <- colorRampPalette(colors)
+        palette_ramp <- colorRampPalette(palette)
       },
       error = function(e) {
         warning(
@@ -333,73 +326,73 @@ add_colors_to_nodes <- function(
 
 validate_palette_limits <- function(
   sources,
-  palettes_limits_list = NULL,
+  palettes_limits_list = c(NA_real_),
   palette_limit = NULL,
   default_palette_limit = FALSE
 ) {
   # Check palettes_limits_list
-  if (!all(
-    !is.null(palettes_limits_list),
-    all(sources %in% names(palettes_limits_list)),
-    list_elements_are_types(
-      palettes_limits_list,
-      setNames(rep("numeric", length(sources)), sources),
-      warn = FALSE
-    )
-  )) {
-    # warning(
-    #   "Some sources do not have specified palette limits.\n",
-    # )
-    palette_limit <- default_palette_limit
+  if (!is.numeric(palettes_limits_list)) stop("`palettes_limits_list` must be a numeric vector")
+  if (!all(sources %in% names(palettes_limits_list))) {
+    if (!all(is.na(palettes_limits_list))) {
+      warning(
+        "Some sources do not have specified palette limits.\n",
+        "Not using limits for any source."
+      )
+    }
+    palettes_limits_list <- c(NA_real_)
+    if (is.null(palette_limit)) {
+      palette_limit <- default_palette_limit
+    }
   }
-
   # Assign final palette limits
-  palettes_limits_list <- if (!is.null(palettes_limits_list)) {
-    palettes_limits_list
-  } else {
+  palettes_limits_list <- if (all(is.na(palettes_limits_list))) {
     setNames(rep(palette_limit, length(sources)), sources)
+  } else {
+    palettes_limits_list
   }
 
   palettes_limits_list
 }
 
 validate_palettes <- function(
-  sources,
-  palettes_list = NULL,
-  palette = NULL,
-  default_palette = "Spectral"
+    sources,
+    palettes_list = c(NA_character_),
+    palette = NULL,
+    default_palette = "Spectral"
 ) {
-  # Check palettes_list
-  if (!all(
-    !is.null(palettes_list),
-    all(sources %in% names(palettes_list)),
-    list_elements_are_types(
-      palettes_list,
-      setNames(rep("character", length(sources)), sources),
-      warn = FALSE
-    )
-  )) {
-    # warning(
-    #   "Some sources do not have specified palettes.\n",
-    #   "Defaulting all to '", default_palette, "'."
-    # )
-    palettes_list <- NULL
+  
+  if (!is.character(palettes_list)) {
+    stop("`palettes_list` must be a character vector")
   }
-
-  # Assign final palettes
-  palettes_list <- if (!is.null(palettes_list)) {
-    palettes_list
+  
+  # Check if palettes_list covers all sources
+  palettes_valid <- !all(is.na(palettes_list)) &&
+    !is.null(names(palettes_list)) &&
+    all(sources %in% names(palettes_list))
+  
+  if (!palettes_valid && !is.null(palette)) {
+    palettes_to_use <- rep(palette, length(sources))
+    
+  } else if (palettes_valid) {
+    palettes_to_use <- palettes_list[sources]
+    
   } else {
-    if (!is.null(palette) && is.character(palette)) {
-      setNames(rep(palette, length(sources)), sources)
-    } else {
-      setNames(rep(default_palette, length(sources)), sources)
+    if (!all(is.na(palettes_list))) {
+      warning(
+        "Some sources do not have specified palettes.\n",
+        "Defaulting all to '", default_palette, "'."
+      )
     }
+    palettes_to_use <- rep(default_palette, length(sources))
   }
-
-  palettes_list
+  
+  palettes_list_colors <- setNames(
+    lapply(palettes_to_use, get_palette_colors),
+    sources
+  )
+  
+  palettes_list_colors
 }
-
 
 #' Helper function to create a legend for a single source
 #' @param range_val Numeric, the maximum absolute value for the legend range.
@@ -447,24 +440,9 @@ create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n
 # Helper function to get palette colors for a source
 get_palette_colors <- function(
   palette,
-  source_name,
   default_palette = "Spectral",
   verbose = FALSE
 ) {
-  # Verbose message
-  if (verbose) {
-    message("Processing source: ", source_name)
-  }
-
-  # If palette is NULL, default
-  if (is.null(palette)) {
-    warning(
-      "Palette for source '", source_name,
-      "' is NULL. Defaulting to '", default_palette, "'."
-    )
-    palette <- default_palette
-  }
-
   # If palette is a single name
   if (length(palette) == 1) {
     # Check if it is a valid RColorBrewer palette
@@ -477,7 +455,7 @@ get_palette_colors <- function(
     }
     # Get palette colors from RColorBrewer (11 colors, reversed)
 
-    palette_colors <- rev(RColorBrewer::brewer.pal(n = 11, name = palette))
+    palette_colors <- rev(RColorBrewer::brewer.pal(n = 7, name = palette))
   } else {
     # If palette is already a vector of colors, use it directly
     palette_colors <- palette
@@ -490,7 +468,7 @@ get_palette_colors <- function(
 get_palette_range <- function(
   de_value_vector,
   source_name,
-  palette_limit = NULL,
+  palette_limit = FALSE,
   verbose = FALSE
 ) {
   # If a palette limit is provided ( I use false because NULL cannot be in a list)

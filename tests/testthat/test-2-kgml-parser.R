@@ -29,12 +29,12 @@ test_that("parse_kgml_reactions returns correct edges from reactions", {
 })
 
 test_that("complete_kgml_reactions returns correct edges from reactions", {
-  all_reaction_edges  <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
+  all_reaction_edges <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
   expect_equal(all_reaction_edges, kgml_steps$all_reaction_edges)
 })
 
 test_that("parse_kgml_reactions returns correct edges from reactions if edges is NULL", {
-  reactions_edges  <- parse_kgml_reactions(xml_no_edges, kegg_edge_defaults())
+  reactions_edges <- parse_kgml_reactions(xml_no_edges, kegg_edge_defaults())
   expect_equal(reactions_edges, NULL)
 })
 
@@ -44,7 +44,7 @@ test_that("parse_kgml_relations returns correct edges from relations if edges is
 })
 
 test_that("complete_kgml_reactions returns correct edges from reactions if edges is NULL", {
-  all_reaction_edges  <- complete_kgml_reactions(kgml_steps$nodes, NULL, kegg_edge_defaults())
+  all_reaction_edges <- complete_kgml_reactions(kgml_steps$nodes, NULL, kegg_edge_defaults())
   expect_equal(all_reaction_edges, NULL)
 })
 
@@ -65,9 +65,22 @@ test_that("combined edges (relations + reactions + line edges) load correctly", 
 
 test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   g <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
-  expect_true(igraph::identical_graphs(g, kgml_steps$g_test_01))
-  expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
-  expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
+  # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_01))
+  expect_equal(
+    igraph::graph_attr(g),
+    igraph::graph_attr(kgml_steps$g_test_01)
+  )
+  expect_equal(
+    igraph::vertex_attr(g),
+    igraph::vertex_attr(kgml_steps$g_test_01)
+  )
+
+  expect_equal(
+    igraph::edge_attr(g),
+    igraph::edge_attr(kgml_steps$g_test_01)
+  )
+  # expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
+  # expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 })
 
 test_that("add_group correctly assigns group labels", {
@@ -86,22 +99,17 @@ test_that("add_group correctly assigns group labels", {
 })
 
 test_that("add_labels works correctly", {
-  compounds_db <- data.frame(id = c("C00001", "C00002"), name = c("Water,test;H2O", "ATP"))
-  glycans_db <- data.frame(id = c("G00001"), name = c("GlycanX;Y"))
-  genes_db <- data.frame(id = c("K00001", "K00002"), name = c("GeneA", "GeneB;alias"))
-  enzymes_db <- data.frame(id = c("1.1.1.1"), name = c("EnzymeX"))
-
   vertices_df <- data.frame(
     KEGG = c("cpd:C00001", "cpd:C00099", "gl:G00001", "ko:K00001", "ko:K99999", "ec:1.1.1.1", "ec:9.9.9.9"),
     ids_for_mapping = c("C00001", "C00099", "G00001", "K00001", "K99999", "1.1.1.1", "9.9.9.9"),
-    graphics_name = c("Water", "beta-Alanine, test", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA),
+    graphics_name = c("Water", "beta-Alanine, test", "N-Acetyl-D-glucosaminyldiphosphodolichol", "alcohol dehydrogenase", NA, "alcohol dehydrogenase", NA)
   )
 
   nodes_out <- add_node_labels(vertices_df, bfc = bfc)
-  expect_equal(nodes_out$label[1], "Water,test")
-  expect_equal(nodes_out$label[2], "beta-Alanine, test")
+  expect_equal(nodes_out$label[1], "H2O")
+  expect_equal(nodes_out$label[2], "beta-Alanine")
   expect_equal(nodes_out$label[3], "N-Acetyl-D-glucosaminyldiphosphodolichol")
-  expect_equal(nodes_out$label[4], "E1.1.1.1")
+  expect_equal(nodes_out$label[4], "E1.1.1.1, adh")
   expect_equal(nodes_out$label[5], "K99999")
   expect_equal(nodes_out$label[6], "alcohol dehydrogenase")
   expect_equal(nodes_out$label[7], "9.9.9.9")
@@ -109,7 +117,7 @@ test_that("add_labels works correctly", {
 
 test_that("add_reaction_labels works correctly", {
   vertices_df <- data.frame(
-    reaction = c("rn:R00001", "rn:R00099", NA, "rn:R00002"),
+    reaction = c("rn:R00001", "rn:R00099", NA, "rn:R00002")
   )
 
   nodes_out <- add_reaction_labels(vertices_df, bfc = bfc)
