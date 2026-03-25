@@ -102,7 +102,6 @@ kegg_to_graph <- function(
 #'   feature_column = "KEGG_ids",
 #'   value_column = "log2FoldChange"
 #' )
-#'
 #' @export
 map_results_to_graph <- function(
     g,
@@ -301,7 +300,7 @@ make_graph_subset <- function(g, ids_to_include) {
 #' Highlight a subset of the graph based on KEGG IDs
 #' @param g An igraph object to visualize. 
 #' Must have vertex attributes 'x' and 'y' for layout.
-#' @param nodes_to_highlight Character vector of
+#' @param ids_to_highlight Character vector of
 #'  KEGG IDs to include in the highlighted subset.
 #' @return An igraph object with highlighted nodes 
 #' and faded non-highlighted nodes and edges.

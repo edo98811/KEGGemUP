@@ -3,6 +3,7 @@
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
 #' @return A visNetwork object representing the graph.
+#' @importFrom htmlwidgets JS
 #' @noRd
 make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
 

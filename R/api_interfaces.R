@@ -41,42 +41,46 @@ get_pathway_name <- function(id, verbose = FALSE) {
 #' data_dir <- tempdir()
 #' kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
 download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) {
-  
   mode <- select_cache_or_path(bfc, path, verbose)
-  
+
   if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
   }
-  
+
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
   if (verbose) message("Downloading KGML from: ", url)
-  
+
   if (mode == "cache") {
     cached_path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
     if (verbose) message("Cached: ", pathway_id)
     return(cached_path)
   }
-  
+
   resp <- make_request(url)
   kgml_xml <- resp_body_xml(resp)
-  
-  if (mode != "none") {
-    file_name <- if (!is.null(path) && tools::file_ext(path) != "") {
-      path
-    } else {
-      file.path(path.expand(path %||% getwd()), paste0(pathway_id, ".xml"))
-    }
-    
-    write_xml(kgml_xml, file_name)
-    
-    if (verbose) message("Downloaded & saved in: ", file_name)
-    
-    return(file_name)
+
+  # Save to path if specified, otherwise save in current working directory
+  # If path is a directory, save there, if it's a file path, save there, 
+  # if it's NULL save in current working directory
+  if (is.null(path)) {
+    file_name <- file.path(getwd(), paste0(pathway_id, ".xml"))
+  } else if (dir.exists(path)) {
+    file_name <- file.path(path, paste0(pathway_id, ".xml"))
+  } else {
+    dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+    file_name <- path
   }
-  
-  invisible(kgml_xml)
+
+
+  write_xml(kgml_xml, file_name)
+  if (verbose) message("Downloaded & saved in: ", file_name)
+
+  return(file_name)
 }
 
+#' Make requests with retry logic
+#' @param url URL to request
+#' @return Response object from httr2
 make_request <- function(url) {
   resp <- request(url) |>
     req_retry(max_tries = 3) |>
@@ -84,7 +88,7 @@ make_request <- function(url) {
 
   if (resp_is_error(resp)) {
     warning(
-      "Failed to download KEGG DB: ", db_name,
+      "Failed to download KGML from: ", url,
       " (HTTP status ", resp_status(resp), ")"
     )
     return(NULL)

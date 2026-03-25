@@ -27,10 +27,12 @@ Depends:
 Imports:
     BiocFileCache,
     httr2,
+    ggplot2,
     igraph,
     KEGGREST,
     visNetwork,
     RColorBrewer,
+    htmlwidgets,
     xml2
 Suggests: 
     shinytest2,

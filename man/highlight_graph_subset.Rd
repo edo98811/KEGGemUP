@@ -10,7 +10,7 @@ highlight_graph_subset(g, ids_to_highlight)
 \item{g}{An igraph object to visualize.
 Must have vertex attributes 'x' and 'y' for layout.}
 
-\item{nodes_to_highlight}{Character vector of
+\item{ids_to_highlight}{Character vector of
 KEGG IDs to include in the highlighted subset.}
 }
 \value{

@@ -158,6 +158,28 @@ test_that("validate_palettes handles different scenarios", {
     )
   )
 
+  # Palette with global invalid palette
+  warn <- capture_warnings(
+    result <- KEGGemUP:::validate_palettes(sources, palettes_list, palette = "test"),
+  )
+  expect_equal(length(warn), 2)
+  expect_equal(
+    result,
+    setNames(
+      list(
+        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral")),
+        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral"))
+      ),
+      sources
+    )
+  )
+  
+  # Palette with global palette and palettes list with one invalid
+  warn <- capture_warnings(
+    result <- KEGGemUP:::validate_palettes(sources, palettes_list <- c(X = "Spectral", A = "Viridis"), palette = "test")
+  )
+  expect_equal(length(warn), 2)
+
   # Correct list with proper names
   palettes_list <- c(A = "Spectral", B = "RdPu")
   result <- KEGGemUP:::validate_palettes(sources, palettes_list)
@@ -267,4 +289,41 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
   # Color assignment checks
   expect_true(any(grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", colored_nodes$vertex.color)))
   expect_true(any(colored_nodes$vertex.color != "white"))
+})
+
+test_that("add_colors_to_nodes handles errors in palette validation", {
+
+  # Prepare vertices_df
+  vertices_df <- kgml_steps$all_nodes
+  indexes_to_map <- which(
+    vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
+  )
+  vertices_df$ids_for_mapping[indexes_to_map] <- vapply(
+    vertices_df$KEGG[indexes_to_map],
+    KEGGemUP:::remove_kegg_prefix_str,
+    character(1)
+  )
+
+  # Map results and add colors with invalid palette
+  results_combined <- combine_results_in_dataframe(de_results_list)
+  expect_warning(mapped_nodes <- KEGGemUP:::add_results_nodes(
+    vertices_df,
+    results_combined
+  ), "Some nodes had multiple matching IDs")
+  
+  suppressMessages(
+    warns <- capture_warnings(
+      colored_nodes <- KEGGemUP:::add_colors_to_nodes(
+        mapped_nodes,
+        palette = c("sasf", "invalid"),
+        palettes_limits_list = c(NA_real_),
+        palette_limit = NULL,
+        palettes_list = c(NA_character_)
+      )$vertices_df
+    )
+  )
+  
+  expect_equal(length(warns), 8)
+  # Should still return a data frame with vertex.color column
+  expect_true(is.data.frame(colored_nodes))
 })

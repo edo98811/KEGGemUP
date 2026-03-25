@@ -144,6 +144,7 @@ build_kegg_graph <- function(
 #' @param pathway_name Name of the pathway for the graph title.
 #' @noRd
 make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FALSE) {
+  ## TODO: rewrite
   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
     message("No edges in graph.")
@@ -201,50 +202,50 @@ make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FAL
 #   return(g)
 # }
 
-# ' Create a visNetwork graph from nodes and edges data frames
-#' @param vertices_df Data frame of nodes.
-#' @param edges_df Data frame of edges.
-#' @param pathway_name Name of the pathway for the graph title.
-#' @return A visNetwork object representing the graph.
-#' @noRd
-make_tidygraph_graph <- function(
-  vertices_df,
-  edges_df,
-  pathway_name = NULL,
-  verbose = FALSE
-) {
-  # Sort vertices
-  vertices_df <- vertices_df[
-    order(tolower(vertices_df$label), tolower(vertices_df$name)),
-  ]
+# # ' Create a visNetwork graph from nodes and edges data frames
+# #' @param vertices_df Data frame of nodes.
+# #' @param edges_df Data frame of edges.
+# #' @param pathway_name Name of the pathway for the graph title.
+# #' @return A visNetwork object representing the graph.
+# #' @noRd
+# make_tidygraph_graph <- function(
+#   vertices_df,
+#   edges_df,
+#   pathway_name = NULL,
+#   verbose = FALSE
+# ) {
+#   # Sort vertices
+#   vertices_df <- vertices_df[
+#     order(tolower(vertices_df$label), tolower(vertices_df$name)),
+#   ]
 
-  # Check for empty edges
-  if (nrow(edges_df) == 0 || is.null(edges_df)) {
-    warning("No edges in graph. Creating a graph with isolated nodes.")
-    edges_df <- data.frame(from = character(), to = character())
-  }
+#   # Check for empty edges
+#   if (nrow(edges_df) == 0 || is.null(edges_df)) {
+#     warning("No edges in graph. Creating a graph with isolated nodes.")
+#     edges_df <- data.frame(from = character(), to = character())
+#   }
 
-  # Create graph
-  g <- tidygraph::tbl_graph(
-    nodes = vertices_df,
-    edges = edges_df,
-    directed = TRUE
-  )
+#   # Create graph
+#   g <- tidygraph::tbl_graph(
+#     nodes = vertices_df,
+#     edges = edges_df,
+#     directed = TRUE
+#   )
 
-  # Add pathway_name as graph attribute if provided
-  if (!is.null(pathway_name)) {
-    g <- g %>%
-      activate(graph) %>%
-      mutate(name = pathway_name)
-  }
+#   # Add pathway_name as graph attribute if provided
+#   if (!is.null(pathway_name)) {
+#     g <- g %>%
+#       activate(graph) %>%
+#       mutate(name = pathway_name)
+#   }
 
-  # Verbose output
-  if (verbose) {
-    message(
-      "Graph created with ",
-      nrow(vertices_df), " nodes and ", nrow(edges_df), " edges."
-    )
-  }
+#   # Verbose output
+#   if (verbose) {
+#     message(
+#       "Graph created with ",
+#       nrow(vertices_df), " nodes and ", nrow(edges_df), " edges."
+#     )
+#   }
 
-  return(g)
-}
+#   return(g)
+# }

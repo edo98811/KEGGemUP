@@ -240,18 +240,21 @@ add_colors_to_nodes <- function(
 
     ## from here to map to continous value (make function)
     # Get paletteRamp for this source
-    tryCatch(
+    palette_ramp <- tryCatch(
       {
-        palette_ramp <- colorRampPalette(palette)
+        colorRampPalette(palette)
       },
       error = function(e) {
         warning(
           "Failed to create color ramp for source '", source_name,
           "': ", e$message, ". Skipping this source."
         )
-        next
+        NULL
       }
     )
+
+    # If palette ramp creation failed, skip to next source
+    if (is.null(palette_ramp)) next
 
     # This makes the de values of the plot limited to the range
     # specified in palette_limits, if provided.
