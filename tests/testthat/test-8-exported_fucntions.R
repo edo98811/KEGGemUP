@@ -1,5 +1,4 @@
 test_that("map_results_to_graph correctly maps DE results onto igraph", {
-  # Use the preloaded reference graph
   g <- expected_graphs$g_test_01
 
   # Map results
@@ -49,7 +48,6 @@ test_that("map_results_to_graph does not accept a non igraph object", {
 })
 
 test_that("kegg_to_graph returns correct igraph using local KGML", {
-  # Run function
   expect_warning(
     g <-
       kegg_to_graph(
@@ -77,16 +75,13 @@ test_that("kegg_to_graph handles missing KGML file", {
 })
 
 test_that("make_kegg_visNetwork works correctly", {
-  # Your input igraph
-  g_input <- expected_graphs$g_test_01_mapped
 
-  # Your expected visNetwork object
+  g_input <- expected_graphs$g_test_01_mapped
   v_expected <- expected_graphs$visNetwork_test_01_mapped
 
-  # Run the function
   v_actual <- make_kegg_visNetwork(g_input)
 
-  # Basic type check
+  # type check
   expect_s3_class(v_actual, "visNetwork")
 
   # Compare to expected visNetwork object
@@ -139,12 +134,13 @@ test_that("make_graph_subset returns original graph if no matching nodes found",
 test_that("highlight_graph_subset works correctly", {
   ids_to_highlight <- c("C00001", "C00002")
 
+  # Prepare graph and mapping to identify which nodes should be highlighted
   g_input <- expected_graphs$g_test_01_mapped
   g_highlighted <- highlight_graph_subset(g_input, ids_to_highlight)
-
   vertices_df <- igraph::as_data_frame(g_highlighted, what = "vertices")
   mapping <- make_mapping_df(vertices_df)
   nodes_to_highlight <- mapping$matched_id %in% ids_to_highlight
+  
   # Check that the highlighted graph is still an igraph
   nodes_to_highlight <- unique(
     mapping[mapping$matched_id %in% ids_to_highlight, "name"]

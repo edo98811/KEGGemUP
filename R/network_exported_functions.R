@@ -158,7 +158,7 @@ map_results_to_graph <- function(
   )
   
   nodes_updated <- return_list$vertices_df
-  legend_plot <- return_list$legend_plot
+  legend_plots <- return_list$legend_plots
   
   # Order nodes to match original graph
   nodes_updated <- nodes_updated[
@@ -167,7 +167,7 @@ map_results_to_graph <- function(
   ]
   
   stopifnot(identical(nodes_updated$name, igraph::V(g)$name))
-  
+
   # Update vertex attributes
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
@@ -175,7 +175,7 @@ map_results_to_graph <- function(
   # igraph::vertex_attr(g, "text") <- nodes_updated$text
   igraph::vertex_attr(g, "de_text") <- nodes_updated$de_text
   igraph::vertex_attr(g, "de_name") <- nodes_updated$de_name
-  igraph::graph_attr(g, "legend_plot") <- legend_plot
+  igraph::graph_attr(g, "legend_plots") <- legend_plots
   
   return(g)
 }

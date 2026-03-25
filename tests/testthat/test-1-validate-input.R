@@ -19,7 +19,6 @@ test_that("invalid inputs return NULL", {
   
 })
 
-
 test_that("single dataframe input is standardized correctly", {
   
   df <- data.frame(
@@ -43,7 +42,6 @@ test_that("single dataframe input is standardized correctly", {
   expect_identical(entry$value_column, "logFC")
   expect_identical(entry$feature_column, "gene")
 })
-
 
 test_that("single dataframe with missing columns returns NULL", {
   
@@ -108,7 +106,6 @@ test_that("valid list input is preserved", {
   expect_named(res, "test1")
   expect_true(is.data.frame(res$test1$de_table))
 })
-
 
 test_that("invalid list entries are removed", {
   

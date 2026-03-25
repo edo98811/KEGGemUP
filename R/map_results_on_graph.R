@@ -319,7 +319,7 @@ add_colors_to_nodes <- function(
 
   return_list <- list(
     vertices_df = vertices_df,
-    legend_plot = legend
+    legend_plots = legend
   )
   return(return_list)
 }
@@ -330,21 +330,29 @@ validate_palette_limits <- function(
   palette_limit = NULL,
   default_palette_limit = FALSE
 ) {
-  # Check palettes_limits_list
-  if (!is.numeric(palettes_limits_list)) stop("`palettes_limits_list` must be a numeric vector")
-  if (!all(sources %in% names(palettes_limits_list))) {
+
+  if (!is.numeric(palettes_limits_list))
+    stop("`palettes_limits_list` must be a numeric vector")
+
+  if (is.null(names(palettes_limits_list)) ||
+      !all(sources %in% names(palettes_limits_list))) {
+
     if (!all(is.na(palettes_limits_list))) {
       warning(
         "Some sources do not have specified palette limits.\n",
         "Not using limits for any source."
       )
     }
+
     palettes_limits_list <- c(NA_real_)
-    if (is.null(palette_limit)) {
-      palette_limit <- default_palette_limit
-    }
   }
-  # Assign final palette limits
+
+  if (is.null(palette_limit)) {
+    palette_limit <- default_palette_limit
+  } else if (!is.numeric(palette_limit) || length(palette_limit) != 1) {
+    stop("`palette_limit` must be a single numeric value")
+  }
+
   palettes_limits_list <- if (all(is.na(palettes_limits_list))) {
     setNames(rep(palette_limit, length(sources)), sources)
   } else {

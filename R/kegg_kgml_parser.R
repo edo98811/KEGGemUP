@@ -297,12 +297,12 @@ complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = F
   new_edges_list <- lapply(seq_len(nrow(reaction_edges)), function(i) {
     reaction_id <- reaction_edges$reaction_name[i]
 
+    # Skip if reaction_id is missing or empty, with a warning
     if (is.na(reaction_id) || reaction_id == "") {
       if (verbose) message("Skipping edge ", i, " with missing reaction name.")
       return(NULL)
     }
-
-    reaction_node_idx <- which(vertices_df$reaction == reaction_id)
+    reaction_node_idx <- which(vertices_df$reaction == reaction_id & vertices_df$type != "line")
 
     if (length(reaction_node_idx) == 0) {
       if (verbose) message("No node found for reaction ", reaction_id, " in edge ", i)

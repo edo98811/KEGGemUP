@@ -51,11 +51,13 @@ test_that("complete_kgml_reactions returns correct edges from reactions if edges
 test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   g <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
   # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_01))
+
   expect_equal(
     igraph::graph_attr(g),
     igraph::graph_attr(kgml_steps$g_test_01)
   )
 
+  # Because the vertex order can be different
   v1 <- igraph::as_data_frame(g, what = "vertices")
   v2 <- igraph::as_data_frame(kgml_steps$g_test_01, what = "vertices")
   
@@ -71,7 +73,7 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   e2 <- e2[order(e2$from, e2$to), ]
   
   expect_equal(e1, e2)
-  # expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
+  expect_equal(igraph::graph_attr(g, "title"), "hsa00001")
   # expect_equal(igraph::graph_attr(g, "type"), "KEGG_Pathway")
 })
 

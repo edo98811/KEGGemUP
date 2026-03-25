@@ -40,7 +40,8 @@ test_that("build_kegg_graph works correctly", {
 })
 
 test_that("make_igraph_graph handles edge cases", {
-  ## Empty edges (to be sure)
+
+  # Empty edges do not cause problems (it should be NULL actually, but to be sure)
   vertices_df <- data.frame(name = c("1", "2"), label = c("A", "B"))
   edges_df <- data.frame(from = character(), to = character())
 
@@ -64,6 +65,7 @@ test_that("make_igraph_graph handles edge cases", {
   vertices_df <- data.frame(name = c("3", "1", "2"), label = c("Z", "A", "B"))
   edges_df <- data.frame(from = c("3", "1"), to = c("1", "2"))
 
+  # Works in correct case
   g <- make_igraph_graph(vertices_df, edges_df, "hsa00001")
 
   vertex_labels <- igraph::V(g)$label

@@ -76,3 +76,36 @@ test_that("style_igraph_graph works correctly on vertices", {
   expect_equal(unique(nodes_df$vertex.color[nodes_df$graphics_type == "line"]), "transparent")
   expect_equal(unique(nodes_df$vertex.color[nodes_df$type == "group"]), "transparent")
 })
+
+test_that("scale_dimensions works correctly", {
+
+  df <- data.frame(
+    x = c(1, 2, 3),
+    y = c(4, 5, 6)
+  )
+
+  # default scaling
+  res1 <- scale_dimensions(df)
+  expect_equal(res1$x, df$x * 5)
+  expect_equal(res1$y, df$y * 5)
+
+  # custom scaling
+  res2 <- scale_dimensions(df, factor = 2)
+  expect_equal(res2$x, df$x * 2)
+  expect_equal(res2$y, df$y * 2)
+
+  # non-numeric factor -> warning + default
+  expect_warning(
+    res3 <- scale_dimensions(df, factor = "a"),
+    "Scaling factor"
+  )
+  expect_equal(res3$x, df$x * 5)
+
+  # negative factor -> warning + default
+  expect_warning(
+    res4 <- scale_dimensions(df, factor = -3),
+    "Scaling factor"
+  )
+  expect_equal(res4$x, df$x * 5)
+
+})

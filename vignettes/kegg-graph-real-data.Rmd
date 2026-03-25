@@ -41,8 +41,8 @@ The first step is installing the package.
 If you dont have the package installed you can do so by running:
 
 ```{r install-package, eval=FALSE}
-install.packages("remotes")     
-remotes::install_github("edo98811/KEGGemUP")
+# install.packages("remotes")     
+# remotes::install_github("edo98811/KEGGemUP")
 ```
 
 Then load it.
@@ -255,8 +255,6 @@ KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
                  "C01762", "C05512", "C00301", "C01185", "C00455",
                  "22436", "14544", "18950", "11486", "80285", "59027")
 subg <- make_graph_subset(g, KEGG_to_include)
-
-make_igraph_visualisation(subg)
 ```
 
 ### VisNetwork visualisation
@@ -271,7 +269,7 @@ make_kegg_visNetwork(subg)
 
 You can also download a kgml file from kegg and parse a kegg pathway directly from it.
 ```{r from-file, out.width="100%", out.height="800px"}
-path_file <- KEGGemUP::download_kgml( "mmu04933")
+path_file <- KEGGemUP::download_kgml("mmu04933")
 
 graph_parsed <- kegg_to_graph(pathway_id = "example", kgml_file = path_file)
 

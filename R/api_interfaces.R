@@ -41,39 +41,40 @@ get_pathway_name <- function(id, verbose = FALSE) {
 #' data_dir <- tempdir()
 #' kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
 download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) {
-  # Determine whether to use cache or save to path
+  
   mode <- select_cache_or_path(bfc, path, verbose)
-
+  
   if (!is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
   }
-
+  
   url <- paste0("https://rest.kegg.jp/get/", pathway_id, "/kgml")
   if (verbose) message("Downloading KGML from: ", url)
-
-  # If using cache, check if the file is already cached and return the path
+  
   if (mode == "cache") {
-    path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
+    cached_path <- BiocFileCache::bfcrpath(bfc, url, ext = ".xml")
     if (verbose) message("Cached: ", pathway_id)
-    return(path)
+    return(cached_path)
   }
-
-  # If the path is provided, save the file there. If it's a file path, use it directly.
-  file_name <-
-    if (grepl("\\.[^/\\\\]+$", path)) {
+  
+  resp <- make_request(url)
+  kgml_xml <- resp_body_xml(resp)
+  
+  if (mode != "none") {
+    file_name <- if (!is.null(path) && tools::file_ext(path) != "") {
       path
     } else {
-      file.path(path.expand(path), paste0(pathway_id, ".xml"))
+      file.path(path.expand(path %||% getwd()), paste0(pathway_id, ".xml"))
     }
-
-  resp <- make_request(url)
-
-  kgml_xml <- resp_body_xml(resp)
-  write_xml(kgml_xml, file_name)
-
-  if (verbose) message("Downloaded & saved in: ", file_name)
-
-  return(file_name)
+    
+    write_xml(kgml_xml, file_name)
+    
+    if (verbose) message("Downloaded & saved in: ", file_name)
+    
+    return(file_name)
+  }
+  
+  invisible(kgml_xml)
 }
 
 make_request <- function(url) {
@@ -182,7 +183,7 @@ select_cache_or_path <- function(bfc, path, verbose = FALSE) {
     }
     mode <- "dir"
   } else {
-    if (verbose) message("No 'bfc' or 'path' provided. Not saving KEGG database only downloading and returning.")
+    if (verbose) message("No 'bfc' or 'path' provided.")
     mode <- "none"
   }
   return(mode)
