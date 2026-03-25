@@ -160,7 +160,7 @@ add_results_nodes <- function(
     nodes_to_check$de_text[text_idx],
     text_by_node
   )
-  
+
   # Warn if necessary
   if (warn) {
     warning(
@@ -200,10 +200,10 @@ add_results_nodes <- function(
 #' @noRd
 add_colors_to_nodes <- function(
   vertices_df,
-  palettes_limits_list = c(NA_real_),
-  palettes_list = c(NA_character_),
-  palette = NULL,
-  palette_limit = NULL,
+  palettes_limits_list,
+  palettes_list,
+  palette,
+  palette_limit,
   verbose = FALSE
 ) {
   # Default values
@@ -214,13 +214,14 @@ add_colors_to_nodes <- function(
 
   # Checking the palette provided
   palettes_limits_list <- validate_palette_limits(
-    sources,
-    palettes_limits_list,
-    palette_limit = palette_limit
+    sources = sources,
+    palettes_limits_list = palettes_limits_list,
+    palette_limit = palette_limit,
+    default_palette_limit = FALSE
   )
   palettes_list <- validate_palettes(
-    sources,
-    palettes_list,
+    sources = sources,
+    palettes_list = palettes_list,
     palette = palette,
     default_palette = default_palette
   )
@@ -326,17 +327,16 @@ add_colors_to_nodes <- function(
 
 validate_palette_limits <- function(
   sources,
-  palettes_limits_list = c(NA_real_),
-  palette_limit = NULL,
-  default_palette_limit = FALSE
+  palettes_limits_list,
+  palette_limit,
+  default_palette_limit
 ) {
-
-  if (!is.numeric(palettes_limits_list))
+  if (!is.numeric(palettes_limits_list)) {
     stop("`palettes_limits_list` must be a numeric vector")
+  }
 
   if (is.null(names(palettes_limits_list)) ||
-      !all(sources %in% names(palettes_limits_list))) {
-
+    !all(sources %in% names(palettes_limits_list))) {
     if (!all(is.na(palettes_limits_list))) {
       warning(
         "Some sources do not have specified palette limits.\n",
@@ -363,27 +363,24 @@ validate_palette_limits <- function(
 }
 
 validate_palettes <- function(
-    sources,
-    palettes_list = c(NA_character_),
-    palette = NULL,
-    default_palette = "Spectral"
+  sources,
+  palettes_list = c(NA_character_),
+  palette = NULL,
+  default_palette = "Spectral"
 ) {
-  
   if (!is.character(palettes_list)) {
     stop("`palettes_list` must be a character vector")
   }
-  
+
   # Check if palettes_list covers all sources
   palettes_valid <- !all(is.na(palettes_list)) &&
     !is.null(names(palettes_list)) &&
     all(sources %in% names(palettes_list))
-  
+
   if (!palettes_valid && !is.null(palette)) {
     palettes_to_use <- rep(palette, length(sources))
-    
   } else if (palettes_valid) {
     palettes_to_use <- palettes_list[sources]
-    
   } else {
     if (!all(is.na(palettes_list))) {
       warning(
@@ -393,12 +390,12 @@ validate_palettes <- function(
     }
     palettes_to_use <- rep(default_palette, length(sources))
   }
-  
+
   palettes_list_colors <- setNames(
     lapply(palettes_to_use, get_palette_colors),
     sources
   )
-  
+
   palettes_list_colors
 }
 

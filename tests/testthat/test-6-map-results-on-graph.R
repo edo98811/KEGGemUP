@@ -40,7 +40,6 @@ test_that("get_palette_range works correctly", {
 })
 
 test_that("add_results_nodes with malformed vertices_df", {
-
   # Missing ids_for_mapping column
   malformed_vertices_df <- data.frame(name = c("node2", "node2"))
   results_combined <- KEGGemUP:::combine_results_in_dataframe(de_results_list)
@@ -122,8 +121,10 @@ test_that("get_palette_colors works correctly and handles errors", {
   expect_true(is.character(KEGGemUP:::get_palette_colors(palette_valid)))
 
   # Test with invalid RColorBrewer palette
-  expect_warning(KEGGemUP:::get_palette_colors(palette_invalid),
-   "Palette 'NotAValidPalette' is not a valid RColorBrewer palette.")
+  expect_warning(
+    KEGGemUP:::get_palette_colors(palette_invalid),
+    "Palette 'NotAValidPalette' is not a valid RColorBrewer palette."
+  )
 
   # Test with character vector of colors
   expect_equal(KEGGemUP:::get_palette_colors(palette_char_vector), palette_char_vector)
@@ -197,30 +198,34 @@ test_that("validate_palette_limits handles different scenarios", {
   # Palettes_limits_list wrong type
   palettes_limits_list <- "Test"
   expect_error(
-    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list),
+    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list, palette_limit = NULL, default_palette_limit = FALSE),
     "`palettes_limits_list` must be a numeric vector"
   )
 
   # Palettes_limits_list wrong names
   palettes_limits_list <- c(X = 0.5, Y = 1)
   expect_warning(
-    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list),
+    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list, palette_limit = NULL, default_palette_limit = FALSE),
     "Some sources do not have specified palette limits"
   )
   expect_equal(result, setNames(rep(FALSE, 2), sources))
 
   # Correct list with proper names
   palettes_limits_list <- c(A = 0.5, B = 1)
-  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list)
+  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = palettes_limits_list, palette_limit = NULL, default_palette_limit = FALSE)
   expect_equal(result, palettes_limits_list)
 
   # Palettes_limits_list not set returns default
-  result <- KEGGemUP:::validate_palette_limits(sources, default_palette_limit = 1)
+  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(NA_real_), palette_limit = NULL, default_palette_limit = 1)
   expect_equal(result, setNames(rep(1, 2), sources))
 
   # Palettes_limits_list empty with custom default
-  result <- KEGGemUP:::validate_palette_limits(sources)
-  expect_equal(result, setNames(rep(FALSE, FALSE), sources))
+  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(NA_real_), palette_limit = NULL, default_palette_limit = FALSE)
+  expect_equal(result, setNames(rep(FALSE, 2), sources))
+
+  # Test with palette limit and no list
+  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(NA_real_), palette_limit = 2, default_palette_limit = FALSE)
+  expect_equal(result, setNames(rep(2, 2), sources))
 })
 
 test_that("add_colors_to_nodes assigns colors based on de_value", {
@@ -248,7 +253,10 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
   suppressMessages(
     colored_nodes <- KEGGemUP:::add_colors_to_nodes(
       mapped_nodes,
-      palette = "RdYlGn"
+      palette = "RdYlGn",
+      palettes_limits_list = c(NA_real_),
+      palette_limit = NULL,
+      palettes_list = c(NA_character_)
     )$vertices_df
   )
 
