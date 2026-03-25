@@ -20,25 +20,25 @@ test_that("remove_kegg_prefix_str removes prefixes and preserves NA", {
 })
 
 test_that("make_mapping_df works", {
-  df1 <- data.frame(name = c("A","B"), ids_for_mapping = c("id1","id2"), stringsAsFactors = FALSE)
+  df1 <- data.frame(name = c("A","B"), ids_for_mapping = c("id1","id2"))
   res1 <- make_mapping_df(df1)
   expect_equal(nrow(res1), 2)
   expect_equal(res1$name, c("A","B"))
   expect_equal(res1$matched_id, c("id1","id2"))
   
-  df2 <- data.frame(name = c("A","B"), ids_for_mapping = c("id1;id2","id3;id4;id5"), stringsAsFactors = FALSE)
+  df2 <- data.frame(name = c("A","B"), ids_for_mapping = c("id1;id2","id3;id4;id5"))
   res2 <- make_mapping_df(df2)
   expect_equal(nrow(res2), 5)
   expect_equal(res2$name, c("A","A","B","B","B"))
   expect_equal(res2$matched_id, c("id1","id2","id3","id4","id5"))
   
-  df3 <- data.frame(name = c("A","B","C"), ids_for_mapping = c("id1;id2","","id3"), stringsAsFactors = FALSE)
+  df3 <- data.frame(name = c("A","B","C"), ids_for_mapping = c("id1;id2","","id3"))
   res3 <- make_mapping_df(df3)
   expect_equal(nrow(res3), 3)
   expect_equal(res3$name, c("A","A","C"))
   expect_equal(res3$matched_id, c("id1","id2","id3"))
   
-  df4 <- data.frame(name = c("A","B"), ids_for_mapping = c("",""), stringsAsFactors = FALSE)
+  df4 <- data.frame(name = c("A","B"), ids_for_mapping = c("",""))
   res4 <- make_mapping_df(df4)
   expect_equal(nrow(res4), NULL)
 })

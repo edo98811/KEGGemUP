@@ -23,8 +23,7 @@ test_that("single dataframe input is standardized correctly", {
   
   df <- data.frame(
     gene = c("a", "b", "c"),
-    logFC = c(1.2, -0.3, 0.8),
-    stringsAsFactors = FALSE
+    logFC = c(1.2, -0.3, 0.8)
   )
   suppressMessages(
     res <- standardize_de_results(
@@ -46,8 +45,7 @@ test_that("single dataframe input is standardized correctly", {
 test_that("single dataframe with missing columns returns NULL", {
   
   df <- data.frame(
-    gene = c("a", "b", "c"),
-    stringsAsFactors = FALSE
+    gene = c("a", "b", "c")
   )
   
   warn <- capture_warnings(
@@ -67,8 +65,7 @@ test_that("single dataframe with wrong column types returns NULL", {
   
   df <- data.frame(
     gene = c("a", "b", "c"),
-    logFC = c("1", "2", "3"),
-    stringsAsFactors = FALSE
+    logFC = c("1", "2", "3")
   )
   
   warn <- capture_warnings(
@@ -88,8 +85,7 @@ test_that("valid list input is preserved", {
   
   df <- data.frame(
     gene = c("a", "b", "c"),
-    logFC = c(1, 2, 3),
-    stringsAsFactors = FALSE
+    logFC = c(1, 2, 3)
   )
   
   input <- list(
@@ -111,14 +107,12 @@ test_that("invalid list entries are removed", {
   
   df <- data.frame(
     gene = c("a", "b"),
-    logFC = c(1, 2),
-    stringsAsFactors = FALSE
+    logFC = c(1, 2)
   )
   
   bad_df <- data.frame(
     gene = c("a", "b"),
-    logFC = c("1", "2"),
-    stringsAsFactors = FALSE
+    logFC = c("1", "2")
   )
   
   input <- list(
@@ -153,8 +147,7 @@ test_that("all invalid list entries return NULL", {
   
   df <- data.frame(
     gene = c("a", "b"),
-    logFC = c("1", "2"),
-    stringsAsFactors = FALSE
+    logFC = c("1", "2")
   )
   
   input <- list(
@@ -178,8 +171,7 @@ test_that("list must be named", {
   
   df <- data.frame(
     gene = c("a", "b"),
-    logFC = c(1, 2),
-    stringsAsFactors = FALSE
+    logFC = c(1, 2)
   )
   
   input <- list(

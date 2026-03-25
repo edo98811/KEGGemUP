@@ -85,7 +85,7 @@
     </entry>
 
     <!-- Line node -->
-    <entry id="41" name="tst:1111 tst:2222 tst:3333" type="gene" reaction="rn:R00004" link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111+tst:2222+tst:3333">
+    <entry id="41" name="tst:1111 tst:2222 tst:3333" type="gene" reaction="rn:R00001" link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111+tst:2222+tst:3333">
       <graphics name="GENE1, GENE2, GENE3..." fgcolor="#66CC66" bgcolor="#FFFFFF" type="line" coords="100,150,200,150"/>
     </entry>
 

@@ -84,12 +84,12 @@ kegg_edge_defaults <- function() {
 # #' @return A data frame with default KEGG edge attributes
 # #' @export
 # return_template_edges <- function(nrows = 1) {
-#   data.frame(lapply(kegg_edge_defaults(), function(x) rep(x, nrows)), stringsAsFactors = FALSE)
+#   data.frame(lapply(kegg_edge_defaults(), function(x) rep(x, nrows)))
 # }
 
 # #' Return a template data frame for KEGG vertices with default attributes
 # #' @return A data frame with default KEGG vertex attributes
 # #' @export
 # return_template_vertices <- function(nrows = 1) {
-#   data.frame(lapply(kegg_vertex_defaults(), function(x) rep(x, nrows)), stringsAsFactors = FALSE)
+#   data.frame(lapply(kegg_vertex_defaults(), function(x) rep(x, nrows)))
 # }

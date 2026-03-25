@@ -46,7 +46,7 @@ expand_keggs <- function(kegg_df) {
   }
 
   # Return the expanded data frame
-  return(data.frame(name = ids_out, KEGG = kegg_out, stringsAsFactors = FALSE))
+  return(data.frame(name = ids_out, KEGG = kegg_out))
 }
 
 #' Return all cached KEGG and mapping files from BiocFileCache

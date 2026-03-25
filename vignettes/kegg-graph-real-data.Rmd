@@ -228,8 +228,9 @@ To see the available palettes you can run `RColorBrewer::display.brewer.all()`.
 You can also visit this page: [RColorBrewer palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
 
 ```{r use-package-3, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
-graph <- kegg_to_graph(pathway)
-graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC", palette = "PiYG")
+graph <- kegg_to_graph(pathway) |> 
+  map_results_to_graph(de_results_limma, feature_column = "ENTREZID", value_column = "logFC", palette = "PiYG")
+
 graph_visnetwork <- make_kegg_visNetwork(graph)
 graph_visnetwork
 ```

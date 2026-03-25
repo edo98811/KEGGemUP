@@ -77,5 +77,4 @@ vis_graph <- map_results_to_graph(graph,
   feature_column = "KEGG_ids",
   value_column = "log2FoldChange"
 )
-
 }

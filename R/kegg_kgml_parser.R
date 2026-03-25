@@ -20,7 +20,7 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
     n_rows <- max(length(graphics_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
     # Fill static attributes from entry
     entry_vertices_df$KEGG <- xml2::xml_attr(node, "name")
@@ -77,7 +77,7 @@ parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
     n_rows <- 1 # keep the group node itself
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
 
     # Fill static attributes from entry
@@ -138,7 +138,7 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
     }
 
     # Pre-allocate a data.frame for this entry
-    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+    entry_vertices_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
     # Fill static attributes from entry
     entry_vertices_df$line_id <- xml2::xml_attr(node, "id")
@@ -248,7 +248,7 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
     n_rows <- max(length(subtype_nodes), 1) # at least one row per entry
 
     # Pre-allocate a data.frame for this entry
-    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
     # Fill static attributes from entry
     entry_edges_df$from <- xml2::xml_attr(relation, "entry1")
@@ -302,7 +302,7 @@ complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = F
       if (verbose) message("Skipping edge ", i, " with missing reaction name.")
       return(NULL)
     }
-    reaction_node_idx <- which(vertices_df$reaction == reaction_id & vertices_df$type != "line")
+    reaction_node_idx <- which(vertices_df$reaction == reaction_id & vertices_df$graphics_type != "line")
 
     if (length(reaction_node_idx) == 0) {
       if (verbose) message("No node found for reaction ", reaction_id, " in edge ", i)
@@ -371,7 +371,7 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
     n_rows <- n_sub * n_prod
 
     # Pre-allocate a data.frame for this entry
-    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows), stringsAsFactors = FALSE)
+    entry_edges_df <- data.frame(lapply(defaults, rep, each = n_rows))
 
     # Fill static attributes from entry
     entry_edges_df$reaction_id <- xml2::xml_attr(reaction, "id")
