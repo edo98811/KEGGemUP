@@ -72,7 +72,8 @@ de_results <- data.frame(
   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
   log2FoldChange = c(1.5, -2.0, 0.5)
 )
-vis_graph <- map_results_to_graph(graph,
+vis_graph <- map_results_to_graph(
+  graph,
   de_results,
   feature_column = "KEGG_ids",
   value_column = "log2FoldChange"

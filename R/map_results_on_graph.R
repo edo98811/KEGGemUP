@@ -364,38 +364,62 @@ validate_palette_limits <- function(
 
   palettes_limits_list
 }
-
 validate_palettes <- function(
   sources,
-  palettes_list = c(NA_character_),
+  palettes_list = list(NA_character_),
   palette = NULL,
   default_palette = "Spectral"
 ) {
-  if (!is.character(palettes_list)) {
-    stop("`palettes_list` must be a character vector")
+
+  if (!is.list(palettes_list) && !is.character(palettes_list)) {
+    stop("`palettes_list` must be a list or character vector")
   }
 
-  # Check if palettes_list covers all sources
-  palettes_valid <- !all(is.na(palettes_list)) &&
-    !is.null(names(palettes_list)) &&
-    all(sources %in% names(palettes_list))
+  # Convert character vector to list for consistent handling
+  if (is.character(palettes_list)) {
+    palettes_list <- as.list(palettes_list)
+  }
 
-  if (!palettes_valid && !is.null(palette)) {
-    palettes_to_use <- rep(palette, length(sources))
-  } else if (palettes_valid) {
+  names_present <- !is.null(names(palettes_list))
+  names_match   <- names_present && all(sources %in% names(palettes_list))
+
+  palettes_all_na <- all(vapply(
+    palettes_list,
+    function(x) length(x) == 1 && is.na(x),
+    logical(1)
+  ))
+
+  palettes_valid <- !palettes_all_na && names_match
+
+  if (!palettes_valid && names_present && !names_match) {
+    warning("Names of `palettes_list` do not match `sources`.")
+  }
+
+  if (palettes_valid) {
     palettes_to_use <- palettes_list[sources]
+
+  } else if (!is.null(palette)) {
+    palettes_to_use <- rep(list(palette), length(sources))
+
   } else {
-    if (!all(is.na(palettes_list))) {
+    if (!palettes_all_na) {
       warning(
         "Some sources do not have specified palettes.\n",
         "Defaulting all to '", default_palette, "'."
       )
     }
-    palettes_to_use <- rep(default_palette, length(sources))
+
+    palettes_to_use <- rep(list(default_palette), length(sources))
   }
 
   palettes_list_colors <- setNames(
-    lapply(palettes_to_use, get_palette_colors),
+    lapply(palettes_to_use, function(p) {
+      if (is.character(p) && length(p) == 1) {
+        get_palette_colors(p)
+      } else {
+        p
+      }
+    }),
     sources
   )
 

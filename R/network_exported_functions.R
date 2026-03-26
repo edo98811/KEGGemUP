@@ -97,7 +97,8 @@ kegg_to_graph <- function(
 #'   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
 #'   log2FoldChange = c(1.5, -2.0, 0.5)
 #' )
-#' vis_graph <- map_results_to_graph(graph,
+#' vis_graph <- map_results_to_graph(
+#'   graph,
 #'   de_results,
 #'   feature_column = "KEGG_ids",
 #'   value_column = "log2FoldChange"
@@ -112,7 +113,7 @@ map_results_to_graph <- function(
     palette = NULL,
     palette_limit = NULL,
     palettes_limits_list = c(NA_real_),
-    palettes_list = c(NA_character_)
+    palettes_list = list(NA_character_)
 ) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
@@ -207,8 +208,7 @@ map_results_to_graph <- function(
 #' graph <- map_results_to_graph(
 #' graph, 
 #' de_results, 
-#' feature_column = "KEGG_ids"
-#' ),
+#' feature_column = "KEGG_ids",
 #' value_column = "log2FoldChange")
 #'
 #' vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, 

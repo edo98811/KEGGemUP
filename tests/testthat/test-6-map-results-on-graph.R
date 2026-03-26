@@ -135,18 +135,19 @@ test_that("validate_palettes handles different scenarios", {
   sources <- c("A", "B")
 
   # Palettes_list wrong type (data.frame)
-  palettes_list <- data.frame(x = 1:2)
+  palettes_list <- 121
   expect_error(
     result <- KEGGemUP:::validate_palettes(sources, palettes_list),
-    "`palettes_list` must be a character vector"
+    "`palettes_list` must be a list or character vector"
   )
 
   # Palettes_list wrong names
   palettes_list <- c(X = "Spectral", Y = "Viridis")
-  expect_warning(
-    result <- KEGGemUP:::validate_palettes(sources, palettes_list),
-    "Some sources do not have specified palettes"
+  warn <- capture_warnings(
+    result <- KEGGemUP:::validate_palettes(sources, palettes_list)
   )
+  expect_equal(length(warn), 2)
+  
   expect_equal(
     result,
     setNames(
@@ -162,7 +163,7 @@ test_that("validate_palettes handles different scenarios", {
   warn <- capture_warnings(
     result <- KEGGemUP:::validate_palettes(sources, palettes_list, palette = "test"),
   )
-  expect_equal(length(warn), 2)
+  expect_equal(length(warn), 3)
   expect_equal(
     result,
     setNames(
@@ -173,12 +174,12 @@ test_that("validate_palettes handles different scenarios", {
       sources
     )
   )
-  
+
   # Palette with global palette and palettes list with one invalid
   warn <- capture_warnings(
     result <- KEGGemUP:::validate_palettes(sources, palettes_list <- c(X = "Spectral", A = "Viridis"), palette = "test")
   )
-  expect_equal(length(warn), 2)
+  expect_equal(length(warn), 3)
 
   # Correct list with proper names
   palettes_list <- c(A = "Spectral", B = "RdPu")
@@ -189,6 +190,38 @@ test_that("validate_palettes handles different scenarios", {
       list(
         rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral")),
         rev(RColorBrewer::brewer.pal(n = 7, name = "RdPu"))
+      ),
+      sources
+    )
+  )
+  A_palette <- c(
+    "#0a52ff",
+    "#7095ff",
+    "#b3d3ff",
+    "#f3f3f3",
+    "#fcb4a1",
+    "#f37153",
+    "#de0000"
+  )
+  B_palette <- c(
+    "#004D4D",
+    "#1F9E89",
+    "#A6E3E9",
+    "#FFFFFF",
+    "#F2B6D0",
+    "#D64F8B",
+    "#7A003C"
+  )
+
+  # Correct list with proper names and vector input
+  palettes_list <- list(A = A_palette, B = B_palette)
+  result <- KEGGemUP:::validate_palettes(sources, palettes_list = palettes_list)
+  expect_equal(
+    result,
+    setNames(
+      list(
+        A_palette,
+        B_palette
       ),
       sources
     )
@@ -225,17 +258,15 @@ test_that("validate_palette_limits handles different scenarios", {
   )
 
   # Palettes_limits_list wrong names
-  palettes_limits_list <- c(X = 0.5, Y = 1)
   expect_warning(
-    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list, palette_limit = NULL, default_palette_limit = FALSE),
+    result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(X = 0.5, Y = 1), palette_limit = NULL, default_palette_limit = FALSE),
     "Some sources do not have specified palette limits"
   )
   expect_equal(result, setNames(rep(FALSE, 2), sources))
 
   # Correct list with proper names
-  palettes_limits_list <- c(A = 0.5, B = 1)
-  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = palettes_limits_list, palette_limit = NULL, default_palette_limit = FALSE)
-  expect_equal(result, palettes_limits_list)
+  result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(A = 0.5, B = 1), palette_limit = NULL, default_palette_limit = FALSE)
+  expect_equal(result, c(A = 0.5, B = 1))
 
   # Palettes_limits_list not set returns default
   result <- KEGGemUP:::validate_palette_limits(sources, palettes_limits_list = c(NA_real_), palette_limit = NULL, default_palette_limit = 1)
@@ -292,7 +323,6 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
 })
 
 test_that("add_colors_to_nodes handles errors in palette validation", {
-
   # Prepare vertices_df
   vertices_df <- kgml_steps$all_nodes
   indexes_to_map <- which(
@@ -310,7 +340,7 @@ test_that("add_colors_to_nodes handles errors in palette validation", {
     vertices_df,
     results_combined
   ), "Some nodes had multiple matching IDs")
-  
+
   suppressMessages(
     warns <- capture_warnings(
       colored_nodes <- KEGGemUP:::add_colors_to_nodes(
@@ -322,8 +352,8 @@ test_that("add_colors_to_nodes handles errors in palette validation", {
       )$vertices_df
     )
   )
-  
-  expect_equal(length(warns), 8)
+
+  expect_equal(length(warns), 4)
   # Should still return a data frame with vertex.color column
   expect_true(is.data.frame(colored_nodes))
 })

@@ -50,8 +50,7 @@ log2FoldChange = c(1.5, -2.0, 0.5)
 graph <- map_results_to_graph(
 graph, 
 de_results, 
-feature_column = "KEGG_ids"
-),
+feature_column = "KEGG_ids",
 value_column = "log2FoldChange")
 
 vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, 
