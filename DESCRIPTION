@@ -28,6 +28,7 @@ Imports:
     BiocFileCache,
     httr2,
     ggplot2,
+    rlang,
     igraph,
     KEGGREST,
     visNetwork,

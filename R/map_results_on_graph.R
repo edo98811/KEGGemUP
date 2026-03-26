@@ -431,7 +431,11 @@ validate_palettes <- function(
 #' @param palette_ramp A color ramp function created by colorRampPalette.
 #' @param title Character, the title for the legend.
 #' @param n_element Integer, the number of elements (breaks) to show in the legend.
-#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void ggplot_gtable ggplot_build
+#'
+#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void
+#' ggplot_gtable ggplot_build
+#' @importFrom rlang .data
+#'
 #' @return A ggplot grob object representing the legend.
 create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n_element = 7) {
   # Reverse palette from RColorBrewer
@@ -448,7 +452,7 @@ create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n
   # Create the legend plot
   p <- ggplot(legend_df) +
     geom_point(
-      aes(x = 1, y = seq_along(value), fill = value),
+      aes(x = 1, y = seq_along(.data$value), fill = .data$value),
       shape = 21,
       size = 5,
       color = "black"
