@@ -9,3 +9,4 @@
 library(testthat)
 library(KEGGemUP)
 
+test_check("KEGGemUP")
