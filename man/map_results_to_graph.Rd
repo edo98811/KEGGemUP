@@ -13,7 +13,7 @@ map_results_to_graph(
   palette = NULL,
   palette_limit = NULL,
   palettes_limits_list = c(NA_real_),
-  palettes_list = c(NA_character_)
+  palettes_list = list(NA_character_)
 )
 }
 \arguments{
