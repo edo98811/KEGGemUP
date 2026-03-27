@@ -74,7 +74,7 @@ regular_node_html <- function(vertices_df) {
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$link, "' target='_blank'>",
       "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
-      paste0(vertices_df$label, "on KEGG"),
+      paste0(vertices_df$label, " on KEGG"),
       "</button></a></div>"
     )
   )
@@ -85,7 +85,7 @@ regular_node_html <- function(vertices_df) {
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$reaction_link, "' target='_blank'>",
       "<button type='button' style='color:#fff; background-color:#33b742; border-color:#2e6da4;'>",
-      paste0(vertices_df$reaction_name, "on KEGG"),
+      paste0(vertices_df$reaction_name, " on KEGG"),
       "</button></a></div>"
     )
   )
@@ -192,7 +192,7 @@ add_edge_tooltip <- function(edges_df) {
     "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_reaction], "</td></tr>",
     "</table>",
-    button_html_reaction[idx_reaction] 
+    button_html_reaction[idx_reaction]
   )
 
   # Line edges
@@ -202,7 +202,7 @@ add_edge_tooltip <- function(edges_df) {
     "<table>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_line], "</td></tr>",
     "</table>",
-    button_html_reaction[idx_line] 
+    button_html_reaction[idx_line]
   )
 
   return(edges_df)
