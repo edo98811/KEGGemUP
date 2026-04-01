@@ -1,3 +1,19 @@
+# Constant values ----
+.color_edge_relation_EC <- "#8A2BE2"
+.color_edge_relation_PP <- "#FFD700"
+.color_edge_relation_GE <- "#FF6347"
+.color_edge_relation_PC <- "#20B2AA"
+.color_edge_relation_maplink <- "#FF4500"
+
+.color_edge_substrate_reversible <- "#008000"
+.color_edge_product_reversible <- "#008000"
+.color_edge_substrate_irreversible <- "#FF4500"
+.color_edge_product_irreversible <- "#FF4500"
+
+.color_edge_line <- "black"
+.color_edge_group <- "transparent"
+
+
 #' Style igraph graph nodes and edges
 #' @param g An igraph graph object
 #' @return The styled igraph graph object
@@ -39,21 +55,32 @@ style_igraph_graph <- function(g) {
 style_edges_igraph <- function(edges_df) {
   # Define edge style maps
   edge_style_map_relation <- list(
-    ECrel = list(color = "#8A2BE2", lty = 2L, arrow.mode = 2L, label = "EC"),
-    PPrel = list(color = "#FF6347", lty = 2L, arrow.mode = 2L, label = "PP"),
-    GErel = list(color = "#FFD700", lty = 2L, arrow.mode = 2L, label = "GE"),
-    PCrel = list(color = "#20B2AA", lty = 2L, arrow.mode = 2L, label = "PC"),
-    maplink = list(color = "#FF4500", lty = 5L, arrow.mode = 1L, label = "maplink")
+    ECrel = list(color = scales::alpha(.color_edge_relation_EC, 0.6),
+                 lty = 2L, arrow.mode = 2L, label = "EC"),
+    PPrel = list(color = scales::alpha(.color_edge_relation_PP, 0.6),
+                 lty = 2L, arrow.mode = 2L, label = "PP"),
+    GErel = list(color = scales::alpha(.color_edge_relation_GE, 0.6),
+                 lty = 2L, arrow.mode = 2L, label = "GE"),
+    PCrel = list(color = scales::alpha(.color_edge_relation_PC, 0.6),
+                 lty = 2L, arrow.mode = 2L, label = "PC"),
+    maplink = list(color = scales::alpha(.color_edge_relation_maplink, 0.6),
+                   lty = 5L, arrow.mode = 1L, label = "maplink")
   )
   edge_style_map_reaction <- list(
-    reaction_substrate_reversible = list(color = "#008000", lty = 1L, arrow.mode = 1L, label = "⇄"),
-    reaction_product_reversible = list(color = "#008000", lty = 1L, arrow.mode = 2L, label = "⇄"),
-    reaction_substrate_irreversible = list(color = "#FF4500", lty = 1L, arrow.mode = 0L, label = "→"),
-    reaction_product_irreversible = list(color = "#FF4500", lty = 1L, arrow.mode = 2L, label = "→")
+    reaction_substrate_reversible = list(color = .color_edge_substrate_reversible,
+                                         lty = 1L, arrow.mode = 1L, label = "⇄"),
+    reaction_product_reversible = list(color = .color_edge_product_reversible,
+                                       lty = 1L, arrow.mode = 2L, label = "⇄"),
+    reaction_substrate_irreversible = list(color = .color_edge_substrate_irreversible,
+                                           lty = 1L, arrow.mode = 0L, label = "→"),
+    reaction_product_irreversible = list(color = .color_edge_product_irreversible,
+                                         lty = 1L, arrow.mode = 2L, label = "→")
   )
   edge_style_map_type <- list(
-    line  = list(color = "black", lty = 1L, arrow.mode = 0L, label = ""),
-    group = list(color = "transparent", lty = 2L, arrow.mode = 0L, label = "")
+    line  = list(color = .color_edge_line,
+                 lty = 1L, arrow.mode = 0L, label = ""),
+    group = list(color = .color_edge_group,
+                 lty = 2L, arrow.mode = 0L, label = "")
   )
 
   # Apply styles based on relation_type, reaction_type and type
