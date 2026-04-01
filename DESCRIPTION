@@ -17,7 +17,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
 biocViews: 
-    Pathways, KEGG, Network, Visualization, DifferentialExpression
+    Software, Pathways, KEGG, Network, Visualization, DifferentialExpression,
+    GraphAndNetwork, Transcriptomics, Proteomics, Metabolomics, SystemsBiology
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/edo98811/KEGGemUP, https://edo98811.github.io/KEGGemUP/
