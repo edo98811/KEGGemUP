@@ -25,8 +25,8 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
   const height = size;
   return {
     drawNode: function() {
+      // only draw the rectangle here
       ctx.save();
-      // Draw rectangle
       ctx.fillStyle = fillColor;
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 2;
@@ -35,21 +35,33 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
       ctx.fill();
       ctx.stroke();
       ctx.restore();
+    },
 
-      // Draw label above rectangle
+    drawExternalLabel: function() {
+      // this handles the part of drawing this *on top of the rest*
       ctx.save();
-      ctx.font = '14px Arial';
-      ctx.fillStyle = '#000000';
+      ctx.font = '14px IBM Plex Sans'; // default could also be '14px Arial'
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
-      ctx.fillText(label || '', x, y - height/2 - 5);
+
+      const text = label || '';
+      const tx = x;
+      const ty = y - height/2 - 1;
+
+      const metrics = ctx.measureText(text);
+      const textWidth = metrics.width;
+      const textHeight = 14;
+
+      // const padX = 8;
+      // const padY = 5;
+
+      // text
+      ctx.fillStyle = '#000000';
+      ctx.fillText(text, tx, ty);
+
       ctx.restore();
-    },
-    drawExternalLabel: function() {
-      // optional: leave empty for now
-    },
-    nodeDimensions: { width: width, height: height }
-  };
+    }
+  }
 }
 ")
 
