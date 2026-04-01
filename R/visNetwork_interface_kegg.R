@@ -18,7 +18,7 @@ make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
 
   custom_renderer <- htmlwidgets::JS("
 function({ ctx, x, y, state: { selected, hover }, style, label }) {
-  const size = style?.size || 80; // this is the heigth for rectangle nodes 
+  const size = style?.size || 80; // this is the height for rectangle nodes
   const fillColor = style?.color || '#FFFFFF';
 
   const width = size * 2.7;
