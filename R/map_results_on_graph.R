@@ -530,7 +530,7 @@ get_palette_range <- function(
     if (verbose) {
       message(
         "Calculating color range for source '", source_name,
-        "' based on de_value range: [-",
+        "' based on de_value range: [",
         round(min(de_value_vector, na.rm = TRUE), 3),
         ", ",
         round(max(de_value_vector, na.rm = TRUE), 3),
