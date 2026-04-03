@@ -2,16 +2,17 @@
 % Please edit documentation in R/api_interfaces.R
 \name{download_kgml}
 \alias{download_kgml}
-\title{Download and cache KEGG KGML files.}
+\title{Download a KGML file}
 \usage{
 download_kgml(pathway_id, bfc = NULL, path = NULL, verbose = FALSE)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110').}
+\item{pathway_id}{Character, KEGG pathway ID (e.g., 'hsa04110').}
 
-\item{bfc}{BiocFileCache object for caching KEGG KGML files.}
+\item{bfc}{BiocFileCache object for caching KEGG KGML files. Defaults to NULL}
 
-\item{path}{Optional path to save the KGML file if not using cache.}
+\item{path}{Optional path to save the KGML file if not using cache. Defaults
+to NULL}
 
 \item{verbose}{Logical, if TRUE, print additional messages.}
 }
@@ -21,7 +22,19 @@ Path to the cached KGML file.
 \description{
 Download and cache KEGG KGML files.
 }
+\details{
+This function can save an individual KGML to the cache or to a path.
+If specified, the BiocFileCache cache is prioritized.
+If a \code{path} if specified and it is a directory, it will save the file there.
+If the path specified a file path, this will be the location to store the
+file. If it is left as NULL, it will save the KMGL file in the current
+working directory
+}
 \examples{
 data_dir <- tempdir()
 kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
+
+cache_dir <- tempdir()
+kgml_path_cached <- download_kgml("hsa04110", bfc = BiocFileCache(cache_dir),
+                                  verbose = TRUE)
 }

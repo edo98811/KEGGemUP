@@ -48,11 +48,11 @@ de_results <- data.frame(
 log2FoldChange = c(1.5, -2.0, 0.5)
 )
 graph <- map_results_to_graph(
-graph, 
-de_results, 
+graph,
+de_results,
 feature_column = "KEGG_ids",
 value_column = "log2FoldChange")
 
-vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5, 
+vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5,
 relationships = "all", visualisation_type = "standard")
 }

@@ -2,16 +2,18 @@
 % Please edit documentation in R/api_interfaces.R
 \name{get_kegg_db}
 \alias{get_kegg_db}
-\title{Get KEGG db with caching.}
+\title{Get a KEGG database file}
 \usage{
 get_kegg_db(db_name = "compound", path = NULL, bfc = NULL, verbose = FALSE)
 }
 \arguments{
 \item{db_name}{Name of the KEGG database to retrieve (default: "compound").}
 
-\item{path}{Optional path to save the KEGG database file if not using cache.}
+\item{path}{Optional path to save the KEGG database file if not using cache.
+Defaults to NULL.}
 
-\item{bfc}{BiocFileCache object for caching KEGG database files.}
+\item{bfc}{BiocFileCache object for caching KEGG database files. Defaults to
+NULL}
 
 \item{verbose}{Logical, if TRUE, print additional messages.}
 }
@@ -19,7 +21,7 @@ get_kegg_db(db_name = "compound", path = NULL, bfc = NULL, verbose = FALSE)
 A data frame with KEGG IDs and names.
 }
 \description{
-Get KEGG db with caching.
+Get KEGG database, with caching.
 }
 \details{
 The valid KEGG database names are:
@@ -30,7 +32,16 @@ network | variant | disease | drug | dgroup
 \examples{
 # Saving in path
 data_dir <- tempdir()
-kegg_compounds <- get_kegg_db("compound", path = data_dir, verbose = TRUE)
+kegg_compounds <- get_kegg_db(db_name = "compound",
+                              path = data_dir, verbose = TRUE)
+
 # Just returning without saving
-kegg_genes <- get_kegg_db("compound", verbose = TRUE)
+kegg_compounds_onthefly <- get_kegg_db(db_name = "compound",
+                                       verbose = TRUE)
+head(kegg_compounds_onthefly)
+
+# saving to cache (in a temp dir)
+kegg_compounds_cached <- get_kegg_db(db_name = "compound",
+                                     bfc = BiocFileCache(tempdir()),
+                                     verbose = TRUE)
 }
