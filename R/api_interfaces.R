@@ -31,7 +31,8 @@
 #' kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
 #'
 #' cache_dir <- tempdir()
-#' kgml_path_cached <- download_kgml("hsa04110", bfc = BiocFileCache(cache_dir),
+#' kgml_path_cached <- download_kgml("hsa04110",
+#'                                   bfc = BiocFileCache::BiocFileCache(cache_dir),
 #'                                   verbose = TRUE)
 download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) {
   mode <- select_cache_or_path(bfc, path, verbose)
@@ -172,7 +173,7 @@ download_all_pathways <- function(org, verbose = FALSE) {
 #'
 #' # saving to cache (in a temp dir)
 #' kegg_compounds_cached <- get_kegg_db(db_name = "compound",
-#'                                      bfc = BiocFileCache(tempdir()),
+#'                                      bfc = BiocFileCache::BiocFileCache(tempdir()),
 #'                                      verbose = TRUE)
 get_kegg_db <- function(
     db_name = "compound",
