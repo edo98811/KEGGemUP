@@ -1,7 +1,15 @@
-# https://rpubs.com/huanfaChen/261838
+# node and edge default values --------------------------------------------
 
 #' Default KEGG node attributes
+#'
+#' Definition of the default KEGG node attributes
+#'
+#' @details
+#' See https://rpubs.com/huanfaChen/261838 for some notes on different types of
+#' "not available information"
+#'
 #' @return A list of default KEGG node attributes
+#'
 #' @noRd
 kegg_vertex_defaults <- function() {
   list(
@@ -46,6 +54,16 @@ kegg_vertex_defaults <- function() {
 }
 
 
+#' Default KEGG edge attributes
+#'
+#' Definition of the default KEGG edge attributes
+#'
+#' @details
+#' See https://rpubs.com/huanfaChen/261838 for some notes on different types of
+#' "not available information"
+#'
+#' @return A list of default KEGG edge attributes
+#'
 #' @noRd
 kegg_edge_defaults <- function() {
   list(
@@ -64,6 +82,7 @@ kegg_edge_defaults <- function() {
     reaction_from_name = NA_character_,
     reaction_to_name = NA_character_,
     point_index = NA_integer_,
+
     # Style attributes
     directed = TRUE,
     color = "gray",
