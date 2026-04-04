@@ -2,7 +2,7 @@
 % Please edit documentation in R/network_exported_functions.R
 \name{make_kegg_visNetwork}
 \alias{make_kegg_visNetwork}
-\title{Plot KEGG pathway graph using visNetwork}
+\title{Create an interactive visualization of KEGG pathways with visNetwork}
 \usage{
 make_kegg_visNetwork(
   g,

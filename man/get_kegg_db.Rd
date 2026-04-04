@@ -42,6 +42,6 @@ head(kegg_compounds_onthefly)
 
 # saving to cache (in a temp dir)
 kegg_compounds_cached <- get_kegg_db(db_name = "compound",
-                                     bfc = BiocFileCache(tempdir()),
+                                     bfc = BiocFileCache::BiocFileCache(tempdir()),
                                      verbose = TRUE)
 }

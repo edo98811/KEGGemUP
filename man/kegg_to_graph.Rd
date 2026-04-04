@@ -2,12 +2,12 @@
 % Please edit documentation in R/network_exported_functions.R
 \name{kegg_to_graph}
 \alias{kegg_to_graph}
-\title{Convert KEGG pathway to igraph object}
+\title{Create a graph for a KEGG pathway}
 \usage{
 kegg_to_graph(pathway_id, kgml_file = NULL, verbose = FALSE)
 }
 \arguments{
-\item{pathway_id}{KEGG pathway ID (e.g., 'hsa04110') or
+\item{pathway_id}{Character, KEGG pathway ID (e.g., 'hsa04110') or
 NULL if using kgml_file}
 
 \item{kgml_file}{Path to a local KGML file (optional,

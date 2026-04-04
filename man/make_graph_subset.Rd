@@ -2,7 +2,7 @@
 % Please edit documentation in R/network_exported_functions.R
 \name{make_graph_subset}
 \alias{make_graph_subset}
-\title{Create igraph visualization with improved layout}
+\title{Subset a graph object for a KEGG pathway}
 \usage{
 make_graph_subset(g, ids_to_include)
 }
@@ -21,4 +21,8 @@ Create igraph visualization with improved layout
 }
 \details{
 All the edges between the vertices are plotted automatically.
+}
+\examples{
+# TODO
+
 }

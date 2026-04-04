@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{return_all_cached}
 \alias{return_all_cached}
-\title{Return all cached KEGG and mapping files from BiocFileCache}
+\title{Return all cached KEGGemUP information}
 \usage{
 return_all_cached()
 }
@@ -13,12 +13,13 @@ A list containing data frames of cached KEGG and mapping files
 Return all cached KEGG and mapping files from BiocFileCache
 }
 \details{
-This function retrieves information about
-all cached KEGG pathway files
-and mapping files stored using BiocFileCache.
+This function retrieves information about all cached KEGG pathway
+files and mapping files stored using BiocFileCache.
 }
 \examples{
 cache_info <- return_all_cached()
-print(cache_info$kegg) # View cached KEGG pathway files
-print(cache_info$mappings) # View cached mapping files
+# View cached KEGG pathway files
+print(cache_info$kegg)
+# View cached mapping files
+print(cache_info$mappings)
 }

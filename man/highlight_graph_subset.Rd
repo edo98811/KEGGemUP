@@ -2,7 +2,7 @@
 % Please edit documentation in R/network_exported_functions.R
 \name{highlight_graph_subset}
 \alias{highlight_graph_subset}
-\title{Highlight a subset of the graph based on KEGG IDs}
+\title{Highlight a subset of the KEGG graph}
 \usage{
 highlight_graph_subset(g, ids_to_highlight)
 }
@@ -24,4 +24,8 @@ Highlight a subset of the graph based on KEGG IDs
 This function highlights the nodes corresponding
 to the provided KEGG IDs and fades the rest of the graph.
 It modifies vertex attributes to achieve this effect.
+}
+\examples{
+# TODO
+
 }

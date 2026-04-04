@@ -2,15 +2,15 @@
 % Please edit documentation in R/helper_functions.R
 \name{reset_cache}
 \alias{reset_cache}
-\title{Reset KEGG and mapping caches by deleting all cached files}
+\title{Reset all KEGGemUP caches}
 \usage{
 reset_cache()
 }
 \value{
-None
+(invisible) NULL
 }
 \description{
-Reset KEGG and mapping caches by deleting all cached files
+Reset the KEGG and mapping caches by deleting all cached files
 }
 \details{
 This function deletes all cached KEGG pathway files

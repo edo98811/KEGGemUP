@@ -2,7 +2,7 @@
 % Please edit documentation in R/network_exported_functions.R
 \name{map_results_to_graph}
 \alias{map_results_to_graph}
-\title{Map differential expression results to nodes}
+\title{Map continuous values to graph nodes}
 \usage{
 map_results_to_graph(
   g,
