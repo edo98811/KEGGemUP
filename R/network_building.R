@@ -1,10 +1,18 @@
+# from KEGG files to igraph objects ---------------------------------------
+
+#' Build an igraph graph from a KGML file
+#'
 #' Build an igraph graph from a KEGG KGML file
-#' @param file Path to the KGML file
-#' @param pathway_name Name of the pathway
+#'
+#' @param file Character, path to the KGML file
+#' @param pathway_name Name of the pathway. Character, defaults to `Pathway`
 #' @param bfc_map BiocFileCache for mapping data (optional)
 #' @param verbose Logical indicating whether to print verbose messages
+#'
 #' @return An igraph object representing the KEGG pathway graph
+#'
 #' @importFrom xml2 read_xml
+#'
 #' @noRd
 build_kegg_graph <- function(
   file,
@@ -137,11 +145,15 @@ build_kegg_graph <- function(
   return(g)
 }
 
+#' Create an igraph object, from nodes and edges df
+#'
 #' Create an igraph graph from nodes and edges data frames
+#'
 #' @param vertices_df Data frame of nodes.
 #' @param edges_df Data frame of edges.
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @param pathway_name Name of the pathway for the graph title.
+#'
 #' @noRd
 make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FALSE) {
   ## TODO: rewrite
