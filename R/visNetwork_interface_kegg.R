@@ -1,11 +1,23 @@
+# creating graphs in visNetwork -------------------------------------------
+
 #' Create a visNetwork graph from nodes and edges data frames
+#'
+#' @details
+#' This function uses a custom renderer to handle all aspects that are not
+#' directly handled within visNetwork with a full R-based API
+#'
 #' @param vertices_df Data frame of nodes.
 #' @param edges_df Data frame of edges.
 #' @param pathway_name Name of the pathway for the graph title.
+#'
 #' @return A visNetwork object representing the graph.
+#'
 #' @importFrom htmlwidgets JS
+#'
 #' @noRd
-make_vis_graph <- function(vertices_df, edges_df, pathway_name) {
+make_vis_graph <- function(vertices_df,
+                           edges_df,
+                           pathway_name) {
 
 # if using an external file
 # renderer_dep <- htmltools::htmlDependency(
@@ -69,7 +81,12 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
     warning("No edges in graph.")
     v <- visNetwork::visNetwork(nodes = vertices_df, main = pathway_name, background = "#F5F5F5") # if graph has no edges
   } else {
-    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name, background = "#F5F5F5") # if graph has edges
+    # v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name, background = "#F5F5F5") # if graph has edges
+    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, background = "#FFFFFF",
+                                main = list(text = pathway_name,
+                                            style = 'font-family:IBM Plex Sans, Fira Code, Arial, Tahoma, Geneva, Verdana, sans-serif;font-weight:bold;font-size:20px;text-align:center;')
+
+    ) # if graph has edges
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
@@ -110,10 +127,16 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
 }
 
 #' Map igraph-styled edges to visNetwork attributes
-#' @param edges_df Data frame of edges extracted from igraph using as_data_frame(what="edges")
-#' @return edges_df with visNetwork-compatible styling columns: color, arrows, dashes, label
+#'
+#' @param edges_df Data frame of edges extracted from igraph using
+#' `as_data_frame(x, what="edges")`
+#'
+#' @return edges_df with visNetwork-compatible styling columns: color, arrows,
+#' dashes, label
+#'
 #' @noRd
-igraph_edges_to_visNetwork <- function(edges_df, relationships = c("all", "reactions", "relations")) {
+igraph_edges_to_visNetwork <- function(edges_df,
+                                       relationships = c("all", "reactions", "relations")) {
   relationships <- match.arg(relationships)
 
   if (relationships == "reactions") {
@@ -133,18 +156,7 @@ igraph_edges_to_visNetwork <- function(edges_df, relationships = c("all", "react
   }
   # Map arrow.mode from igraph to visNetwork arrows
   # igraph arrow.mode: 0 = none, 1 = back, 2 = to, 3 = tee, 4 = both (etc)
-  switch_arrow <- function(mode) {
-    if (is.na(mode)) {
-      return("")
-    }
-    switch(as.character(mode),
-      "0" = "",
-      "1" = "from",
-      "2" = "to",
-      "3" = "to;from",
-      ""
-    )
-  }
+
   edges_df$arrows <- vapply(edges_df$arrow.mode, switch_arrow, character(1))
 
   # Map lty (igraph) to dashes (visNetwork)
@@ -157,16 +169,24 @@ igraph_edges_to_visNetwork <- function(edges_df, relationships = c("all", "react
   edges_df$from <- as.character(edges_df$from)
   edges_df$to <- as.character(edges_df$to)
 
-  edges_df
+  return(edges_df)
 }
 
 #' Map KEGG-styled nodes to visNetwork attributes
-#' @param vertices_df Data frame of nodes extracted from igraph using as_data_frame(what="vertices")
+#'
+#' @param vertices_df Data frame of nodes extracted from igraph using
+#' `as_data_frame(x, what = "vertices")`
 #' @param scaling_factor Numeric scaling factor for node sizes
-#' @param visualisation_type Character vector specifying the type of visualisation for nodes: "standard", "positions", or "node_name"
-#' @return vertices_df with visNetwork-compatible styling columns: shape, borderRadius, widthConstraint, heightConstraint
+#' @param visualisation_type Character vector specifying the type of
+#' visualisation for nodes: "standard", "positions", or "node_name"
+#'
+#' @return vertices_df with visNetwork-compatible styling columns: shape,
+#' borderRadius, widthConstraint, heightConstraint
+#'
 #' @noRd
-kegg_nodes_to_visNetwork <- function(vertices_df, scaling_factor, visualisation_type) {
+kegg_nodes_to_visNetwork <- function(vertices_df,
+                                     scaling_factor,
+                                     visualisation_type) {
   if (is.null(vertices_df) || nrow(vertices_df) == 0) {
     return(vertices_df)
   }
@@ -233,4 +253,25 @@ kegg_nodes_to_visNetwork <- function(vertices_df, scaling_factor, visualisation_
   # vertices_df <- vertices_df[order(vertices_df$label), ]
 
   return(vertices_df)
+}
+
+
+#' Handles the arrow switch
+#'
+#' @param mode The mode as a character
+#'
+#' @returns The label for the arrows
+#'
+#' @noRd
+switch_arrow <- function(mode) {
+  if (is.na(mode)) {
+    return("")
+  }
+  switch(as.character(mode),
+         "0" = "",
+         "1" = "from",
+         "2" = "to",
+         "3" = "to;from",
+         ""
+  )
 }
