@@ -1,4 +1,4 @@
-# Constant values ----
+# Constant values --------------------------------------------------------
 .color_edge_relation_EC <- "#8A2BE2"
 .color_edge_relation_PP <- "#FFD700"
 .color_edge_relation_GE <- "#FF6347"
@@ -14,9 +14,22 @@
 .color_edge_group <- "transparent"
 
 
+
+# styling functions -------------------------------------------------------
+
+#' Style graph nodes and edges
+#'
 #' Style igraph graph nodes and edges
+#'
+#' @details
+#' The graph elements are styled keeping in mind what we require to use within
+#' KEGGemUP.
+#' This function is called internally by `kegg_to_graph`.
+#'
 #' @param g An igraph graph object
+#'
 #' @return The styled igraph graph object
+#'
 #' @noRd
 style_igraph_graph <- function(g) {
   stopifnot(inherits(g, "igraph"))
@@ -48,9 +61,15 @@ style_igraph_graph <- function(g) {
     igraph::graph_attr(g, "type") <- igraph::graph_attr(g, "type")
   }
 
-  g
+  return(g)
 }
 
+#' Style the edges of a graph
+#'
+#' Style the edges of a graph, working on the edges data frame directly
+#'
+#' @importFrom scales alpha
+#'
 #' @noRd
 style_edges_igraph <- function(edges_df) {
   # Define edge style maps
@@ -113,14 +132,17 @@ style_vertices_igraph <- function(vertices_df) {
   vertices_df$vertex.color[vertices_df$type == "group"] <- "transparent"
   vertices_df$size[vertices_df$type == "group"] <- 2
   vertices_df$size[vertices_df$graphics_type == "line"] <- 1
+
   return(vertices_df)
 }
 
 #' Scale node dimensions for better visualization.
+#'
 #' @param vertices_df Data frame of nodes with x and y coordinates.
 #' @param factor Scaling factor (default: 2).
 #'
 #' @return vertices_df with scaled x and y coordinates.
+#'
 #' @noRd
 scale_dimensions <- function(vertices_df, factor = 5) {
 
@@ -145,7 +167,14 @@ scale_dimensions <- function(vertices_df, factor = 5) {
   return(vertices_df)
 }
 
-
+#' Apply a style map
+#'
+#' @param df Data frame of edges with x and y coordinates.
+#' @param column Character value
+#' @param style_map Style map provided as a list
+#'
+#' @return Data frame of edges, but styled
+#'
 #' @noRd
 apply_style_map <- function(df, column, style_map) {
 
@@ -161,9 +190,8 @@ apply_style_map <- function(df, column, style_map) {
     }
   }
 
-  df
+  return(df)
 }
-
 
 
 
@@ -179,7 +207,7 @@ apply_style_map <- function(df, column, style_map) {
 #'
 #' @examples
 #' # TODO add a minimal one
-#'
+#' ## TODO: create a faKEGG function (and graph)
 cleanup_title_node <- function(g) {
   title_node <- grep(pattern = "^TITLE:", V(g)$label)
   g <- igraph::delete_vertices(g, title_node)
