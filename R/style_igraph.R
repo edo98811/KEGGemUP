@@ -1,20 +1,3 @@
-# Constant values --------------------------------------------------------
-.color_edge_relation_EC <- "#8A2BE2"
-.color_edge_relation_PP <- "#FFD700"
-.color_edge_relation_GE <- "#FF6347"
-.color_edge_relation_PC <- "#20B2AA"
-.color_edge_relation_maplink <- "#FF4500"
-
-.color_edge_substrate_reversible <- "#008000"
-.color_edge_product_reversible <- "#008000"
-.color_edge_substrate_irreversible <- "#FF4500"
-.color_edge_product_irreversible <- "#FF4500"
-
-.color_edge_line <- "black"
-.color_edge_group <- "transparent"
-
-
-
 # styling functions -------------------------------------------------------
 
 #' Style graph nodes and edges
