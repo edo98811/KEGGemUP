@@ -62,6 +62,11 @@ kegg_to_graph <- function(
 
   # Style graph
   g <- style_igraph_graph(g)
+
+  # # re-sorting the vertices alphabetically
+  # rank_vertices <- rank(V(g)$name)
+  # g <- permute(g, rank_vertices)
+
   return(g)
 }
 
