@@ -154,6 +154,8 @@ build_kegg_graph <- function(
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @param pathway_name Name of the pathway for the graph title.
 #'
+#' @return An igraph object representing the KEGG pathway graph
+#'
 #' @noRd
 make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FALSE) {
   ## TODO: rewrite

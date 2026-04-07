@@ -14,19 +14,23 @@
 #'
 #' @noRd
 add_node_tooltip <- function(vertices_df) {
-  vertices_df$title <- vapply(
-    seq_len(nrow(vertices_df)),
-    function(i) {
-      switch(tolower(vertices_df$type[i]),
-        group = group_node_html(vertices_df[i, , drop = FALSE]),
-        ortholog = regular_node_html(vertices_df[i, , drop = FALSE]),
-        gene = regular_node_html(vertices_df[i, , drop = FALSE]),
-        enzyme = regular_node_html(vertices_df[i, , drop = FALSE]),
-        compound = regular_node_html(vertices_df[i, , drop = FALSE]),
-        other_node_html(vertices_df[i, , drop = FALSE])
-      )
-    },
-    character(1)
+  vertices_df$title <- paste0(
+    "<div style='background:white; padding:4px;'>", ## TODO: candidate for a constant? or even expose to param?
+    vapply(
+      seq_len(nrow(vertices_df)),
+      function(i) {
+        switch(tolower(vertices_df$type[i]),
+               group = group_node_html(vertices_df[i, , drop = FALSE]),
+               ortholog = regular_node_html(vertices_df[i, , drop = FALSE]),
+               gene = regular_node_html(vertices_df[i, , drop = FALSE]),
+               enzyme = regular_node_html(vertices_df[i, , drop = FALSE]),
+               compound = regular_node_html(vertices_df[i, , drop = FALSE]),
+               other_node_html(vertices_df[i, , drop = FALSE])
+        )
+      },
+      character(1)
+    ),
+    "</div>"
   )
 
   return(vertices_df)
@@ -62,34 +66,40 @@ add_edge_tooltip <- function(edges_df) {
   # Relation edges
   idx_relation <- edges_df$type == "relation"
   edges_df$title[idx_relation] <- paste0(
+    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
     "<h4 style='text-align: center;'>", edges_df$type[idx_relation], "</h4>",
     "<table>",
     "<tr><th align='left'>Type: </th><td>", edges_df$relation_type[idx_relation], "</td></tr>",
     "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name[idx_relation], "</td></tr>",
     "<tr><th align='left'>Label: </th><td>", edges_df$relation_subtype_value[idx_relation], "</td></tr>",
-    "</table>"
+    "</table>",
+    "</div>"
   )
 
   # Reaction edges
   idx_reaction <- edges_df$type == "reaction"
   edges_df$title[idx_reaction] <- paste0(
+    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
     "<h4 style='text-align: center;'>", edges_df$type[idx_reaction], "</h4>",
     "<table>",
     "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id[idx_reaction], "</td></tr>",
     "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_reaction], "</td></tr>",
     "</table>",
-    button_html_reaction[idx_reaction]
+    button_html_reaction[idx_reaction],
+    "</div>"
   )
 
   # Line edges
   idx_line <- edges_df$type == "line"
   edges_df$title[idx_line] <- paste0(
+    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
     "<h4 style='text-align: center;'>", edges_df$type[idx_line], "</h4>",
     "<table>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_line], "</td></tr>",
     "</table>",
-    button_html_reaction[idx_line]
+    button_html_reaction[idx_line],
+    "</div>"
   )
 
   return(edges_df)

@@ -23,6 +23,12 @@ Create igraph visualization with improved layout
 All the edges between the vertices are plotted automatically.
 }
 \examples{
-# TODO
+# TODOedo: which pathway needs to be retrieved here? can be that there is no overlap with the one chosen here (otherwise the example fails)
+pathway <- "hsa04010"
+g <- kegg_to_graph(pathway)
+KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
+                 "C01762", "C05512", "C00301", "C01185", "C00455",
+                 "22436", "14544", "18950", "11486", "80285", "59027")
+subg <- make_graph_subset(g, KEGG_to_include)
 
 }

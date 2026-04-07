@@ -62,6 +62,11 @@ kegg_to_graph <- function(
 
   # Style graph
   g <- style_igraph_graph(g)
+
+  # # re-sorting the vertices alphabetically
+  # rank_vertices <- rank(V(g)$name)
+  # g <- permute(g, rank_vertices)
+
   return(g)
 }
 
@@ -303,6 +308,8 @@ map_results_to_graph <- function(
 #' @importFrom igraph V induced_subgraph
 #'
 #' @examples
+#' # TODOedo: which pathway needs to be retrieved here? can be that there is no overlap with the one chosen here (otherwise the example fails)
+#' pathway <- "hsa04010"
 #' g <- kegg_to_graph(pathway)
 #' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
 #'                  "C01762", "C05512", "C00301", "C01185", "C00455",
@@ -361,6 +368,8 @@ make_graph_subset <- function(g, ids_to_include) {
 #' @importFrom igraph V set_vertex_attr set_edge_attr incident
 #'
 #' @examples
+#' # TODOedo: which pathway needs to be retrieved here? can be that there is no overlap with the one chosen here (otherwise the example fails)
+#' pathway <- "hsa04110"
 #' g <- kegg_to_graph(pathway)
 #' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
 #'                  "C01762", "C05512", "C00301", "C01185", "C00455",
@@ -414,7 +423,7 @@ highlight_graph_subset <- function(g, ids_to_highlight) {
     g,
     "vertex.color",
     index = nodes_to_fade,
-    value = "rgba(200,200,200,0.4)"
+    value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
 
   # Edge attributes
@@ -431,7 +440,7 @@ highlight_graph_subset <- function(g, ids_to_highlight) {
     g,
     "color",
     index = edges_to_fade,
-    value = "rgba(200,200,200,0.4)"
+    value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
   g <- set_edge_attr(g, "width", index = edges_to_fade, value = 1)
 

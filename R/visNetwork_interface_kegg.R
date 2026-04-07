@@ -78,15 +78,21 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
 ")
 
   if (nrow(edges_df) == 0 || is.null(edges_df)) {
+    # if graph has no edges
     warning("No edges in graph.")
-    v <- visNetwork::visNetwork(nodes = vertices_df, main = pathway_name, background = "#F5F5F5") # if graph has no edges
-  } else {
-    # v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, main = pathway_name, background = "#F5F5F5") # if graph has edges
-    v <- visNetwork::visNetwork(nodes = vertices_df, edges = edges_df, background = "#FFFFFF",
+    v <- visNetwork::visNetwork(nodes = vertices_df,
+                                background = .color_visnetwork_background,
                                 main = list(text = pathway_name,
-                                            style = 'font-family:IBM Plex Sans, Fira Code, Arial, Tahoma, Geneva, Verdana, sans-serif;font-weight:bold;font-size:20px;text-align:center;')
+                                            style = .font_visnetwork_title))
+  } else {
+    # if graph has edges
+    v <- visNetwork::visNetwork(nodes = vertices_df,
+                                edges = edges_df,
+                                background = .color_visnetwork_background,
+                                main = list(text = pathway_name,
+                                            style = .font_visnetwork_title)
 
-    ) # if graph has edges
+    )
   }
 
   v <- visNetwork::visPhysics(v, enabled = FALSE)
@@ -199,14 +205,15 @@ kegg_nodes_to_visNetwork <- function(vertices_df,
 
   # Map KEGG types to shapes
   vertices_df$shape[vertices_df$graphics_type == "rectangle"] <- "custom"
-  vertices_df$size[vertices_df$graphics_type == "rectangle"] <- vertices_df$height[vertices_df$graphics_type == "rectangle"]
+  vertices_df$size[vertices_df$graphics_type == "rectangle"] <-
+    vertices_df$height[vertices_df$graphics_type == "rectangle"]
   vertices_df$shape[vertices_df$graphics_type == "circle"] <- "dot"
   vertices_df$shape[vertices_df$graphics_type == "roundrectangle"] <- "box"
   vertices_df$shape[vertices_df$graphics_type == "line"] <- "text"
   vertices_df$shape[vertices_df$graphics_type == "ellipse"] <- "dot"
   # vertices_df[vertices_df$shape == "box", "margin.top"] <- vertices_df[vertices_df$shape == "box", "height"] * 0.5 + 10 # label will appear above the box
 
-  vertices_df$font.size[vertices_df$graphics_type == "line"] <- 8
+  vertices_df$font.size[vertices_df$graphics_type == "line"] <- .font_node_size
 
   vertices_df$shape[vertices_df$graphics_type == "group"] <- "dot"
   vertices_df$widthConstraint <- vertices_df$width
@@ -218,20 +225,20 @@ kegg_nodes_to_visNetwork <- function(vertices_df,
   vertices_df$widthConstraint[vertices_df$graphics_type == "line"] <- nchar(as.character(
     vertices_df$label[vertices_df$graphics_type == "line"]
   )) * 4
-  vertices_df$font.background[vertices_df$graphics_type == "line"] <- "white"
+  vertices_df$font.background[vertices_df$graphics_type == "line"] <- .color_nodelabel_background
   # Set border color normally black and red on hover (except for line nodes)
   vertices_df$color <- lapply(seq_len(nrow(vertices_df)), function(i) {
     border_color <-
       if ( # vertices_df$graphics_type[i] == "line" ||
         vertices_df$graphics_type[i] %in% c("group", "line")) {
-        "transparent"
+        .color_nodeborder_groupline
       } else {
-        "black"
+        .color_nodeborder_default
       }
     list(
       background = vertices_df$vertex.color[i],
       border = border_color,
-      highlight = list(border = "red")
+      highlight = list(border = .color_nodeborder_highlighted)
     )
   })
 

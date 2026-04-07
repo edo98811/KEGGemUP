@@ -1,9 +1,12 @@
+# mapping values ----------------------------------------------------------
+
 #' Add results from combined results data frame to nodes data frame
+#'
 #' @param vertices_df Data frame of nodes with a column 'ids_for_mapping'
 #' @param results_combined Data frame with combined results containing columns:
 #' ids_for_mapping, de_value, de_source
 #' @param verbose Logical, if TRUE, prints messages about the process.
-#' @return Updated nodes data frame with added columns: de_value, color, de_source, text
+#'
 #' @details
 #'   Example structure:
 #'   - vertices_df:
@@ -21,6 +24,9 @@
 #'     | 1111            | 2.5      | de1       |
 #'     | 2222            | -1.2     | de2       |
 #'     | 3333            | 0.5      | de1       |
+#'
+#' @return Updated nodes data frame with added columns: de_value, color, de_source, text
+#'
 #' @noRd
 add_results_nodes <- function(
   vertices_df,
@@ -190,13 +196,17 @@ add_results_nodes <- function(
 
 
 #' Add color palettes
+#'
 #' @param vertices_df Data frame of nodes with 'de_value' and 'de_source' columns.
 #' @param palettes A vector of color palette names from RColorBrewer.
 #' @param verbose Logical indicating whether to print verbose messages.
+#'
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stats setNames na.omit
+#'
 #' @return vertices_df with colored nodes based on their values.
+#'
 #' @noRd
 add_colors_to_nodes <- function(
   vertices_df,
@@ -210,7 +220,7 @@ add_colors_to_nodes <- function(
   sources <- unique(na.omit(vertices_df$de_source))
   valid_nodes <- vertices_df[!is.na(vertices_df$de_source), , drop = FALSE]
   legend <- list()
-  default_palette <- "Spectral"
+  default_palette <- "RdBu"
 
   # Checking the palette provided
   palettes_limits_list <- validate_palette_limits(
@@ -325,50 +335,103 @@ add_colors_to_nodes <- function(
     vertices_df = vertices_df,
     legend_plots = legend
   )
+
   return(return_list)
 }
 
-validate_palette_limits <- function(
-  sources,
-  palettes_limits_list,
-  palette_limit,
-  default_palette_limit
-) {
-  if (!is.numeric(palettes_limits_list)) {
-    stop("`palettes_limits_list` must be a numeric vector")
+
+#' Combine multiple differential expression results into a single data frame
+#'
+#' @param results_list A named list where each element is a differential
+#' expression result
+#' @param verbose Logical, if TRUE, prints messages about the process.
+#'
+#' @return A combined data frame with columns: ids_for_mapping, de_value,
+#' de_source
+#'
+#' @noRd
+combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
+  # Checks
+  if (is.null(results_list) || length(results_list) == 0) {
+    if (verbose) {
+      message("No results to combine; returning NULL.")
+    }
+    return(NULL)
   }
 
-  if (is.null(names(palettes_limits_list)) ||
-    !all(sources %in% names(palettes_limits_list))) {
-    if (!all(is.na(palettes_limits_list))) {
-      warning(
-        "Some sources do not have specified palette limits.\n",
-        "Not using limits for any source."
-      )
+  # Validate each entry in the results list
+  results <- lapply(names(results_list), function(de_entry_name) {
+    if (verbose) {
+      message("Processing entry: ", de_entry_name)
     }
 
-    palettes_limits_list <- c(NA_real_)
+    # Validate the structure of each de_entry
+    de_entry <- results_list[[de_entry_name]]
+    de_table <- de_entry$de_table
+    value_column <- de_entry$value_column
+    feature_column <- de_entry$feature_column
+
+    if (feature_column == "rownames") {
+      de_table[[feature_column]] <- rownames(de_table)
+    }
+
+    ids <- remove_kegg_prefix(de_table[[feature_column]])
+
+    # Create a data frame for this entry
+    data.frame(
+      ids_for_mapping = ids,
+      de_value = de_table[[value_column]],
+      de_source = rep(de_entry_name, nrow(de_table)),
+      de_name = rep(value_column, nrow(de_table))
+    )
+  })
+
+  # Combine all results into a single data frame
+  combined_results <- do.call(rbind, results)
+
+  if (verbose) {
+    message(
+      "Combined results data frame created with ",
+      nrow(combined_results), " rows."
+    )
   }
 
-  if (is.null(palette_limit)) {
-    palette_limit <- default_palette_limit
-  } else if (!is.numeric(palette_limit) || length(palette_limit) != 1) {
-    stop("`palette_limit` must be a single numeric value")
-  }
-
-  palettes_limits_list <- if (all(is.na(palettes_limits_list))) {
-    setNames(rep(palette_limit, length(sources)), sources)
-  } else {
-    palettes_limits_list
-  }
-
-  palettes_limits_list
+  return(combined_results)
 }
+
+#' winsorize values
+#'
+#' @param x the values to winsorize
+#' @param range_val the (single numeric) value to cut the original vector to
+#'
+#' @returns the winsorized values
+#'
+#' @noRd
+winsorize <- function(x, range_val) {
+  if (!is.numeric(range_val) || length(range_val) != 1) {
+    stop("'range_val' must be a single numeric value")
+  }
+  pmax(pmin(x, range_val), -range_val)
+}
+
+
+# palette management ------------------------------------------------------
+
+#' Validate color palettes
+#'
+#' @param sources TODOedo
+#' @param palettes_list TODOedo
+#' @param palette TODOedo
+#' @param default_palette TODOedo
+#'
+#' @returns TODOedo
+#'
+#' @noRd
 validate_palettes <- function(
-  sources,
-  palettes_list = list(NA_character_),
-  palette = NULL,
-  default_palette = "Spectral"
+    sources,
+    palettes_list = list(NA_character_),
+    palette = NULL,
+    default_palette = "RdBu"
 ) {
 
   if (!is.list(palettes_list) && !is.character(palettes_list)) {
@@ -426,57 +489,70 @@ validate_palettes <- function(
   palettes_list_colors
 }
 
-#' Helper function to create a legend for a single source
-#' @param range_val Numeric, the maximum absolute value for the legend range.
-#' @param palette_ramp A color ramp function created by colorRampPalette.
-#' @param title Character, the title for the legend.
-#' @param n_element Integer, the number of elements (breaks) to show in the legend.
+#' Validating palette limits
 #'
-#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void
-#' ggplot_gtable ggplot_build
-#' @importFrom rlang .data
+#' @param sources TODOedo
+#' @param palettes_limits_list TODOedo
+#' @param palette_limit TODOedo
+#' @param default_palette_limit TODOedo
 #'
-#' @return A ggplot grob object representing the legend.
-create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n_element = 7) {
-  # Reverse palette from RColorBrewer
+#' @returns TODOedo
+#'
+#' @noRd
+validate_palette_limits <- function(
+  sources,
+  palettes_limits_list,
+  palette_limit,
+  default_palette_limit
+) {
+  if (!is.numeric(palettes_limits_list)) {
+    stop("`palettes_limits_list` must be a numeric vector")
+  }
 
-  # Compute breaks based on the range of the values
-  breaks_seq <- round(seq(-range_val, range_val, length.out = n_element), 1)
+  if (is.null(names(palettes_limits_list)) ||
+    !all(sources %in% names(palettes_limits_list))) {
+    if (!all(is.na(palettes_limits_list))) {
+      warning(
+        "Some sources do not have specified palette limits.\n",
+        "Not using limits for any source."
+      )
+    }
 
-  # Assign colors to breaks
-  legend_df <- data.frame(
-    value = breaks_seq,
-    color = palette_ramp(n_element)
-  )
+    palettes_limits_list <- c(NA_real_)
+  }
 
-  # Create the legend plot
-  p <- ggplot(legend_df) +
-    geom_point(
-      aes(x = 1, y = seq_along(.data$value), fill = .data$value),
-      shape = 21,
-      size = 5,
-      color = "black"
-    ) +
-    scale_fill_gradientn(
-      colours = legend_df$color,
-      breaks = legend_df$value,
-      name = title
-    ) +
-    theme_void()
+  if (is.null(palette_limit)) {
+    palette_limit <- default_palette_limit
+  } else if (!is.numeric(palette_limit) || length(palette_limit) != 1) {
+    stop("`palette_limit` must be a single numeric value")
+  }
 
-  # Extract legend grob
-  g <- ggplot_gtable(ggplot_build(p))
-  legend <- g$grobs[[
-    which(sapply(g$grobs, function(x) x$name) == "guide-box")
-  ]]
+  palettes_limits_list <- if (all(is.na(palettes_limits_list))) {
+    setNames(rep(palette_limit, length(sources)), sources)
+  } else {
+    palettes_limits_list
+  }
 
-  return(legend)
+  palettes_limits_list
 }
 
-# Helper function to get palette colors for a source
+
+
+
+#' get palette colors
+#'
+#' Helper function to get palette colors for a source
+#'
+#' @param palette TODOedo
+#' @param default_palette TODOedo
+#' @param verbose TODOedo
+#'
+#' @returns TODOedo
+#'
+#' @noRd
 get_palette_colors <- function(
   palette,
-  default_palette = "Spectral",
+  default_palette = "RdBu",
   verbose = FALSE
 ) {
   # If palette is a single name
@@ -500,7 +576,18 @@ get_palette_colors <- function(
   return(palette_colors)
 }
 
-# Helper function to determine color range for a source
+#' Get a palette range
+#'
+#' Helper function to determine color range for a source
+#'
+#' @param de_value_vector TODOedo
+#' @param source_name TODOedo
+#' @param palette_limit TODOedo
+#' @param verbose TODOedo
+#'
+#' @returns TODOedo
+#'
+#' @noRd
 get_palette_range <- function(
   de_value_vector,
   source_name,
@@ -563,66 +650,58 @@ get_palette_range <- function(
   return(range_val)
 }
 
-winsorize <- function(x, range_val) {
-  if (!is.numeric(range_val) || length(range_val) != 1) {
-    stop("'range_val' must be a single numeric value")
-  }
-  pmax(pmin(x, range_val), -range_val)
-}
 
 
-#' Combine multiple differential expression results into a single data frame
-#' @param results_list A named list where each element is a differential
-#' expression result
-#' @param verbose Logical, if TRUE, prints messages about the process.
-#' @return A combined data frame with columns:
-#' ids_for_mapping, de_value, de_source
+# creating a legend ------------------------------------------------
+
+#' Helper function to create a legend for a single source
+#'
+#' @param range_val Numeric, the maximum absolute value for the legend range.
+#' @param palette_ramp A color ramp function created by colorRampPalette.
+#' @param title Character, the title for the legend.
+#' @param n_element Integer, the number of elements (breaks) to show in the legend.
+#'
+#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void
+#' ggplot_gtable ggplot_build
+#' @importFrom rlang .data
+#'
+#' @return A ggplot grob object representing the legend
+#'
 #' @noRd
-combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
-  # Checks
-  if (is.null(results_list) || length(results_list) == 0) {
-    if (verbose) {
-      message("No results to combine; returning NULL.")
-    }
-    return(NULL)
-  }
+create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n_element = 7) {
+  # Reverse palette from RColorBrewer
 
-  # Validate each entry in the results list
-  results <- lapply(names(results_list), function(de_entry_name) {
-    if (verbose) {
-      message("Processing entry: ", de_entry_name)
-    }
+  # Compute breaks based on the range of the values
+  breaks_seq <- round(seq(-range_val, range_val, length.out = n_element), 1)
 
-    # Validate the structure of each de_entry
-    de_entry <- results_list[[de_entry_name]]
-    de_table <- de_entry$de_table
-    value_column <- de_entry$value_column
-    feature_column <- de_entry$feature_column
+  # Assign colors to breaks
+  legend_df <- data.frame(
+    value = breaks_seq,
+    color = palette_ramp(n_element)
+  )
 
-    if (feature_column == "rownames") {
-      de_table[[feature_column]] <- rownames(de_table)
-    }
+  # Create the legend plot
+  p <- ggplot(legend_df) +
+    geom_point(
+      aes(x = 1, y = seq_along(.data$value), fill = .data$value),
+      shape = 21,
+      size = 5,
+      color = "black"
+    ) +
+    scale_fill_gradientn(
+      colours = legend_df$color,
+      breaks = legend_df$value,
+      name = title
+    ) +
+    theme_void()
 
-    ids <- remove_kegg_prefix(de_table[[feature_column]])
+  # Extract legend grob
+  g <- ggplot_gtable(ggplot_build(p))
+  legend <- g$grobs[[
+    which(sapply(g$grobs, function(x) x$name) == "guide-box")
+  ]]
 
-    # Create a data frame for this entry
-    data.frame(
-      ids_for_mapping = ids,
-      de_value = de_table[[value_column]],
-      de_source = rep(de_entry_name, nrow(de_table)),
-      de_name = rep(value_column, nrow(de_table))
-    )
-  })
-
-  # Combine all results into a single data frame
-  combined_results <- do.call(rbind, results)
-
-  if (verbose) {
-    message(
-      "Combined results data frame created with ",
-      nrow(combined_results), " rows."
-    )
-  }
-
-  return(combined_results)
+  return(legend)
 }
+
+
