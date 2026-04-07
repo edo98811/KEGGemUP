@@ -32,8 +32,9 @@
 #'
 #' cache_dir <- tempdir()
 #' kgml_path_cached <- download_kgml("hsa04110",
-#'                                   bfc = BiocFileCache::BiocFileCache(cache_dir),
-#'                                   verbose = TRUE)
+#'   bfc = BiocFileCache::BiocFileCache(cache_dir),
+#'   verbose = TRUE
+#' )
 download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) {
   mode <- select_cache_or_path(bfc, path, verbose)
 
@@ -163,23 +164,29 @@ download_all_pathways <- function(org, verbose = FALSE) {
 #' @examples
 #' # Saving in path
 #' data_dir <- tempdir()
-#' kegg_compounds <- get_kegg_db(db_name = "compound",
-#'                               path = data_dir, verbose = TRUE)
+#' kegg_compounds <- get_kegg_db(
+#'   db_name = "compound",
+#'   path = data_dir, verbose = TRUE
+#' )
 #'
 #' # Just returning without saving
-#' kegg_compounds_onthefly <- get_kegg_db(db_name = "compound",
-#'                                        verbose = TRUE)
+#' kegg_compounds_onthefly <- get_kegg_db(
+#'   db_name = "compound",
+#'   verbose = TRUE
+#' )
 #' head(kegg_compounds_onthefly)
 #'
 #' # saving to cache (in a temp dir)
-#' kegg_compounds_cached <- get_kegg_db(db_name = "compound",
-#'                                      bfc = BiocFileCache::BiocFileCache(tempdir()),
-#'                                      verbose = TRUE)
+#' kegg_compounds_cached <- get_kegg_db(
+#'   db_name = "compound",
+#'   bfc = BiocFileCache::BiocFileCache(tempdir()),
+#'   verbose = TRUE
+#' )
 get_kegg_db <- function(
-    db_name = "compound",
-    path = NULL,
-    bfc = NULL,
-    verbose = FALSE
+  db_name = "compound",
+  path = NULL,
+  bfc = NULL,
+  verbose = FALSE
 ) {
   if (verbose) message("Retrieving KEGG database: ", db_name)
   mode <- select_cache_or_path(bfc, path, verbose)
@@ -206,12 +213,21 @@ get_kegg_db <- function(
   ) |> as.data.frame()
 
   if (mode == "dir") {
-    file_name <-
-      if (grepl("\\.[^/\\\\]+$", path)) {
-        path
-      } else {
-        file.path(path.expand(path), paste0("kegg_", db_name, ".tsv"))
-      }
+    if (is.null(path)) {
+      file_name <- file.path(getwd(), paste0("kegg_", db_name, ".tsv"))
+    } else if (dir.exists(path)) {
+      file_name <- file.path(path, paste0("kegg_", db_name, ".tsv"))
+    } else {
+      dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+      file_name <- path
+    }
+
+    # file_name <-
+    #   if (grepl("\\.[^/\\\\]+$", path)) {
+    #     path
+    #   } else {
+    #     file.path(path.expand(path), paste0("kegg_", db_name, ".tsv"))
+    #   }
     write.table(
       kegg_db,
       file = file_name,
@@ -314,4 +330,3 @@ select_cache_or_path <- function(bfc, path, verbose = FALSE) {
   }
   return(mode)
 }
-

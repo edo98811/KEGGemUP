@@ -3,11 +3,7 @@
 #' Default KEGG node attributes
 #'
 #' Definition of the default KEGG node attributes
-#'
-#' @details
-#' See https://rpubs.com/huanfaChen/261838 for some notes on different types of
-#' "not available information"
-#'
+#' 
 #' @return A list of default KEGG node attributes
 #'
 #' @noRd
@@ -58,10 +54,6 @@ kegg_vertex_defaults <- function() {
 #'
 #' Definition of the default KEGG edge attributes
 #'
-#' @details
-#' See https://rpubs.com/huanfaChen/261838 for some notes on different types of
-#' "not available information"
-#'
 #' @return A list of default KEGG edge attributes
 #'
 #' @noRd
@@ -99,16 +91,3 @@ kegg_edge_defaults <- function() {
   )
 }
 
-# #' Return a template data frame for KEGG edges with default attributes
-# #' @return A data frame with default KEGG edge attributes
-# #' @export
-# return_template_edges <- function(nrows = 1) {
-#   data.frame(lapply(kegg_edge_defaults(), function(x) rep(x, nrows)))
-# }
-
-# #' Return a template data frame for KEGG vertices with default attributes
-# #' @return A data frame with default KEGG vertex attributes
-# #' @export
-# return_template_vertices <- function(nrows = 1) {
-#   data.frame(lapply(kegg_vertex_defaults(), function(x) rep(x, nrows)))
-# }
