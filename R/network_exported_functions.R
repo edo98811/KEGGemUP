@@ -270,8 +270,6 @@ map_results_to_graph <- function(
     drop = FALSE
   ]
 
-  stopifnot(identical(nodes_updated$name, igraph::V(g)$name))
-
   # Update vertex attributes
   igraph::vertex_attr(g, "de_value") <- nodes_updated$de_value
   igraph::vertex_attr(g, "de_source") <- nodes_updated$de_source
@@ -305,7 +303,11 @@ map_results_to_graph <- function(
 #' @importFrom igraph V induced_subgraph
 #'
 #' @examples
-#' # TODO
+#' g <- kegg_to_graph(pathway)
+#' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
+#'                  "C01762", "C05512", "C00301", "C01185", "C00455",
+#'                  "22436", "14544", "18950", "11486", "80285", "59027")
+#' subg <- make_graph_subset(g, KEGG_to_include)
 #'
 make_graph_subset <- function(g, ids_to_include) {
 
@@ -359,7 +361,11 @@ make_graph_subset <- function(g, ids_to_include) {
 #' @importFrom igraph V set_vertex_attr set_edge_attr incident
 #'
 #' @examples
-#' # TODO
+#' g <- kegg_to_graph(pathway)
+#' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
+#'                  "C01762", "C05512", "C00301", "C01185", "C00455",
+#'                  "22436", "14544", "18950", "11486", "80285", "59027")
+#' subg <- highlight_graph_subset(g, KEGG_to_include)
 #'
 highlight_graph_subset <- function(g, ids_to_highlight) {
   if (!inherits(g, "igraph")) {

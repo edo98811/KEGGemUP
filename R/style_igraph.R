@@ -180,7 +180,8 @@ apply_style_map <- function(df, column, style_map) {
 
   # What style columns are defined in the style mapping?
   style_cols <- unique(unlist(lapply(style_map, names)))
-
+  
+  # Iterate over the style map and apply styles to the data frame
   for (i in names(style_map)) {
     style <- style_map[[i]]
     indexes <- df[[column]] == i
