@@ -408,7 +408,7 @@ highlight_graph_subset <- function(g, ids_to_highlight) {
     g,
     "vertex.color",
     index = nodes_to_fade,
-    value = "rgba(200,200,200,0.4)"
+    value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
 
   # Edge attributes
@@ -425,7 +425,7 @@ highlight_graph_subset <- function(g, ids_to_highlight) {
     g,
     "color",
     index = edges_to_fade,
-    value = "rgba(200,200,200,0.4)"
+    value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
   g <- set_edge_attr(g, "width", index = edges_to_fade, value = 1)
 
