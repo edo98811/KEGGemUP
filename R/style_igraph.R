@@ -87,13 +87,13 @@ style_edges_igraph <- function(edges_df) {
   )
   edge_style_map_reaction <- list(
     reaction_substrate_reversible = list(color = .color_edge_substrate_reversible,
-                                         lty = 1L, arrow.mode = 1L, label = "⇄"),
+                                         lty = 1L, arrow.mode = 1L, label = "\u21C4"),
     reaction_product_reversible = list(color = .color_edge_product_reversible,
-                                       lty = 1L, arrow.mode = 2L, label = "⇄"),
+                                       lty = 1L, arrow.mode = 2L, label = "\u21C4"),
     reaction_substrate_irreversible = list(color = .color_edge_substrate_irreversible,
-                                           lty = 1L, arrow.mode = 0L, label = "→"),
+                                           lty = 1L, arrow.mode = 0L, label = "\u2192"),
     reaction_product_irreversible = list(color = .color_edge_product_irreversible,
-                                         lty = 1L, arrow.mode = 2L, label = "→")
+                                         lty = 1L, arrow.mode = 2L, label = "\u2192")
   )
   edge_style_map_type <- list(
     line  = list(color = .color_edge_line,
