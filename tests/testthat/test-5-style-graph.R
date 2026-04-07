@@ -46,9 +46,9 @@ test_that("style_igraph_graph works correctly on relations", {
 
   expect_true(all(maplink$arrow.mode == 1))
   expect_true(all(others$arrow.mode == 2))
-  expect_true(all(edges_df$color[edges_df$relation_type == "PPrel"] == "#FF6347"))
-  expect_true(all(edges_df$color[edges_df$relation_type == "ECrel"] == "#8A2BE2"))
-  expect_true(all(edges_df$color[edges_df$relation_type == "maplink"] == "#FF4500"))
+  expect_true(all(edges_df$color[edges_df$relation_type == "PPrel"] == scales::alpha("#FFD700", 0.6)))
+  expect_true(all(edges_df$color[edges_df$relation_type == "ECrel"] == scales::alpha("#8A2BE2", 0.6)))
+  expect_true(all(edges_df$color[edges_df$relation_type == "maplink"] == scales::alpha("#FF4500", 0.6)))
   expect_true(all(edges_df$label[edges_df$relation_type == "PPrel"] == "PP"))
   expect_true(all(edges_df$label[edges_df$relation_type == "ECrel"] == "EC"))
   expect_true(all(edges_df$label[edges_df$relation_type == "maplink"] == "maplink"))
