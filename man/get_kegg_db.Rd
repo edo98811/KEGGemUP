@@ -32,16 +32,22 @@ network | variant | disease | drug | dgroup
 \examples{
 # Saving in path
 data_dir <- tempdir()
-kegg_compounds <- get_kegg_db(db_name = "compound",
-                              path = data_dir, verbose = TRUE)
+kegg_compounds <- get_kegg_db(
+  db_name = "compound",
+  path = data_dir, verbose = TRUE
+)
 
 # Just returning without saving
-kegg_compounds_onthefly <- get_kegg_db(db_name = "compound",
-                                       verbose = TRUE)
+kegg_compounds_onthefly <- get_kegg_db(
+  db_name = "compound",
+  verbose = TRUE
+)
 head(kegg_compounds_onthefly)
 
 # saving to cache (in a temp dir)
-kegg_compounds_cached <- get_kegg_db(db_name = "compound",
-                                     bfc = BiocFileCache::BiocFileCache(tempdir()),
-                                     verbose = TRUE)
+kegg_compounds_cached <- get_kegg_db(
+  db_name = "compound",
+  bfc = BiocFileCache::BiocFileCache(tempdir()),
+  verbose = TRUE
+)
 }

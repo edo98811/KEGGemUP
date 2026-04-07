@@ -36,6 +36,7 @@ kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
 
 cache_dir <- tempdir()
 kgml_path_cached <- download_kgml("hsa04110",
-                                  bfc = BiocFileCache::BiocFileCache(cache_dir),
-                                  verbose = TRUE)
+  bfc = BiocFileCache::BiocFileCache(cache_dir),
+  verbose = TRUE
+)
 }
