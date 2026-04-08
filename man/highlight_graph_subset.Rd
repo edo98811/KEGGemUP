@@ -26,12 +26,11 @@ to the provided KEGG IDs and fades the rest of the graph.
 It modifies vertex attributes to achieve this effect.
 }
 \examples{
-# TODOedo: which pathway needs to be retrieved here? can be that there is no overlap with the one chosen here (otherwise the example fails)
-pathway <- "hsa04110"
+pathway <- "mmu00230"
 g <- kegg_to_graph(pathway)
 KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
                  "C01762", "C05512", "C00301", "C01185", "C00455",
                  "22436", "14544", "18950", "11486", "80285", "59027")
-subg <- highlight_graph_subset(g, KEGG_to_include)
+highlighted_subg <- highlight_graph_subset(g, KEGG_to_include)
 
 }
