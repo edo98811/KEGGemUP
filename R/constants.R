@@ -37,7 +37,7 @@
 
 
 
-# for visNetwork_tooltips_kegg.R ------------------------------------------
+## for visNetwork_tooltips_kegg.R ------------------------------------------
 
 .color_button <- "" ## TODO
 .color_button_background <- ""
