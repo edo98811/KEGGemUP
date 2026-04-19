@@ -54,7 +54,7 @@ Map differential expression results to nodes
 This function can be used to map the differential expression
 results to the graph,
 the input of the graph must be the output of the function
-\code{kegg_to_graph} in the igraph format.
+\code{create_kegg_graph} in the igraph format.
 The results to be mapped can be
 provided either as a list or as a single data.frame.
 If a single data.frame
@@ -66,7 +66,7 @@ respectively, but these can be changed using the
 }
 \examples{
 pathway <- "hsa04110" # Example pathway ID
-graph <- kegg_to_graph(pathway_id = pathway)
+graph <- create_kegg_graph(pathway_id = pathway)
 # Example differential expression results
 de_results <- data.frame(
   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
