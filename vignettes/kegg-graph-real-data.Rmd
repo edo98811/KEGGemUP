@@ -138,7 +138,7 @@ de_entrez_IFNg_vs_naive_genes <- anns $ENTREZID[
 ## Exporting the graph 
 This is how to build a KEGG pathway graph and the structure of its nodes and edges.
 ```{r}
-graph <- kegg_to_graph("hsa00563")
+graph <- create_kegg_graph("hsa00563")
 
 # Extract all vertex attributes
 vertices_df <- igraph::as_data_frame(graph, what = "vertices")
@@ -158,11 +158,11 @@ DT::datatable(
 ```
 ## Building KEGG pathway graphs
 
-You can build a KEGG pathway graph from a KEGG pathway ID using the function `kegg_to_graph()`. The input of this function is a KEGG pathway ID (for example "hsa00563" for the human Glycosylphosphatidylinositol (GPI)-anchor biosynthesis pathway) and the output is a graph object representing the pathway.
+You can build a KEGG pathway graph from a KEGG pathway ID using the function `create_kegg_graph()`. The input of this function is a KEGG pathway ID (for example "hsa00563" for the human Glycosylphosphatidylinositol (GPI)-anchor biosynthesis pathway) and the output is a graph object representing the pathway.
 
 ## Build a graph from a pathway ID and map results to nodes
 
-To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_nodes()`. The input of this function is a graph object built with `kegg_to_graph()` and a list of differential expression results tables or a single differential expression results table.
+To map the differential expression results to the nodes of a KEGG pathway graph you can use `map_results_to_nodes()`. The input of this function is a graph object built with `create_kegg_graph()` and a list of differential expression results tables or a single differential expression results table.
 
 You can also pass as input to `map_results_to_nodes()` a single `data.frame` with the differential expression results. This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix) and another with the values to map to the nodes (e.g., log2 fold changes). You can pass to the function the names of these columns if they differ from the default ones with the parameters `feature_column` and `value_column`.
 
@@ -196,13 +196,13 @@ de_results_list <-list(
 
 We will now take a KEGG pathway from the enrichment results we built earlier and map the differential expression results to its nodes. As you can see you simply need to pass to the function the graph object and the list of differential expression results tables that we defined before.
 
-The workflow is as follows: first we build the graph from the KEGG pathway ID, then we map the differential expression results to the nodes of the graph, and at the end we plot the graph using `make_kegg_visNetwork()`, which creates an interactive visualization of the graph using visNetwork.
+The workflow is as follows: first we build the graph from the KEGG pathway ID, then we map the differential expression results to the nodes of the graph, and at the end we plot the graph using `render_kegg_graph()`, which creates an interactive visualization of the graph using visNetwork.
 
 ```{r use-package, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
 pathway <- "hsa00563"  
-graph <- kegg_to_graph(pathway)
+graph <- create_kegg_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_list)
-graph_visnetwork <- make_kegg_visNetwork(graph, scaling_factor = 5)
+graph_visnetwork <- render_kegg_graph(graph, scaling_factor = 5)
 graph_visnetwork
 ```
 
@@ -217,9 +217,9 @@ de_results_limma <-  data.frame(res_macrophage_IFNg_vs_naive_limma)
 Then we will call the function with this table as input. The parameter `feature_column` and `value_column` are set to match the column names in our differential expression results table.
 
 ```{r use-package-2, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
-graph <- kegg_to_graph(pathway)
+graph <- create_kegg_graph(pathway)
 graph <- map_results_to_graph(graph, de_results_limma, feature_column = "ENTREZID", value_column = "logFC")
-graph_visnetwork <- make_kegg_visNetwork(graph)
+graph_visnetwork <- render_kegg_graph(graph)
 graph_visnetwork
 ```
 
@@ -228,10 +228,10 @@ To see the available palettes you can run `RColorBrewer::display.brewer.all()`.
 You can also visit this page: [RColorBrewer palettes](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html).
 
 ```{r use-package-3, fig.width=14, fig.height=10, out.width="100%", out.height="800px"}
-graph <- kegg_to_graph(pathway) |> 
+graph <- create_kegg_graph(pathway) |> 
   map_results_to_graph(de_results_limma, feature_column = "ENTREZID", value_column = "logFC", palette = "PiYG")
 
-graph_visnetwork <- make_kegg_visNetwork(graph)
+graph_visnetwork <- render_kegg_graph(graph)
 graph_visnetwork
 ```
 
@@ -245,17 +245,17 @@ library(org.Mm.eg.db)
 
 pathway <- "mmu00230"
 
-g <- kegg_to_graph(pathway) |>
+g <- create_kegg_graph(pathway) |>
   map_results_to_graph(de_results_list)
 ```
 
-it can happen that you only want a subset of it, expecially for complex pathways. For that therfe is the function `make_graph_subset`. You need to supply to it either entrezids for gene and proteins, or KEGG compound ids if you wish to use the compounds. We can make a subset of it and try to visualise it using the igraph function.
+it can happen that you only want a subset of it, expecially for complex pathways. For that therfe is the function `subset_kegg_graph`. You need to supply to it either entrezids for gene and proteins, or KEGG compound ids if you wish to use the compounds. We can make a subset of it and try to visualise it using the igraph function.
 
 ```{r, make-kegg-graph-subset}
 KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
                  "C01762", "C05512", "C00301", "C01185", "C00455",
                  "22436", "14544", "18950", "11486", "80285", "59027")
-subg <- make_graph_subset(g, KEGG_to_include)
+subg <- subset_kegg_graph(g, KEGG_to_include)
 ```
 
 ### VisNetwork visualisation
@@ -263,18 +263,18 @@ subg <- make_graph_subset(g, KEGG_to_include)
 Let's now visualise it using visnetwork.
 
 ```{r, make-kegg-graph-visnetwork, results = 'asis'}
-make_kegg_visNetwork(subg)
+render_kegg_graph(subg)
 ```
 
 ### Loading a downloaded file
 
 You can also download a kgml file from kegg and parse a kegg pathway directly from it.
 ```{r from-file, out.width="100%", out.height="800px"}
-path_file <- KEGGemUP::download_kgml("mmu04933")
+path_file <- KEGGemUP::retrieve_kgml("mmu04933")
 
-graph_parsed <- kegg_to_graph(pathway_id = "example", kgml_file = path_file)
+graph_parsed <- create_kegg_graph(pathway_id = "example", kgml_file = path_file)
 
-make_kegg_visNetwork(graph_parsed)
+render_kegg_graph(graph_parsed)
 ```
 
 ## Session info

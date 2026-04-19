@@ -7,7 +7,7 @@
 #' @details
 #' The graph elements are styled keeping in mind what we require to use within
 #' KEGGemUP.
-#' This function is called internally by `kegg_to_graph`.
+#' This function is called internally by `create_kegg_graph`.
 #'
 #' @param g An igraph graph object
 #'

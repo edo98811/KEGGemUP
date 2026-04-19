@@ -75,13 +75,13 @@ kgml_path_no_edges <- system.file("extdata", "no_edges.xml", package = "KEGGemUP
 kgml_steps <- readRDS(system.file("extdata", "kgml_parsing_steps.rds", package = "KEGGemUP"))
 xml_example <- xml2::read_xml(kgml_path_01)
 xml_no_edges <- xml2::read_xml(kgml_path_no_edges)
-expected_graphs <- readRDS(system.file("extdata", "kegg_to_graph_expected.rds", package = "KEGGemUP"))
+expected_graphs <- readRDS(system.file("extdata", "create_kegg_graph_expected.rds", package = "KEGGemUP"))
 bfc_path <- tools::R_user_dir("BiocFileCache", which = "cache")
 bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
 
 # devtools::load_all()
 
-# # Tests for expected outputs of kegg_to_graph and map_results_to_graph
+# # Tests for expected outputs of create_kegg_graph and map_results_to_graph
 # kgml_path_01 <- system.file("extdata", "test01.xml", package = "KEGGemUP")
 # # kgml_path_01 <- "inst/extdata/test01.xml"
 # xml_example <- xml2::read_xml(kgml_path_01)
@@ -121,12 +121,12 @@ bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
 
 # saveRDS(kgml_steps, file = "inst/extdata/kgml_parsing_steps.rds")
 
-# g_test_01 <- kegg_to_graph(
+# g_test_01 <- create_kegg_graph(
 #   pathway_id = "hsa00001",
 #   kgml_file = kgml_path_01
 # )
 
-# # g_test_02 <- kegg_to_graph(
+# # g_test_02 <- create_kegg_graph(
 # #   pathway_id = "hsa00001",
 # #   kgml_file = kgml_path_02
 # # )
@@ -149,13 +149,13 @@ bfc <- BiocFileCache(cache = file.path(bfc_path, "test"), ask = FALSE)
 # expected$g_test_01_mapped <- g_test_01_mapped
 # # expected$g_test_02_mapped <- g_test_02_mapped
 
-# vis_graph_01 <- make_kegg_visNetwork(g_test_01_mapped)
-# # vis_graph_02 <- make_kegg_visNetwork(g_test_02_mapped)
+# vis_graph_01 <- render_kegg_graph(g_test_01_mapped)
+# # vis_graph_02 <- render_kegg_graph(g_test_02_mapped)
 
 # expected$visNetwork_test_01_mapped <- vis_graph_01
 # # expected$visNetwork_test_02_mapped <- vis_graph_02
 
-# saveRDS(expected, file = "inst/extdata/kegg_to_graph_expected.rds")
+# saveRDS(expected, file = "inst/extdata/create_kegg_graph_expected.rds")
 
 
 

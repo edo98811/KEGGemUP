@@ -1,6 +1,6 @@
 test_that("workflow", {
   expect_warning(
-    g_test_01 <- kegg_to_graph(
+    g_test_01 <- create_kegg_graph(
       pathway_id = "hsa00001",
       kgml_file = kgml_path_01
     ), "Could not retrieve pathway name for ID: hsa00001"
@@ -23,12 +23,12 @@ test_that("workflow", {
   expect_type(graph_attr(g_test_01_mapped, "legend_plots"), "list")
   expect_true(all(sapply(graph_attr(g_test_01_mapped, "legend_plot"), function(x) inherits(x, "gtable"))))
   
-  vis_graph_01 <- make_kegg_visNetwork(g_test_01_mapped)
+  vis_graph_01 <- render_kegg_graph(g_test_01_mapped)
   expect_s3_class(vis_graph_01, "visNetwork")
 
-  graph_01_subset <- make_graph_subset(g_test_01_mapped, ids_to_include = c("C00001", "C00002"))
+  graph_01_subset <- subset_kegg_graph(g_test_01_mapped, ids_to_include = c("C00001", "C00002"))
 
-  highlighted_graph <- highlight_graph_subset(g_test_01_mapped, ids_to_highlight = c("C00001", "C00002"))
+  highlighted_graph <- highlight_kegg_graph(g_test_01_mapped, ids_to_highlight = c("C00001", "C00002"))
 
   expect_lt(length(V(graph_01_subset)), length(V(g_test_01_mapped)))
   expect_equal(length(V(highlighted_graph)), length(V(g_test_01_mapped)))

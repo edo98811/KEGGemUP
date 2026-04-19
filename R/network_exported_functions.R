@@ -21,9 +21,9 @@
 #'
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
-#' graph <- kegg_to_graph(pathway_id = pathway, verbose = TRUE)
+#' graph <- create_kegg_graph(pathway_id = pathway, verbose = TRUE)
 #' plot(graph) # Plot the graph using igraph's plotting functions
-kegg_to_graph <- function(
+create_kegg_graph <- function(
     pathway_id,
     kgml_file = NULL,
     verbose = FALSE
@@ -47,7 +47,7 @@ kegg_to_graph <- function(
     if (verbose) {
       message("Downloading KGML file for pathway ID: ", pathway_id)
     }
-    kgml_file <- download_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
+    kgml_file <- retrieve_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
     if (is.null(kgml_file)) {
       warning("Failed to download KGML file for pathway ID: ", pathway_id)
       return(NULL)
@@ -99,7 +99,7 @@ kegg_to_graph <- function(
 #'
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
-#' graph <- kegg_to_graph(pathway_id = pathway)
+#' graph <- create_kegg_graph(pathway_id = pathway)
 #' # Example differential expression results
 #' de_results <- data.frame(
 #'  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
@@ -111,9 +111,9 @@ kegg_to_graph <- function(
 #' feature_column = "KEGG_ids",
 #' value_column = "log2FoldChange")
 #'
-#' vis_graph <- make_kegg_visNetwork(graph, scaling_factor = 1.5,
+#' vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
 #' relationships = "all", visualisation_type = "standard")
-make_kegg_visNetwork <- function(
+render_kegg_graph <- function(
     g,
     scaling_factor = 1.5,
     relationships = c("all", "reactions", "relations", "none"),
@@ -139,7 +139,7 @@ make_kegg_visNetwork <- function(
   )
 
   if (nrow(edges_df) > 0)
-    edges_df <- igraph_edges_to_visNetwork(
+    edges_df <- kegg_edges_to_visNetwork(
       edges_df,
       relationships = relationships
     )
@@ -189,7 +189,7 @@ make_kegg_visNetwork <- function(
 #' @details This function can be used to map the differential expression
 #' results to the graph,
 #' the input of the graph must be the output of the function
-#' `kegg_to_graph` in the igraph format.
+#' `create_kegg_graph` in the igraph format.
 #' The results to be mapped can be
 #' provided either as a list or as a single data.frame.
 #' If a single data.frame
@@ -201,7 +201,7 @@ make_kegg_visNetwork <- function(
 #'
 #' @examples
 #' pathway <- "hsa04110" # Example pathway ID
-#' graph <- kegg_to_graph(pathway_id = pathway)
+#' graph <- create_kegg_graph(pathway_id = pathway)
 #' # Example differential expression results
 #' de_results <- data.frame(
 #'   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
@@ -309,14 +309,14 @@ map_results_to_graph <- function(
 #'
 #' @examples
 #' pathway <- "mmu00230"
-#' g <- kegg_to_graph(pathway)
+#' g <- create_kegg_graph(pathway)
 #' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
 #'                  "C01762", "C05512", "C00301", "C01185", "C00455",
 #'                  "22436", "14544", "18950", "11486", "80285", "59027")
-#' subg <- make_graph_subset(g, KEGG_to_include)
+#' subg <- subset_kegg_graph(g, KEGG_to_include)
 #' # plot(g)
 #' # plot(subg)
-make_graph_subset <- function(g, ids_to_include) {
+subset_kegg_graph <- function(g, ids_to_include) {
 
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
@@ -369,13 +369,13 @@ make_graph_subset <- function(g, ids_to_include) {
 #'
 #' @examples
 #' pathway <- "mmu00230"
-#' g <- kegg_to_graph(pathway)
+#' g <- create_kegg_graph(pathway)
 #' KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
 #'                  "C01762", "C05512", "C00301", "C01185", "C00455",
 #'                  "22436", "14544", "18950", "11486", "80285", "59027")
-#' highlighted_subg <- highlight_graph_subset(g, KEGG_to_include)
+#' highlighted_subg <- highlight_kegg_graph(g, KEGG_to_include)
 #'
-highlight_graph_subset <- function(g, ids_to_highlight) {
+highlight_kegg_graph <- function(g, ids_to_highlight) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }

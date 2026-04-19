@@ -1,24 +1,24 @@
 
-test_that("download_kgml rejects invalid inputs", {
+test_that("retrieve_kgml rejects invalid inputs", {
   expect_error(
-    download_kgml("hsa00001", bfc = 1),
+    retrieve_kgml("hsa00001", bfc = 1),
     "BiocFileCache"
   )
 
   expect_error(
-    download_kgml(
+    retrieve_kgml(
       "hsa00001",
       path = c("a", "b")),
     "single string"
   )
 })
 
-test_that("download_kgml works in directory mode", {
+test_that("retrieve_kgml works in directory mode", {
   tmpdir <- tempdir()
   expected_file <- file.path(tmpdir, "hsa00010.xml")
 
   result <- suppressMessages(
-    download_kgml(
+    retrieve_kgml(
       pathway_id = "hsa00010",
       path = tmpdir
     )
@@ -28,15 +28,15 @@ test_that("download_kgml works in directory mode", {
   expect_true(file.exists(result))
 
   # If path is not provided, should save in current working directory
-  result <- suppressMessages(download_kgml(
+  result <- suppressMessages(retrieve_kgml(
     pathway_id = "hsa00010"
   ))
 
   expect_true(file.exists(result))
 })
 
-test_that("download_kgml works in cache mode", {
-  result <- suppressMessages(download_kgml(
+test_that("retrieve_kgml works in cache mode", {
+  result <- suppressMessages(retrieve_kgml(
     pathway_id = "hsa00010",
     bfc = bfc
   ))

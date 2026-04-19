@@ -1,5 +1,5 @@
 
-test_that("igraph_edges_to_visNetwork correctly maps arrows, dashes, color, label", {
+test_that("kegg_edges_to_visNetwork correctly maps arrows, dashes, color, label", {
   # Example edge data frame from igraph
   edges_df <- data.frame(
     from = c("A", "B", "C"),
@@ -8,7 +8,7 @@ test_that("igraph_edges_to_visNetwork correctly maps arrows, dashes, color, labe
     lty = c(1, 2, NA)
   )
 
-  edges_mapped <- igraph_edges_to_visNetwork(edges_df)
+  edges_mapped <- kegg_edges_to_visNetwork(edges_df)
 
   # Check new columns exist
   expect_true(all(c("arrows", "dashes", "color", "label") %in% names(edges_mapped)))
@@ -41,7 +41,7 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
 
   # Check borderRadius exists
   expect_true("borderRadius" %in% names(nodes_mapped))
-  
+
   # Check borderRadius
   expect_equal(nodes_mapped$borderRadius, c(0, 0, 10, 0))
 
@@ -54,7 +54,7 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
 })
 
 
-test_that("igraph_edges_to_visNetwork does not crashif edges_df empty", {
+test_that("kegg_edges_to_visNetwork does not crash if edges_df empty", {
   # Example edge data frame from igraph
   edges_df <- data.frame(
     from = character(0),
@@ -63,7 +63,7 @@ test_that("igraph_edges_to_visNetwork does not crashif edges_df empty", {
     lty = integer(0)
   )
 
-  edges_mapped <- igraph_edges_to_visNetwork(edges_df)
+  edges_mapped <- kegg_edges_to_visNetwork(edges_df)
 
   expect_equal(edges_mapped, edges_df)
 })
@@ -72,7 +72,7 @@ test_that("test_edge_tooltip works correctly", {
   g_input <- expected_graphs$g_test_01_mapped
   edges_df <- as_data_frame(g_input, what = "edges")
   edges_df <- add_edge_tooltip(edges_df)
-  
+
   rel_titles <- edges_df[edges_df$type == "relation", "title", drop = FALSE]
   expect_true(all(grepl("relation", rel_titles$title, ignore.case = TRUE)))
 
@@ -83,13 +83,13 @@ test_that("test_edge_tooltip works correctly", {
   line_titles <- edges_df[edges_df$type == "line", "title", drop = FALSE]
   expect_true(all(grepl("line", line_titles$title, ignore.case = TRUE)))
 })
-  
+
 test_that("test_node_tooltip works correctly", {
-  
+
   g_input <- expected_graphs$g_test_01_mapped
   nodes_df <- as_data_frame(g_input, what = "vertices")
   nodes_df <- add_node_tooltip(nodes_df)
-  
+
   nodes_df_group <- nodes_df[nodes_df$type == "group", "title", drop = FALSE]
   nodes_df_compound <- nodes_df[nodes_df$type == "compound", "title", drop = FALSE]
   nodes_df_ortholog <- nodes_df[nodes_df$type == "ortholog", "title", drop = FALSE]

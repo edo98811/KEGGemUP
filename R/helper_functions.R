@@ -14,12 +14,12 @@
 #' @importFrom BiocFileCache BiocFileCache bfcinfo
 #'
 #' @examples
-#' cache_info <- return_all_cached()
+#' cache_info <- display_cache_KEGGemUP()
 #' # View cached KEGG pathway files
 #' print(cache_info$kegg)
 #' # View cached mapping files
 #' print(cache_info$mappings)
-return_all_cached <- function() {
+display_cache_KEGGemUP <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
@@ -48,8 +48,8 @@ return_all_cached <- function() {
 #' @importFrom utils askYesNo
 #'
 #' @examples
-#' # reset_cache()
-reset_cache <- function() {
+#' # reset_cache_KEGGemUP()
+reset_cache_KEGGemUP <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)

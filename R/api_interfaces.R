@@ -28,14 +28,17 @@
 #'
 #' @examples
 #' data_dir <- tempdir()
-#' kgml_path <- download_kgml("hsa04110", path = data_dir, verbose = TRUE)
+#' kgml_path <- retrieve_kgml("hsa04110", path = data_dir, verbose = TRUE)
 #'
 #' cache_dir <- tempdir()
-#' kgml_path_cached <- download_kgml("hsa04110",
+#' kgml_path_cached <- retrieve_kgml("hsa04110",
 #'   bfc = BiocFileCache::BiocFileCache(cache_dir),
 #'   verbose = TRUE
 #' )
-download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) {
+retrieve_kgml <- function(pathway_id,
+                          bfc = NULL,
+                          path = NULL,
+                          verbose = FALSE) {
   mode <- select_cache_or_path(bfc, path, verbose)
 
   if (!is_valid_pathway(pathway_id)) {
@@ -95,8 +98,9 @@ download_kgml <- function(pathway_id, bfc = NULL, path = NULL, verbose = FALSE) 
 #'
 #' @examples
 #' # Download all pathways for human
-#' # download_all_pathways("hsa", verbose = TRUE)
-download_all_pathways <- function(org, verbose = FALSE) {
+#' # retrieve_all_pathways("hsa", verbose = TRUE)
+retrieve_all_pathways <- function(org,
+                                  verbose = FALSE) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
@@ -125,7 +129,7 @@ download_all_pathways <- function(org, verbose = FALSE) {
     pathway_id <- all_pathways_df$kegg_id[i]
     pathway_desc <- all_pathways_df$description[i]
     if (verbose) message(i, "/", tot_pathways, " - ", pathway_id, "|", pathway_desc)
-    download_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
+    retrieve_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
   }
 
   message("Done retrieving all pathways for ", org, "!")
@@ -182,12 +186,10 @@ download_all_pathways <- function(org, verbose = FALSE) {
 #'   bfc = BiocFileCache::BiocFileCache(tempdir()),
 #'   verbose = TRUE
 #' )
-get_kegg_db <- function(
-  db_name = "compound",
-  path = NULL,
-  bfc = NULL,
-  verbose = FALSE
-) {
+get_kegg_db <- function(db_name = "compound",
+                        path = NULL,
+                        bfc = NULL,
+                        verbose = FALSE) {
   if (verbose) message("Retrieving KEGG database: ", db_name)
   mode <- select_cache_or_path(bfc, path, verbose)
 
@@ -260,7 +262,8 @@ get_kegg_db <- function(
 #'
 #' @examples
 #' get_pathway_name("hsa04110")
-get_pathway_name <- function(id, verbose = FALSE) {
+get_pathway_name <- function(id,
+                             verbose = FALSE) {
   tryCatch(
     {
       res <- KEGGREST::keggGet(id)
@@ -307,7 +310,9 @@ make_request <- function(url) {
 #' @returns The mode of action, as a character
 #'
 #' @noRd
-select_cache_or_path <- function(bfc, path, verbose = FALSE) {
+select_cache_or_path <- function(bfc,
+                                 path,
+                                 verbose = FALSE) {
   if (!is.null(bfc) && !is.null(path)) {
     stop("Provide either 'bfc' OR 'path', not both.")
   } else if (!is.null(bfc)) {

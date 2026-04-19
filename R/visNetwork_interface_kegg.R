@@ -141,7 +141,7 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
 #' dashes, label
 #'
 #' @noRd
-igraph_edges_to_visNetwork <- function(edges_df,
+kegg_edges_to_visNetwork <- function(edges_df,
                                        relationships = c("all", "reactions", "relations")) {
   relationships <- match.arg(relationships)
 
