@@ -86,14 +86,14 @@ reset_cache_KEGGemUP <- function() {
 #'
 #' @noRd
 remove_kegg_prefix_str <- function(kegg_ids) {
-  sapply(kegg_ids, function(id) {
+  vapply(kegg_ids, function(id) {
     if (is.na(id)) {
       return(NA_character_)
     } # preserve NA
     elements <- strsplit(id, " ")[[1]] # split by space
     elements <- sub("^[a-z]+:", "", elements) # remove prefix
     paste(elements, collapse = ";") # collapse back to single string
-  }, USE.NAMES = FALSE)
+  }, FUN.VALUE = character(1), USE.NAMES = FALSE)
 }
 
 #' Convert KEGG IDs with prefixes to IDs without prefixes

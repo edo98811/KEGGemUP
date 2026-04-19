@@ -698,7 +698,7 @@ create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n
   # Extract legend grob
   g <- ggplot_gtable(ggplot_build(p))
   legend <- g$grobs[[
-    which(sapply(g$grobs, function(x) x$name) == "guide-box")
+    which(vapply(g$grobs, function(x) x$name, FUN.VALUE = character(1)) == "guide-box")
   ]]
 
   return(legend)

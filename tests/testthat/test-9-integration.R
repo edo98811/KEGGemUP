@@ -21,8 +21,10 @@ test_that("workflow", {
   expect_true(all(c("vertex.color", "de_value", "de_name") %in% names(vertex_attr(g_test_01_mapped))))
   expect_true("legend_plots" %in% graph_attr_names(g_test_01_mapped))
   expect_type(graph_attr(g_test_01_mapped, "legend_plots"), "list")
-  expect_true(all(sapply(graph_attr(g_test_01_mapped, "legend_plot"), function(x) inherits(x, "gtable"))))
-  
+  expect_true(all(vapply(graph_attr(g_test_01_mapped, "legend_plot"),
+                         function(x) inherits(x, "gtable"),
+                         FUN.VALUE = logical(1))))
+
   vis_graph_01 <- render_kegg_graph(g_test_01_mapped)
   expect_s3_class(vis_graph_01, "visNetwork")
 
