@@ -425,6 +425,28 @@ highlight_kegg_graph <- function(g, ids_to_highlight) {
     value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
 
+  # handling a variable for the fading (maybe add the "all F" out of this and keep it in anyways?)
+  g <- set_vertex_attr(
+    g,
+    "faded",
+    value = FALSE
+  )
+  g <- set_vertex_attr(
+    g,
+    "faded",
+    index = nodes_to_fade,
+    value = TRUE
+  )
+
+
+  # handle extra the nodes with the pathway names...
+  g <- set_vertex_attr(
+    g,
+    "font.color",
+    index = nodes_to_fade,
+    value = "#bbbbbb"
+  )
+
   # Edge attributes
   # Select all edges incident to any faded vertex
   edges_to_fade <- unique(
@@ -442,6 +464,15 @@ highlight_kegg_graph <- function(g, ids_to_highlight) {
     value = "rgba(200,200,200,0.4)" ## TODO: make it a constant?
   )
   g <- set_edge_attr(g, "width", index = edges_to_fade, value = 1)
+  # handling a variable for the fading (maybe add the "all F" out of this and keep it in anyways?)
+
+  ## also set the color of the edge labels to something more faded
+  g <- set_edge_attr(
+    g,
+    "font.color",
+    index = edges_to_fade,
+    value = "#DDDDDD"
+  )
 
   return(g)
 }

@@ -31,7 +31,7 @@
 
 .font_node_size <- 8
 .color_nodelabel_background <- "white"
-.color_nodeborder_default <- "black"
+.color_nodeborder_default <- "#AAAAAA"
 .color_nodeborder_groupline <- "transparent"
 .color_nodeborder_highlighted <- "#87b13f"  # bioc green, as an alternative to red
 

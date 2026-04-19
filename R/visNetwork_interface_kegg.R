@@ -29,9 +29,15 @@ make_vis_graph <- function(vertices_df,
 # custom_renderer <- htmlwidgets::JS("customRenderer")
 
   custom_renderer <- htmlwidgets::JS("
-function({ ctx, x, y, state: { selected, hover }, style, label }) {
+function(params) {
+
+  const { ctx, x, y, style, label, state } = params;
+  const { selected, hover } = state;
+
   const size = style?.size || 80; // this is the height for rectangle nodes
   const fillColor = style?.color || '#FFFFFF';
+  // make this aware to the color, passing this directly did not really work
+  const isFaded = fillColor === 'rgba(200,200,200,0.4)';
 
   const width = size * 2.7;
   const height = size;
@@ -39,9 +45,18 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
     drawNode: function() {
       // only draw the rectangle here
       ctx.save();
+
       ctx.fillStyle = fillColor;
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 2;
+
+      // assign based on the status of being marked as faded
+      ctx.strokeStyle = isFaded
+        ? 'rgba(120,120,120,0.45)'
+        : 'rgba(0,0,0,1)';
+
+      ctx.lineWidth = isFaded
+        ? 1
+        : 2;
+
       ctx.beginPath();
       ctx.rect(x - width/2, y - height/2, width, height);
       ctx.fill();
@@ -68,7 +83,9 @@ function({ ctx, x, y, state: { selected, hover }, style, label }) {
       // const padY = 5;
 
       // text
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = isFaded
+        ? 'rgba(120,120,120,0.75)'
+        : '#000000';
       ctx.fillText(text, tx, ty);
 
       ctx.restore();
