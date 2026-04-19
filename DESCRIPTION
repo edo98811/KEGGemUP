@@ -12,7 +12,11 @@ Authors@R:
             email = "marinif@uni-mainz.de", comment = c(ORCID = "0000-0003-3252-7758")
         )
     )
-Description: TODO Simplify the analysis of multiomics datasets.
+Description: KEGGemUP retrieves and renders interactively KEGG pathway graphs.
+    The retrieval makes full use of the caching functionality to avoid unnecessary
+    download processes. The interactivity of the graph is warranted via the 
+    visNetwork interface to the vis.js library, fully supporting bindings to be 
+    used in Shiny for further operations.
 License: MIT + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
