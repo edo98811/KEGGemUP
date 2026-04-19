@@ -1,6 +1,6 @@
 Package: KEGGemUP
 Title: A package to map you differential expression results on KEGG pathways
-Version: 0.1.0
+Version: 0.9.0
 Authors@R: 
     c(
         person(
