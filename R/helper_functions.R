@@ -59,8 +59,10 @@ reset_cache_KEGGemUP <- function() {
     return()
   }
   message("Deleting all cached KEGG files...")
-  message("total kegg pathways files to delete: ", paste(BiocFileCache::bfcinfo(bfc_kegg)$rname, sep = ", "))
-  message("total other files to delete: ", paste(BiocFileCache::bfcinfo(bfc_map)$rname, sep = ", "))
+  pathways_to_delete <- paste(BiocFileCache::bfcinfo(bfc_kegg)$rname, sep = ", ")
+  others_to_delete <- paste(BiocFileCache::bfcinfo(bfc_map)$rname, sep = ", ")
+  message("total kegg pathways files to delete: ", pathways_to_delete)
+  message("total other files to delete: ", others_to_delete)
   askYesNo("Are you sure you want to delete all cached files?") -> answer
   if (!answer) {
     message("Cache reset aborted.")

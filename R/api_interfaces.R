@@ -271,7 +271,7 @@ get_pathway_name <- function(id,
       res[[1]]$NAME
     },
     error = function(e) {
-      warning(paste("Could not retrieve pathway name for ID:", id))
+      warning("Could not retrieve pathway name for ID: ", id)
       return("")
     }
   )
