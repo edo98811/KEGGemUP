@@ -35,11 +35,14 @@
 .color_nodeborder_groupline <- "transparent"
 .color_nodeborder_highlighted <- "#87b13f"  # bioc green, as an alternative to red
 
-
+.color_node_faded <- "rgba(200,200,200,0.4)"
+.color_pathwaynode_faded <- "#bbbbbb"
+.color_edge_faded <- "rgba(200,200,200,0.4)"
+.color_edgetext_faded <- "#DDDDDD"
 
 ## for visNetwork_tooltips_kegg.R ------------------------------------------
 
-.color_button <- "" ## TODO
+# .color_button <- "" ## TODO
 .color_button_background <- ""
 .color_button_border <- ""
 
