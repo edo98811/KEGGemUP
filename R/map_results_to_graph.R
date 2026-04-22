@@ -417,12 +417,15 @@ winsorize <- function(x,
 
 #' Validate color palettes
 #'
-#' @param sources TODOedo
-#' @param palettes_list TODOedo
-#' @param palette TODOedo
-#' @param default_palette TODOedo
+#' @param sources Vector of character strings, what sources to use for the names/
+#' sources to use
+#' @param palettes_list List, which palettes to use; alternatively, a character
+#' if these should be repeated
+#' @param palette Character string, specifies a single palette
+#' @param default_palette Character, which one to use by default (defaults to
+#' `RdBu` for red-to-blue (through white))
 #'
-#' @returns TODOedo
+#' @returns A named list of palette color values
 #'
 #' @noRd
 validate_palettes <- function(sources,
@@ -488,12 +491,13 @@ validate_palettes <- function(sources,
 
 #' Validating palette limits
 #'
-#' @param sources TODOedo
-#' @param palettes_limits_list TODOedo
-#' @param palette_limit TODOedo
-#' @param default_palette_limit TODOedo
+#' @param sources Vector of character strings, what sources to use for the names/
+#' sources to use
+#' @param palettes_limits_list List for the palette limits
+#' @param palette_limit Single numeric value
+#' @param default_palette_limit Value to cap by default the palette limit
 #'
-#' @returns TODOedo
+#' @returns The `palettes_limits_list` after validation
 #'
 #' @noRd
 validate_palette_limits <- function(sources,
@@ -538,11 +542,12 @@ validate_palette_limits <- function(sources,
 #'
 #' Helper function to get palette colors for a source
 #'
-#' @param palette TODOedo
-#' @param default_palette TODOedo
-#' @param verbose TODOedo
+#' @param palette Single string, should be a RColorBrewer palette name
+#' @param default_palette Character, which one to use by default (defaults to
+#' `RdBu` for red-to-blue (through white))
+#' @param verbose Logical, defines verbosity of function
 #'
-#' @returns TODOedo
+#' @returns The values of the palette colors
 #'
 #' @noRd
 get_palette_colors <- function(palette,
@@ -573,12 +578,12 @@ get_palette_colors <- function(palette,
 #'
 #' Helper function to determine color range for a source
 #'
-#' @param de_value_vector TODOedo
-#' @param source_name TODOedo
-#' @param palette_limit TODOedo
-#' @param verbose TODOedo
+#' @param de_value_vector Vector of the continuous values to map to the nodes
+#' @param source_name Character string
+#' @param palette_limit Palette limits definition
+#' @param verbose Logical, defines verbosity of function
 #'
-#' @returns TODOedo
+#' @returns The range value for the palette
 #'
 #' @noRd
 get_palette_range <- function(de_value_vector,
