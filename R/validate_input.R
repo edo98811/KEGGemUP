@@ -311,8 +311,8 @@ data_frame_has_columns <- function(df,
 #'
 #' @noRd
 dataframe_columns_are_of_type <- function(df,
-                                       col_types,
-                                       na_ok = TRUE) {
+                                          col_types,
+                                          na_ok = TRUE) {
   all_ok <- TRUE
   for (col in names(col_types)) {
     expected_type <- col_types[[col]]
@@ -420,8 +420,8 @@ list_has_names <- function(lst,
 #'
 #' @noRd
 list_elements_are_of_type <- function(lst,
-                                    expected_types,
-                                    warn = TRUE) {
+                                      expected_types,
+                                      warn = TRUE) {
   all_ok <- TRUE
   for (element_name in names(expected_types)) {
     expected_type <- expected_types[[element_name]]

@@ -28,11 +28,9 @@
 #' @return Updated nodes data frame with added columns: de_value, color, de_source, text
 #'
 #' @noRd
-add_results_nodes <- function(
-  vertices_df,
-  results_combined,
-  verbose = FALSE
-) {
+add_results_nodes <- function(vertices_df,
+                              results_combined,
+                              verbose = FALSE) {
   # If results is empty then return the original df
   if (is.null(results_combined)) {
     if (verbose) {
@@ -208,14 +206,12 @@ add_results_nodes <- function(
 #' @return vertices_df with colored nodes based on their values.
 #'
 #' @noRd
-add_colors_to_nodes <- function(
-  vertices_df,
-  palettes_limits_list,
-  palettes_list,
-  palette,
-  palette_limit,
-  verbose = FALSE
-) {
+add_colors_to_nodes <- function(vertices_df,
+                                palettes_limits_list,
+                                palettes_list,
+                                palette,
+                                palette_limit,
+                                verbose = FALSE) {
   # Default values
   sources <- unique(na.omit(vertices_df$de_source))
   valid_nodes <- vertices_df[!is.na(vertices_df$de_source), , drop = FALSE]
@@ -350,7 +346,8 @@ add_colors_to_nodes <- function(
 #' de_source
 #'
 #' @noRd
-combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
+combine_results_in_dataframe <- function(results_list,
+                                         verbose = FALSE) {
   # Checks
   if (is.null(results_list) || length(results_list) == 0) {
     if (verbose) {
@@ -407,7 +404,8 @@ combine_results_in_dataframe <- function(results_list, verbose = FALSE) {
 #' @returns the winsorized values
 #'
 #' @noRd
-winsorize <- function(x, range_val) {
+winsorize <- function(x,
+                      range_val) {
   if (!is.numeric(range_val) || length(range_val) != 1) {
     stop("'range_val' must be a single numeric value")
   }
@@ -427,11 +425,10 @@ winsorize <- function(x, range_val) {
 #' @returns TODOedo
 #'
 #' @noRd
-validate_palettes <- function(
-    sources,
-    palettes_list = list(NA_character_),
-    palette = NULL,
-    default_palette = "RdBu"
+validate_palettes <- function(sources,
+                              palettes_list = list(NA_character_),
+                              palette = NULL,
+                              default_palette = "RdBu"
 ) {
 
   if (!is.list(palettes_list) && !is.character(palettes_list)) {
@@ -499,12 +496,10 @@ validate_palettes <- function(
 #' @returns TODOedo
 #'
 #' @noRd
-validate_palette_limits <- function(
-  sources,
-  palettes_limits_list,
-  palette_limit,
-  default_palette_limit
-) {
+validate_palette_limits <- function(sources,
+                                    palettes_limits_list,
+                                    palette_limit,
+                                    default_palette_limit) {
   if (!is.numeric(palettes_limits_list)) {
     stop("`palettes_limits_list` must be a numeric vector")
   }
@@ -550,11 +545,9 @@ validate_palette_limits <- function(
 #' @returns TODOedo
 #'
 #' @noRd
-get_palette_colors <- function(
-  palette,
-  default_palette = "RdBu",
-  verbose = FALSE
-) {
+get_palette_colors <- function(palette,
+                               default_palette = "RdBu",
+                               verbose = FALSE) {
   # If palette is a single name
   if (length(palette) == 1) {
     # Check if it is a valid RColorBrewer palette
@@ -588,12 +581,10 @@ get_palette_colors <- function(
 #' @returns TODOedo
 #'
 #' @noRd
-get_palette_range <- function(
-  de_value_vector,
-  source_name,
-  palette_limit = FALSE,
-  verbose = FALSE
-) {
+get_palette_range <- function(de_value_vector,
+                              source_name,
+                              palette_limit = FALSE,
+                              verbose = FALSE) {
   # If a palette limit is provided ( I use false because NULL cannot be in a list)
   if (!isFALSE(palette_limit)) {
     range_val <- palette_limit
@@ -668,7 +659,10 @@ get_palette_range <- function(
 #' @return A ggplot grob object representing the legend
 #'
 #' @noRd
-create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n_element = 7) {
+create_legend_continous <- function(range_val,
+                                    palette_ramp,
+                                    title = "Legend",
+                                    n_element = 7) {
   # Reverse palette from RColorBrewer
 
   # Compute breaks based on the range of the values
@@ -698,7 +692,9 @@ create_legend_continous <- function(range_val, palette_ramp, title = "Legend", n
   # Extract legend grob
   g <- ggplot_gtable(ggplot_build(p))
   legend <- g$grobs[[
-    which(vapply(g$grobs, function(x) x$name, FUN.VALUE = character(1)) == "guide-box")
+    which(vapply(g$grobs,
+                 function(x) x$name,
+                 FUN.VALUE = character(1)) == "guide-box")
   ]]
 
   return(legend)

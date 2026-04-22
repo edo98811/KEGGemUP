@@ -159,7 +159,7 @@ function(params) {
 #'
 #' @noRd
 kegg_edges_to_visNetwork <- function(edges_df,
-                                       relationships = c("all", "reactions", "relations")) {
+                                     relationships = c("all", "reactions", "relations")) {
   relationships <- match.arg(relationships)
 
   if (relationships == "reactions") {
