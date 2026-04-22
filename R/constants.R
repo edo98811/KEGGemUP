@@ -42,10 +42,10 @@
 
 ## for visNetwork_tooltips_kegg.R ------------------------------------------
 
-# .color_button <- "" ## TODO
-.color_button_background <- ""
-.color_button_border <- ""
+.style_button_node_name <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
+.style_button_node_reaction <- "color:#fff; background-color:#33b742; border-color:#2e6da4;"
+.color_button_node_pathways <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
 
-.color_button_reaction <- "" ## TODO
+.style_button_edge <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
 
-.color_button_pathways <- "" ## TODO - maybe something with a "kegg centric color"?
+
