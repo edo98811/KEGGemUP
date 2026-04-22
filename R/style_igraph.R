@@ -163,7 +163,7 @@ apply_style_map <- function(df, column, style_map) {
 
   # What style columns are defined in the style mapping?
   style_cols <- unique(unlist(lapply(style_map, names)))
-  
+
   # Iterate over the style map and apply styles to the data frame
   for (i in names(style_map)) {
     style <- style_map[[i]]
@@ -183,15 +183,15 @@ apply_style_map <- function(df, column, style_map) {
 #'
 #' @param g The igraph object
 #'
+#' @details
+#' Strips away the node starting with the `TITLE:` label.
+#' In some situations, that node might not be too heavily needed...
+#'
 #' @returns An igraph object, without the node originally kept as "TITLE:..."
 #'
 #' @noRd
 #'
 #' @importFrom igraph delete_vertices
-#'
-#' @examples
-#' # TODO add a minimal one
-#' ## TODO: create a faKEGG function (and graph)
 cleanup_title_node <- function(g) {
   title_node <- grep(pattern = "^TITLE:", V(g)$label)
   g <- igraph::delete_vertices(g, title_node)
