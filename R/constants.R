@@ -1,12 +1,6 @@
 # Constant values --------------------------------------------------------
 
 
-## for network_exported_functions.R ----------------------------------------
-
-# definition of greyed out nodes and edges
-
-
-
 ## for style_igraph.R ------------------------------------------------------
 .color_edge_relation_EC <- "#8A2BE2"
 .color_edge_relation_PP <- "#FFD700"
@@ -24,7 +18,7 @@
 
 
 
-## for visNetwork_interface_kegg.R -----------------------------------------
+## for visNetwork_interface_tooltips_kegg.R -----------------------------------------
 
 .color_visnetwork_background <- "#FFFFFF"
 .font_visnetwork_title <- "font-family:IBM Plex Sans, Fira Code, Arial, Tahoma, Geneva, Verdana, sans-serif;font-weight:bold;font-size:20px;text-align:center;"
@@ -40,7 +34,7 @@
 .color_edge_faded <- "rgba(200,200,200,0.4)"
 .color_edgetext_faded <- "#DDDDDD"
 
-## for visNetwork_tooltips_kegg.R ------------------------------------------
+
 
 .style_button_node_name <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
 .style_button_node_reaction <- "color:#fff; background-color:#33b742; border-color:#2e6da4;"
