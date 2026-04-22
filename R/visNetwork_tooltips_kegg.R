@@ -15,7 +15,7 @@
 #' @noRd
 add_node_tooltip <- function(vertices_df) {
   vertices_df$title <- paste0(
-    "<div style='background:white; padding:4px;'>", ## TODO: candidate for a constant? or even expose to param?
+    "<div style='background:white; padding:4px;'>",
     vapply(
       seq_len(nrow(vertices_df)),
       function(i) {
@@ -55,8 +55,8 @@ add_edge_tooltip <- function(edges_df) {
     paste0(
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", base_url, edges_df$reaction_name, "' target='_blank'>",
-      "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
-      "KEGG entry",
+      "<button type='button' style='", .style_button_edge,"'>",
+      paste0(edges_df$reaction_name, " on KEGG"),
       "</button></a></div>"
     )
   )
@@ -66,12 +66,12 @@ add_edge_tooltip <- function(edges_df) {
   # Relation edges
   idx_relation <- edges_df$type == "relation"
   edges_df$title[idx_relation] <- paste0(
-    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
+    "<div style='background:white; padding:4px;'>",
     "<h4 style='text-align: center;'>", edges_df$type[idx_relation], "</h4>",
     "<table>",
     "<tr><th align='left'>Type: </th><td>", edges_df$relation_type[idx_relation], "</td></tr>",
     "<tr><th align='left'>Subtype: </th><td>", edges_df$relation_subtype_name[idx_relation], "</td></tr>",
-    "<tr><th align='left'>Label: </th><td>", edges_df$relation_subtype_value[idx_relation], "</td></tr>",
+    # "<tr><th align='left'>Id: </th><td>", edges_df$relation_subtype_value[idx_relation], "</td></tr>",
     "</table>",
     "</div>"
   )
@@ -79,12 +79,12 @@ add_edge_tooltip <- function(edges_df) {
   # Reaction edges
   idx_reaction <- edges_df$type == "reaction"
   edges_df$title[idx_reaction] <- paste0(
-    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
-    "<h4 style='text-align: center;'>", edges_df$type[idx_reaction], "</h4>",
+    "<div style='background:white; padding:4px;'>",
+    "<h4 style='text-align: center;'>", edges_df$reaction_name[idx_reaction], "</h4>",
     "<table>",
-    "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id[idx_reaction], "</td></tr>",
-    "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_reaction], "</td></tr>",
+    "<tr><th align='left'>Type: </th><td>", edges_df$reaction_type[idx_reaction], "</td></tr>",
+    # "<tr><th align='left'>ID: </th><td>", edges_df$reaction_id[idx_reaction], "</td></tr>",
     "</table>",
     button_html_reaction[idx_reaction],
     "</div>"
@@ -93,7 +93,7 @@ add_edge_tooltip <- function(edges_df) {
   # Line edges
   idx_line <- edges_df$type == "line"
   edges_df$title[idx_line] <- paste0(
-    "<div style='background:white; padding:4px;'>", ## TODO as above, candidate to make a constant
+    "<div style='background:white; padding:4px;'>",
     "<h4 style='text-align: center;'>", edges_df$type[idx_line], "</h4>",
     "<table>",
     "<tr><th align='left'>Name: </th><td>", edges_df$reaction_name[idx_line], "</td></tr>",
@@ -122,7 +122,7 @@ regular_node_html <- function(vertices_df) {
     paste0(
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$link, "' target='_blank'>",
-      "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
+      "<button type='button' style='", .style_button_node_name,"'>",
       paste0(vertices_df$label, " on KEGG"),
       "</button></a></div>"
     )
@@ -134,8 +134,8 @@ regular_node_html <- function(vertices_df) {
     paste0(
       "<div style='text-align:center; margin-top:5px;'>",
       "<a href='", vertices_df$reaction_link, "' target='_blank'>",
-      "<button type='button' style='color:#fff; background-color:#33b742; border-color:#2e6da4;'>",
-      paste0(vertices_df$reaction_name, " on KEGG"),
+      "<button type='button' style='", .style_button_node_reaction, "'>",
+      paste0(vertices_df$reaction_label, " on KEGG"),
       "</button></a></div>"
     )
   )
@@ -224,12 +224,12 @@ other_node_html <- function(vertices_df) {
     "<tr><th align='left'>ID </th><td>",
     ifelse(is.na(vertices_df$name), "N/A", vertices_df$name),
     "</td></tr>",
+    "</table>",
     "<div style='text-align:center; margin-top:5px;'>",
     "<a href='", link_to_pathway, "' target='_blank'>",
-    "<button type='button' style='color:#fff; background-color:#337ab7; border-color:#2e6da4;'>",
+    "<button type='button' style='", .color_button_node_pathways, "'>",
     paste0(vertices_df$KEGG, " on KEGG"),
-    "</button></a></div>",
-    "</table>"
+    "</button></a></div>"
   )
 }
 
