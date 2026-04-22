@@ -21,11 +21,9 @@
 #' pathway <- "hsa04110" # Example pathway ID
 #' graph <- create_kegg_graph(pathway_id = pathway, verbose = TRUE)
 #' plot(graph) # Plot the graph using igraph's plotting functions
-create_kegg_graph <- function(
-    pathway_id,
-    kgml_file = NULL,
-    verbose = FALSE
-) {
+create_kegg_graph <- function(pathway_id,
+                              kgml_file = NULL,
+                              verbose = FALSE) {
   # Validate pathway ID format
   if (is.null(kgml_file) && !is_valid_pathway(pathway_id)) {
     stop("Invalid KEGG pathway ID format.")
@@ -111,12 +109,10 @@ create_kegg_graph <- function(
 #'
 #' vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
 #' relationships = "all", visualisation_type = "standard")
-render_kegg_graph <- function(
-    g,
-    scaling_factor = 1.5,
-    relationships = c("all", "reactions", "relations", "none"),
-    visualisation_type = c("standard", "positions", "node_name", "node_size")
-) {
+render_kegg_graph <- function(g,
+                              scaling_factor = 1.5,
+                              relationships = c("all", "reactions", "relations", "none"),
+                              visualisation_type = c("standard", "positions", "node_name", "node_size")) {
 
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
@@ -211,17 +207,15 @@ render_kegg_graph <- function(
 #'   feature_column = "KEGG_ids",
 #'   value_column = "log2FoldChange"
 #' )
-map_results_to_graph <- function(
-    g,
-    de_results,
-    feature_column = NULL,
-    value_column = NULL,
-    verbose = FALSE,
-    palette = NULL,
-    palette_limit = NULL,
-    palettes_limits_list = c(NA_real_),
-    palettes_list = list(NA_character_)
-) {
+map_results_to_graph <- function(g,
+                                 de_results,
+                                 feature_column = NULL,
+                                 value_column = NULL,
+                                 verbose = FALSE,
+                                 palette = NULL,
+                                 palette_limit = NULL,
+                                 palettes_limits_list = c(NA_real_),
+                                 palettes_list = list(NA_character_)) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }
@@ -314,7 +308,8 @@ map_results_to_graph <- function(
 #' subg <- subset_kegg_graph(g, KEGG_to_include)
 #' # plot(g)
 #' # plot(subg)
-subset_kegg_graph <- function(g, ids_to_include) {
+subset_kegg_graph <- function(g,
+                              ids_to_include) {
 
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
@@ -373,7 +368,8 @@ subset_kegg_graph <- function(g, ids_to_include) {
 #'                  "22436", "14544", "18950", "11486", "80285", "59027")
 #' highlighted_subg <- highlight_kegg_graph(g, KEGG_to_include)
 #'
-highlight_kegg_graph <- function(g, ids_to_highlight) {
+highlight_kegg_graph <- function(g,
+                                 ids_to_highlight) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }
@@ -494,12 +490,10 @@ highlight_kegg_graph <- function(g, ids_to_highlight) {
 #' @importFrom xml2 read_xml
 #'
 #' @noRd
-build_kegg_graph <- function(
-  file,
-  pathway_name = "Pathway",
-  bfc_map = NULL,
-  verbose = FALSE
-) {
+build_kegg_graph <- function(file,
+                             pathway_name = "Pathway",
+                             bfc_map = NULL,
+                             verbose = FALSE) {
   xml <- tryCatch(
     xml2::read_xml(file),
     error = function(e) {
@@ -637,7 +631,10 @@ build_kegg_graph <- function(
 #' @return An igraph object representing the KEGG pathway graph
 #'
 #' @noRd
-make_igraph_graph <- function(vertices_df, edges_df, pathway_name, verbose = FALSE) {
+make_igraph_graph <- function(vertices_df,
+                              edges_df,
+                              pathway_name,
+                              verbose = FALSE) {
 
   vertices_df <- vertices_df[order(tolower(vertices_df$label), tolower(vertices_df$name)), ]
   if (nrow(edges_df) == 0 || is.null(edges_df)) {

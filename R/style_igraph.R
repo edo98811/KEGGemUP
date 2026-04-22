@@ -127,7 +127,8 @@ style_vertices_igraph <- function(vertices_df) {
 #' @return vertices_df with scaled x and y coordinates.
 #'
 #' @noRd
-scale_dimensions <- function(vertices_df, factor = 5) {
+scale_dimensions <- function(vertices_df,
+                             factor = 5) {
 
   # Validate factor input
   default_factor <- 5
@@ -159,7 +160,9 @@ scale_dimensions <- function(vertices_df, factor = 5) {
 #' @return Data frame of edges, but styled
 #'
 #' @noRd
-apply_style_map <- function(df, column, style_map) {
+apply_style_map <- function(df,
+                            column,
+                            style_map) {
 
   # What style columns are defined in the style mapping?
   style_cols <- unique(unlist(lapply(style_map, names)))

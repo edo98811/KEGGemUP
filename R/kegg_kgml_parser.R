@@ -14,7 +14,9 @@
 #' @return vertices_df Data frame of nodes with visNetwork-compatible styling columns
 #'
 #' @noRd
-parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
+parse_kgml_nodes <- function(xml,
+                             defaults,
+                             verbose = FALSE) {
   # Find all entries that are not group or line (line is an attribute in graphics)
   nodes <- xml2::xml_find_all(
     xml,
@@ -79,7 +81,9 @@ parse_kgml_nodes <- function(xml, defaults, verbose = FALSE) {
 #' @return vertices_df Data frame of group nodes
 #'
 #' @noRd
-parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
+parse_kgml_groups <- function(xml,
+                              defaults,
+                              verbose = FALSE) {
   # Find all group entries
   group_nodes <- xml2::xml_find_all(
     xml,
@@ -130,7 +134,9 @@ parse_kgml_groups <- function(xml, defaults, verbose = FALSE) {
 #' @return df Data frame of nodes
 #'
 #' @noRd
-parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
+parse_kgml_lines <- function(xml,
+                             defaults,
+                             verbose = FALSE) {
   # Find all line entries (line is an attribute in graphics)
   line_nodes <- xml2::xml_find_all(
     xml,
@@ -201,7 +207,9 @@ parse_kgml_lines <- function(xml, defaults, verbose = FALSE) {
 #' @return edges_df Data frame of edges created from line nodes
 #'
 #' @noRd
-parse_kgml_lines_edges <- function(line_vertices_df, defaults, verbose = FALSE) {
+parse_kgml_lines_edges <- function(line_vertices_df,
+                                   defaults,
+                                   verbose = FALSE) {
   # Handle empty input
   if (is.null(line_vertices_df) || nrow(line_vertices_df) == 0) {
     return(NULL)
@@ -267,7 +275,9 @@ parse_kgml_lines_edges <- function(line_vertices_df, defaults, verbose = FALSE) 
 #' @return edges_df Data frame of relation edges
 #'
 #' @noRd
-parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
+parse_kgml_relations <- function(xml,
+                                 defaults,
+                                 verbose = FALSE) {
   # Find all relation entries
   rels <- xml2::xml_find_all(xml, ".//relation")
 
@@ -319,7 +329,10 @@ parse_kgml_relations <- function(xml, defaults, verbose = FALSE) {
 #' @return edges_df Updated data frame of edges with reaction edges completed
 #'
 #' @noRd
-complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = FALSE) {
+complete_kgml_reactions <- function(vertices_df,
+                                    edges_df,
+                                    defaults,
+                                    verbose = FALSE) {
   reaction_edges <- edges_df[edges_df$type == "reaction", ]
   other_edges <- edges_df[edges_df$type != "reaction", ]
 
@@ -395,8 +408,9 @@ complete_kgml_reactions <- function(vertices_df, edges_df, defaults, verbose = F
 #' @return edges_df Data frame of reaction edges
 #'
 #' @noRd
-parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
-
+parse_kgml_reactions <- function(xml,
+                                 defaults,
+                                 verbose = FALSE) {
   # Find all reaction entries
   reactions <- xml2::xml_find_all(xml, ".//reaction")
 
@@ -479,7 +493,9 @@ parse_kgml_reactions <- function(xml, defaults, verbose = FALSE) {
 #' @importFrom BiocFileCache BiocFileCache
 #'
 #' @noRd
-add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
+add_node_labels <- function(vertices_df,
+                            bfc,
+                            verbose = FALSE) {
   # Load KEGG databases
   compounds_db <- get_kegg_db(db_name = "compound", bfc = bfc, verbose = verbose)
   glycans_db <- get_kegg_db(db_name = "glycan", bfc = bfc, verbose = verbose)
@@ -547,7 +563,9 @@ add_node_labels <- function(vertices_df, bfc, verbose = FALSE) {
 #' @return Updated nodes data frame with reaction labels added to reaction nodes.
 #'
 #' @noRd
-add_reaction_labels <- function(vertices_df, bfc, verbose = FALSE) {
+add_reaction_labels <- function(vertices_df,
+                                bfc,
+                                verbose = FALSE) {
   # Load reaction database
   reactions_db <- get_kegg_db(db_name = "reaction", bfc = bfc)
   reactions_lookup <- setNames(as.character(reactions_db[, 2]), reactions_db[, 1])
@@ -591,7 +609,8 @@ add_reaction_labels <- function(vertices_df, bfc, verbose = FALSE) {
 #' @return Updated nodes data frame with group labels and coordinates added to group nodes.
 #'
 #' @noRd
-add_group <- function(vertices_df, verbose = FALSE) {
+add_group <- function(vertices_df,
+                      verbose = FALSE) {
   # Identify undefined nodes (group nodes)
   group_idx <- which(vertices_df$type == "group")
   if (length(group_idx) == 0) {

@@ -105,11 +105,9 @@ is_valid_pathway <- function(pathway_id) {
 #' @returns A list of standardized DE results
 #'
 #' @noRd
-standardize_de_results <- function(
-  de_results,
-  value_column = NULL,
-  feature_column = NULL
-) {
+standardize_de_results <- function(de_results,
+                                   value_column = NULL,
+                                   feature_column = NULL) {
 
   check_for_single_input <-
     is.data.frame(de_results) &&
@@ -142,7 +140,7 @@ standardize_de_results <- function(
   if (check_for_single_input) {
     if (all(
       data_frame_has_columns(de_results, c(feature_column, value_column)),
-      dataframe_cols_are_of_type(de_results, setNames(
+      dataframe_columns_are_of_type(de_results, setNames(
         c("character", "numeric"),
         c(feature_column, value_column)
       ))
@@ -173,9 +171,9 @@ standardize_de_results <- function(
       all(
         is.list(de_entry),
         list_has_names(de_entry, c("de_table", "value_column", "feature_column"), warn = TRUE),
-        list_elements_are_types(de_entry, c(de_table = "data.frame", value_column = "character", feature_column = "character")),
+        list_elements_are_of_type(de_entry, c(de_table = "data.frame", value_column = "character", feature_column = "character")),
         data_frame_has_columns(de_entry$de_table, c(de_entry$feature_column, de_entry$value_column)),
-        dataframe_cols_are_of_type(
+        dataframe_columns_are_of_type(
           de_entry$de_table,
           setNames(
             c("character", "numeric"),
@@ -293,7 +291,8 @@ standardize_de_results <- function(
 #' @returns A logical value
 #'
 #' @noRd
-data_frame_has_columns <- function(df, required_cols) {
+data_frame_has_columns <- function(df,
+                                   required_cols) {
   missing <- setdiff(required_cols, names(df))
   if (length(missing) > 0) {
     warning("Data frame is missing required columns: ", paste(missing, collapse = ", "))
@@ -311,7 +310,9 @@ data_frame_has_columns <- function(df, required_cols) {
 #' @returns A logical value
 #'
 #' @noRd
-dataframe_cols_are_of_type <- function(df, col_types, na_ok = TRUE) {
+dataframe_columns_are_of_type <- function(df,
+                                       col_types,
+                                       na_ok = TRUE) {
   all_ok <- TRUE
   for (col in names(col_types)) {
     expected_type <- col_types[[col]]
@@ -384,7 +385,9 @@ dataframe_cols_are_of_type <- function(df, col_types, na_ok = TRUE) {
 #' @returns Logical value
 #'
 #' @noRd
-list_has_names <- function(lst, expected_names, warn = TRUE) {
+list_has_names <- function(lst,
+                           expected_names,
+                           warn = TRUE) {
   actual_names <- names(lst)
   missing <- setdiff(expected_names, actual_names)
   extra <- setdiff(actual_names, expected_names)
@@ -416,7 +419,9 @@ list_has_names <- function(lst, expected_names, warn = TRUE) {
 #' @returns Logical value
 #'
 #' @noRd
-list_elements_are_types <- function(lst, expected_types, warn = TRUE) {
+list_elements_are_of_type <- function(lst,
+                                    expected_types,
+                                    warn = TRUE) {
   all_ok <- TRUE
   for (element_name in names(expected_types)) {
     expected_type <- expected_types[[element_name]]
@@ -433,7 +438,6 @@ list_elements_are_types <- function(lst, expected_types, warn = TRUE) {
 
   return(all_ok)
 }
-
 
 
 
