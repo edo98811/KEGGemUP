@@ -46,7 +46,7 @@ add_results_nodes <- function(
     !is.null(vertices_df),
     all(c("name", "ids_for_mapping") %in% colnames(vertices_df)),
     all(c("ids_for_mapping", "de_value", "de_source") %in% colnames(results_combined)),
-    dataframe_cols_are_of_type(
+    dataframe_columns_are_of_type(
       vertices_df,
       c(
         "ids_for_mapping" = "character"
