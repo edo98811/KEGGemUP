@@ -1,6 +1,6 @@
 test_that("style_igraph_graph works correctly on reactions", {
   
-  g_test_01_edges_df <- style_igraph_graph(kgml_steps$g_test_01)
+  g_test_01_edges_df <- style_igraph_graph(expected_kgml_steps$g_test_01)
   
   edges_df <- as_data_frame(g_test_01_edges_df, what = "edges")
   edges_df <- edges_df[
@@ -33,7 +33,7 @@ test_that("style_igraph_graph works correctly on reactions", {
 
 test_that("style_igraph_graph works correctly on relations", {
 
-  g_test_01_edges_df <- style_igraph_graph(kgml_steps$g_test_01)
+  g_test_01_edges_df <- style_igraph_graph(expected_kgml_steps$g_test_01)
   edges_df <- as_data_frame(g_test_01_edges_df, what = "edges")
   edges_df <- edges_df[
     edges_df$type == "relation",
@@ -57,7 +57,7 @@ test_that("style_igraph_graph works correctly on relations", {
 
 test_that("style_igraph_graph works correctly on vertices", {
   
-  g_test_01_nodes_df <- style_igraph_graph(kgml_steps$g_test_01)
+  g_test_01_nodes_df <- style_igraph_graph(expected_kgml_steps$g_test_01)
   nodes_df <- as_data_frame(g_test_01_nodes_df, what = "vertices")
 
   # Testing the properties...

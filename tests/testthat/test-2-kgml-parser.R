@@ -1,36 +1,36 @@
 test_that("parse_kgml_nodes returns correct nodes", {
   vertices_df <- parse_kgml_nodes(xml_example, kegg_vertex_defaults())
-  expect_equal(vertices_df, kgml_steps$nodes)
+  expect_equal(vertices_df, expected_kgml_steps$nodes)
 })
 
 test_that("parse_kgml_groups returns correct group nodes", {
   groups_df <- parse_kgml_groups(xml_example, kegg_vertex_defaults())
-  expect_equal(groups_df, kgml_steps$groups)
+  expect_equal(groups_df, expected_kgml_steps$groups)
 })
 
 test_that("parse_kgml_lines returns correct line nodes", {
   line_nodes <- parse_kgml_lines(xml_example, kegg_vertex_defaults())
-  expect_equal(line_nodes, kgml_steps$line_nodes)
+  expect_equal(line_nodes, expected_kgml_steps$line_nodes)
 })
 
 test_that("parse_kgml_lines_edges returns correct edges from lines", {
-  line_edges <- parse_kgml_lines_edges(kgml_steps$line_nodes, kegg_edge_defaults())
-  expect_equal(line_edges, kgml_steps$line_edges)
+  line_edges <- parse_kgml_lines_edges(expected_kgml_steps$line_nodes, kegg_edge_defaults())
+  expect_equal(line_edges, expected_kgml_steps$line_edges)
 })
 
 test_that("parse_kgml_relations returns correct edges from relations", {
   relations_edges <- parse_kgml_relations(xml_example, kegg_edge_defaults())
-  expect_equal(relations_edges, kgml_steps$relations_edges)
+  expect_equal(relations_edges, expected_kgml_steps$relations_edges)
 })
 
 test_that("parse_kgml_reactions returns correct edges from reactions", {
   reactions_edges <- parse_kgml_reactions(xml_example, kegg_edge_defaults())
-  expect_equal(reactions_edges, kgml_steps$reactions_edges)
+  expect_equal(reactions_edges, expected_kgml_steps$reactions_edges)
 })
 
 test_that("complete_kgml_reactions returns correct edges from reactions", {
-  all_reaction_edges <- complete_kgml_reactions(kgml_steps$nodes, kgml_steps$reactions_edges, kegg_edge_defaults())
-  expect_equal(all_reaction_edges, kgml_steps$completed_reactions)
+  all_reaction_edges <- complete_kgml_reactions(expected_kgml_steps$nodes, expected_kgml_steps$reactions_edges, kegg_edge_defaults())
+  expect_equal(all_reaction_edges, expected_kgml_steps$completed_reactions)
 })
 
 test_that("parse_kgml_reactions returns correct edges from reactions if edges is NULL", {
@@ -44,22 +44,22 @@ test_that("parse_kgml_relations returns correct edges from relations if edges is
 })
 
 test_that("complete_kgml_reactions returns correct edges from reactions if edges is NULL", {
-  all_reaction_edges <- complete_kgml_reactions(kgml_steps$nodes, NULL, kegg_edge_defaults())
+  all_reaction_edges <- complete_kgml_reactions(expected_kgml_steps$nodes, NULL, kegg_edge_defaults())
   expect_equal(all_reaction_edges, NULL)
 })
 
 test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   g <- build_kegg_graph(kgml_path_01, pathway_name = "hsa00001", bfc_map = bfc)
-  # expect_true(igraph::identical_graphs(g, kgml_steps$g_test_01))
+  # expect_true(igraph::identical_graphs(g, expected_kgml_steps$g_test_01))
 
   expect_equal(
     igraph::graph_attr(g),
-    igraph::graph_attr(kgml_steps$g_test_01)
+    igraph::graph_attr(expected_kgml_steps$g_test_01)
   )
 
   # Because the vertex order can be different
   v1 <- igraph::as_data_frame(g, what = "vertices")
-  v2 <- igraph::as_data_frame(kgml_steps$g_test_01, what = "vertices")
+  v2 <- igraph::as_data_frame(expected_kgml_steps$g_test_01, what = "vertices")
   
   v1 <- v1[order(v1$name), ]
   v2 <- v2[order(v2$name), ]
@@ -67,7 +67,7 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
   expect_equal(v1, v2)
   
   e1 <- igraph::as_data_frame(g, what = "edges")
-  e2 <- igraph::as_data_frame(kgml_steps$g_test_01, what = "edges")
+  e2 <- igraph::as_data_frame(expected_kgml_steps$g_test_01, what = "edges")
   
   e1 <- e1[order(e1$from, e1$to), ]
   e2 <- e2[order(e2$from, e2$to), ]
@@ -78,7 +78,7 @@ test_that("build_kegg_graph constructs the expected graph (pathway 01)", {
 })
 
 test_that("add_group correctly assigns group labels", {
-  nodes <- kgml_steps$all_nodes
+  nodes <- expected_kgml_steps$all_nodes
   nodes$label <- nodes$name
   nodes_updated <- add_group(nodes)
   group_nodes <- nodes_updated[nodes_updated$type == "group", ]

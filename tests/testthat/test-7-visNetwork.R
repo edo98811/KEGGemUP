@@ -69,7 +69,7 @@ test_that("kegg_edges_to_visNetwork does not crash if edges_df empty", {
 })
 
 test_that("test_edge_tooltip works correctly", {
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   edges_df <- as_data_frame(g_input, what = "edges")
   edges_df <- add_edge_tooltip(edges_df)
 
@@ -86,7 +86,7 @@ test_that("test_edge_tooltip works correctly", {
 
 test_that("test_node_tooltip works correctly", {
 
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   nodes_df <- as_data_frame(g_input, what = "vertices")
   nodes_df <- add_node_tooltip(nodes_df)
 

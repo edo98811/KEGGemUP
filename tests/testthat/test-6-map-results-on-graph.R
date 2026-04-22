@@ -77,7 +77,7 @@ test_that("add_colors_to_nodes correctly maps DE results onto vertices_df", {
   # with the ids_for_mapping column ready for mapping.
 
   # Prepare vertices_df
-  vertices_df <- kgml_steps$all_nodes
+  vertices_df <- expected_kgml_steps$all_nodes
   indexes_to_map <- which(
     vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
   )
@@ -142,18 +142,18 @@ test_that("validate_palettes handles different scenarios", {
   )
 
   # Palettes_list wrong names
-  palettes_list <- c(X = "Spectral", Y = "Viridis")
+  palettes_list <- c(X = "RdBu", Y = "Viridis")
   warn <- capture_warnings(
     result <- KEGGemUP:::validate_palettes(sources, palettes_list)
   )
   expect_equal(length(warn), 2)
-  
+
   expect_equal(
     result,
     setNames(
       list(
-        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral")),
-        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral"))
+        rev(RColorBrewer::brewer.pal(n = 7, name = "RdBu")),
+        rev(RColorBrewer::brewer.pal(n = 7, name = "RdBu"))
       ),
       sources
     )
@@ -168,8 +168,8 @@ test_that("validate_palettes handles different scenarios", {
     result,
     setNames(
       list(
-        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral")),
-        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral"))
+        rev(RColorBrewer::brewer.pal(n = 7, name = "RdBu")),
+        rev(RColorBrewer::brewer.pal(n = 7, name = "RdBu"))
       ),
       sources
     )
@@ -177,18 +177,18 @@ test_that("validate_palettes handles different scenarios", {
 
   # Palette with global palette and palettes list with one invalid
   warn <- capture_warnings(
-    result <- KEGGemUP:::validate_palettes(sources, palettes_list <- c(X = "Spectral", A = "Viridis"), palette = "test")
+    result <- KEGGemUP:::validate_palettes(sources, palettes_list <- c(X = "RdBu", A = "Viridis"), palette = "test")
   )
   expect_equal(length(warn), 3)
 
   # Correct list with proper names
-  palettes_list <- c(A = "Spectral", B = "RdPu")
+  palettes_list <- c(A = "RdBu", B = "RdPu")
   result <- KEGGemUP:::validate_palettes(sources, palettes_list)
   expect_equal(
     result,
     setNames(
       list(
-        rev(RColorBrewer::brewer.pal(n = 7, name = "Spectral")),
+        rev(RColorBrewer::brewer.pal(n = 7, name = "RdBu")),
         rev(RColorBrewer::brewer.pal(n = 7, name = "RdPu"))
       ),
       sources
@@ -285,7 +285,7 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
   # Same as before, (would it make sense to put this in a function?)
 
   # Prepare vertices_df
-  vertices_df <- kgml_steps$all_nodes
+  vertices_df <- expected_kgml_steps$all_nodes
   indexes_to_map <- which(
     vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
   )
@@ -324,7 +324,7 @@ test_that("add_colors_to_nodes assigns colors based on de_value", {
 
 test_that("add_colors_to_nodes handles errors in palette validation", {
   # Prepare vertices_df
-  vertices_df <- kgml_steps$all_nodes
+  vertices_df <- expected_kgml_steps$all_nodes
   indexes_to_map <- which(
     vertices_df$graphics_type != "line" & vertices_df$graphics_type != "group"
   )

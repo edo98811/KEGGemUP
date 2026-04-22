@@ -1,5 +1,5 @@
 test_that("map_results_to_graph correctly maps DE results onto igraph", {
-  g <- expected_graphs$g_test_01
+  g <- expected_output$g_test_01
 
   # Map results
   suppressMessages(
@@ -76,8 +76,8 @@ test_that("create_kegg_graph handles missing KGML file", {
 
 test_that("render_kegg_graph works correctly", {
 
-  g_input <- expected_graphs$g_test_01_mapped
-  v_expected <- expected_graphs$visNetwork_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
+  v_expected <- expected_output$visNetwork_test_01_mapped
 
   v_actual <- render_kegg_graph(g_input)
 
@@ -92,7 +92,7 @@ test_that("render_kegg_graph works correctly", {
 test_that("subset_kegg_graph works correctly", {
   ids_to_subset <- c("C00001", "C00002")
 
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   g_subset <- subset_kegg_graph(g_input, ids_to_subset)
 
   # Check that the subset graph only contains the specified nodes
@@ -115,7 +115,7 @@ test_that("subset_kegg_graph throws error for non-igraph input", {
 })
 
 test_that("subset_kegg_graph throws error for empty or wrong ids_to_include", {
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   expect_error(
     subset_kegg_graph(g = g_input, ids_to_include = character(0)),
     "ids_to_include must be a non-empty character vector of KEGG IDs."
@@ -124,7 +124,7 @@ test_that("subset_kegg_graph throws error for empty or wrong ids_to_include", {
 })
 
 test_that("subset_kegg_graph returns original graph if no matching nodes found", {
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   expect_warning(
     subset_kegg_graph(g = g_input, ids_to_include = c("NON_EXISTENT_ID")),
     "No matching nodes found for the provided KEGG IDs."
@@ -135,7 +135,7 @@ test_that("highlight_kegg_graph works correctly", {
   ids_to_highlight <- c("C00001", "C00002")
 
   # Prepare graph and mapping to identify which nodes should be highlighted
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   g_highlighted <- highlight_kegg_graph(g_input, ids_to_highlight)
   vertices_df <- igraph::as_data_frame(g_highlighted, what = "vertices")
   mapping <- make_mapping_df(vertices_df)
@@ -162,7 +162,7 @@ test_that("highlight_kegg_graph throws error for non-igraph input", {
 })
 
 test_that("highlight_kegg_graph throws error for empty or wrong ids_to_highlight", {
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   expect_error(
     highlight_kegg_graph(g = g_input, ids_to_highlight = character(0)),
     "ids_to_highlight must be a non-empty character vector of KEGG IDs."
@@ -170,7 +170,7 @@ test_that("highlight_kegg_graph throws error for empty or wrong ids_to_highlight
 })
 
 test_that("highlight_kegg_graph returns original graph if no matching nodes found", {
-  g_input <- expected_graphs$g_test_01_mapped
+  g_input <- expected_output$g_test_01_mapped
   expect_warning(
     highlight_kegg_graph(g = g_input, ids_to_highlight = c("NON_EXISTENT_ID")),
     "No matching nodes found for the provided KEGG IDs."
