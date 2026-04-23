@@ -473,6 +473,53 @@ highlight_kegg_graph <- function(g,
 
 
 
+# exporting the graph -----------------------------------------------------
+
+#' Export a KEGG graph
+#'
+#' Exporting a KEGG graph into its components, nodes and edges, as tab-separated
+#' text files (having them represented as dataframes for max portability)
+#'
+#' @param g An igraph graph object, e.g. created with KEGGemUP
+#' @param basename Character string, specifying the base name for the files to
+#' write the two individual data frames, for nodes and edges
+#'
+#' @returns NULL, invisibly
+#'
+#' @importFrom igraph as_data_frame
+#' @importFrom utils write.table
+#' @importFrom methods is
+#'
+#' @export
+#'
+#' @examples
+#'
+#' g <- create_kegg_graph(pathway_id = "hsa04110")
+#' export_kegg_graph(g, basename = tempfile())
+export_kegg_graph <- function(g,
+                              basename) {
+  # check is graph
+  stopifnot(is(g, "igraph"))
+  stopifnot(is.character(basename))
+
+  # write into current directory with suffix edges and nodes
+  g_nodes <- as_data_frame(g, what = "vertices")
+  g_edges <- as_data_frame(g, what = "edges")
+
+  write.table(g_nodes,
+              file = paste0(basename, "_nodes.tsv"),
+              sep = "\t", quote = FALSE, row.names = FALSE)
+  write.table(g_edges,
+              file = paste0(basename, "_edges.tsv"),
+              sep = "\t", quote = FALSE, row.names = FALSE)
+
+  message("Exported graph components in ",
+          paste0(basename, "_nodes.tsv"),
+          " and ", paste0(basename, "_edges.tsv"))
+
+  return(invisible(NULL))
+}
+
 
 # internal functions - from KEGG files to igraph objects ---------------------
 
