@@ -47,10 +47,10 @@ Imports:
     tools,
     utils
 Suggests: 
-    shinytest2,
-    spelling,
-    testthat (>= 3.0.0),
     knitr,
+    rmarkdown,
+    BiocStyle,
+    testthat (>= 3.0.0),
     macrophage,
     org.Hs.eg.db,
     org.Mm.eg.db,
@@ -59,8 +59,5 @@ Suggests:
     clusterProfiler,
     limma,
     edgeR,
-    purrr,
-    S4Vectors,
-    BiocStyle,
     DT
 Config/testthat/edition: 3
