@@ -41,7 +41,11 @@ Imports:
     visNetwork,
     RColorBrewer,
     htmlwidgets,
-    xml2
+    xml2,
+    grDevices,
+    stats,
+    tools,
+    utils
 Suggests: 
     shinytest2,
     spelling,
