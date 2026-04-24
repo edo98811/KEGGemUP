@@ -655,6 +655,9 @@ build_kegg_graph <- function(file,
     warning("Failed to retrieve pathway name; using 'Pathway' as default.")
   }
 
+  # strip off from the name the eventual "..." sometimes found at the end of labels
+  vertices_df$graphics_name <- gsub("...", "", vertices_df$graphics_name, fixed = TRUE)
+
   g <- make_igraph_graph(
     vertices_df,
     edges_df,
@@ -663,6 +666,7 @@ build_kegg_graph <- function(file,
   )
 
   igraph::graph_attr(g, "type") <- "KEGG_Pathway"
+
   return(g)
 }
 
