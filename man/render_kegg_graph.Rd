@@ -8,7 +8,7 @@ render_kegg_graph(
   g,
   scaling_factor = 1.5,
   relationships = c("all", "reactions", "relations", "none"),
-  visualisation_type = c("standard", "positions", "node_name", "node_size")
+  visualization_type = c("standard", "positions", "node_name", "node_size")
 )
 }
 \arguments{
@@ -22,8 +22,8 @@ node sizes (default: 1.5).}
 relationships to include in edges
 ("all", "reactions", "relations", "none"; default: "all").}
 
-\item{visualisation_type}{Character specifying the type of
-visualisation for nodes:
+\item{visualization_type}{Character specifying the type of
+visualization for nodes:
 "standard", "positions", "node_name", or "node_size" (default: "standard").}
 }
 \value{
@@ -54,5 +54,5 @@ feature_column = "KEGG_ids",
 value_column = "log2FoldChange")
 
 vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
-relationships = "all", visualisation_type = "standard")
+relationships = "all", visualization_type = "standard")
 }

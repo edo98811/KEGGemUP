@@ -37,7 +37,7 @@ test_that("kegg_nodes_to_visNetwork correctly maps shapes and borderRadius", {
     y = c(1, 2, 3, 4)
   )
 
-  nodes_mapped <- kegg_nodes_to_visNetwork(vertices_df, visualisation_type = "standard", scaling_factor = 1)
+  nodes_mapped <- kegg_nodes_to_visNetwork(vertices_df, visualization_type = "standard", scaling_factor = 1)
 
   # Check borderRadius exists
   expect_true("borderRadius" %in% names(nodes_mapped))

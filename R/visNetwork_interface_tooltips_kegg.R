@@ -200,8 +200,8 @@ kegg_edges_to_visNetwork <- function(edges_df,
 #' @param vertices_df Data frame of nodes extracted from igraph using
 #' `as_data_frame(x, what = "vertices")`
 #' @param scaling_factor Numeric scaling factor for node sizes
-#' @param visualisation_type Character vector specifying the type of
-#' visualisation for nodes: "standard", "positions", or "node_name"
+#' @param visualization_type Character vector specifying the type of
+#' visualization for nodes: "standard", "positions", or "node_name"
 #'
 #' @return vertices_df with visNetwork-compatible styling columns: shape,
 #' borderRadius, widthConstraint, heightConstraint
@@ -209,7 +209,7 @@ kegg_edges_to_visNetwork <- function(edges_df,
 #' @noRd
 kegg_nodes_to_visNetwork <- function(vertices_df,
                                      scaling_factor,
-                                     visualisation_type) {
+                                     visualization_type) {
   if (is.null(vertices_df) || nrow(vertices_df) == 0) {
     return(vertices_df)
   }
@@ -259,14 +259,14 @@ kegg_nodes_to_visNetwork <- function(vertices_df,
     )
   })
 
-  if (visualisation_type == "positions") {
+  if (visualization_type == "positions") {
     vertices_df$label <- paste0(
       "x:", round(vertices_df$x, 1), "\n",
       "y:", round(vertices_df$y, 1)
     )
-  } else if (visualisation_type == "node_name") {
+  } else if (visualization_type == "node_name") {
     vertices_df$label <- vertices_df$name
-  } else if (visualisation_type == "node_size") {
+  } else if (visualization_type == "node_size") {
     vertices_df$label <- paste0(
       "w:", round(vertices_df$width, 1), "\n",
       "h:", round(vertices_df$height, 1)

@@ -82,8 +82,8 @@ create_kegg_graph <- function(pathway_id,
 #' @param relationships Character specifying which
 #' relationships to include in edges
 #' ("all", "reactions", "relations", "none"; default: "all").
-#' @param visualisation_type Character specifying the type of
-#' visualisation for nodes:
+#' @param visualization_type Character specifying the type of
+#' visualization for nodes:
 #'  "standard", "positions", "node_name", or "node_size" (default: "standard").
 #'
 #' @return A visNetwork object representing the KEGG pathway
@@ -108,18 +108,18 @@ create_kegg_graph <- function(pathway_id,
 #' value_column = "log2FoldChange")
 #'
 #' vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
-#' relationships = "all", visualisation_type = "standard")
+#' relationships = "all", visualization_type = "standard")
 render_kegg_graph <- function(g,
                               scaling_factor = 1.5,
                               relationships = c("all", "reactions", "relations", "none"),
-                              visualisation_type = c("standard", "positions", "node_name", "node_size")) {
+                              visualization_type = c("standard", "positions", "node_name", "node_size")) {
 
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }
 
   relationships <- match.arg(relationships)
-  visualisation_type <- match.arg(visualisation_type)
+  visualization_type <- match.arg(visualization_type)
   # Convert igraph to data frames
   vertices_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
@@ -129,7 +129,7 @@ render_kegg_graph <- function(g,
   vertices_df <- kegg_nodes_to_visNetwork(
     vertices_df,
     scaling_factor = scaling_factor,
-    visualisation_type = visualisation_type
+    visualization_type = visualization_type
   )
 
   if (nrow(edges_df) > 0)

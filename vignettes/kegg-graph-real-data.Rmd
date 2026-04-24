@@ -38,7 +38,7 @@ knitr::opts_chunk$set(
 # Installation
 
 The first step is installing the package.
-If you dont have the package installed you can do so by running:
+If you don't have the package installed you can do so by running:
 
 ```{r install-package, eval=FALSE}
 # install.packages("remotes")     
@@ -53,11 +53,11 @@ library("KEGGemUP")
 
 KEGG pathways are used in many bioinformatics contexts, this package package can make it very easy to implement these in the analysis of real data.
 
-A very important part of bioinformatics analyses is both data integration and visiazionation. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them thre results of differential expression analyses. 
+A very important part of bioinformatics analyses is both data integration and visualization. KEGGemUP aims to facilitate these tasks by providing functions to parse KEGG pathways and build graph objects, the idea is then to use these graph to map on them three results of differential expression analyses. 
 
 KEGG database uses pathway ids to identify each pathway, for example "hsa00563" is the KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis" in humans. You can use these pathway IDs to download the KGML files for each pathway and then parse them to build graph objects. The id must have the organism prefix, for example "hsa" for human pathways, "mmu" for mouse pathways, etc.
 
-These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` (which you can easily obtain from edgeR or limma by running `as.data.frame()` on the table of the results for each object). To reproduce this situation we will now build an example of a differential expression result using the macrophage dataset from the macrophage package: [bioconductor page](https://www.bioconductor.org/packages/release/data/experiment/html/macrophage.html)
+These vignette assumes you have already performed a differential expression analysis and have the results available as a `data.frame` (which you can easily obtain from edgeR or limma by running `as.data.frame()` on the table of the results for each object). To reproduce this situation we will now build an example of a differential expression result using the macrophage dataset from the macrophage package: [Bioconductor page](https://www.bioconductor.org/packages/release/data/experiment/html/macrophage.html)
 
 To learn more about graph manipulation you can refer to the igraph and visNetwork documentation: 
 
@@ -168,7 +168,7 @@ You can also pass as input to `map_results_to_nodes()` a single `data.frame` wit
 
 Note that the KEGG IDs without organism prefix are the the ENTREZ IDs for genes. For other feature types (e.g., compounds) you will need to make sure that the IDs in your differential expression results table match the KEGG IDs used in the graph.
 
-The defualt parameters are:
+The default parameters are:
 
 - `feature_column`: "KEGG_ids"
 - `value_column`: "log2FoldChange"
@@ -235,7 +235,7 @@ graph_visnetwork <- render_kegg_graph(graph)
 graph_visnetwork
 ```
 
-### Igraph Visualisation 
+### Igraph Visualization 
 
 Let's build another pathway as example: 
 
@@ -249,7 +249,7 @@ g <- create_kegg_graph(pathway) |>
   map_results_to_graph(de_results_list)
 ```
 
-it can happen that you only want a subset of it, expecially for complex pathways. For that therfe is the function `subset_kegg_graph`. You need to supply to it either entrezids for gene and proteins, or KEGG compound ids if you wish to use the compounds. We can make a subset of it and try to visualise it using the igraph function.
+it can happen that you only want a subset of it, especially for complex pathways. For that there is the function `subset_kegg_graph`. You need to supply to it either entrezids for gene and proteins, or KEGG compound ids if you wish to use the compounds. We can make a subset of it and try to visualize it using the igraph function.
 
 ```{r, make-kegg-graph-subset}
 KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
@@ -258,9 +258,9 @@ KEGG_to_include <- c("C00262", "C00385", "C00366", "C00294", "C00387",
 subg <- subset_kegg_graph(g, KEGG_to_include)
 ```
 
-### VisNetwork visualisation
+### VisNetwork visualization
 
-Let's now visualise it using visnetwork.
+Let's now visualize it using visnetwork.
 
 ```{r, make-kegg-graph-visnetwork, results = 'asis'}
 render_kegg_graph(subg)
@@ -270,7 +270,8 @@ render_kegg_graph(subg)
 
 You can also download a kgml file from kegg and parse a kegg pathway directly from it.
 ```{r from-file, out.width="100%", out.height="800px"}
-path_file <- KEGGemUP::retrieve_kgml("mmu04933")
+kgml_tempfile <- tempfile()
+path_file <- KEGGemUP::retrieve_kgml("mmu04933", path = kgml_tempfile)
 
 graph_parsed <- create_kegg_graph(pathway_id = "example", kgml_file = path_file)
 
