@@ -1,3 +1,13 @@
+# KEGGemUP 0.99.0
+
+* Ready for the submission to Bioconductor!
+
+# KEGGemUP 0.9.1
+
+* Better tooltip implementation
+* Highlighting of the nodes now takes care of graying out a bit more of elements that should indeed be not too much into the focus
+* Added `export_kegg_graph()` as a simple function to export the graphs to text files, for maximum compatibility with any framework (possibly even within Cytoscape)
+
 # KEGGemUP 0.9.0
 
 * Restructuring the API to use declarative function names, that possibly better convey the piece of functionality (`create_kegg_graph()` and `render_kegg_graph()` as the main workhorse)
