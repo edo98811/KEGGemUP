@@ -98,14 +98,14 @@ create_kegg_graph <- function(pathway_id,
 #' graph <- create_kegg_graph(pathway_id = pathway)
 #' # Example differential expression results
 #' de_results <- data.frame(
-#'  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
-#' log2FoldChange = c(1.5, -2.0, 0.5)
+#'   KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+#'   log2FoldChange = c(1.5, -2.0, 0.5)
 #' )
 #' graph <- map_results_to_graph(
-#' graph,
-#' de_results,
-#' feature_column = "KEGG_ids",
-#' value_column = "log2FoldChange")
+#'   graph,
+#'   de_results,
+#'   feature_column = "KEGG_ids",
+#'   value_column = "log2FoldChange")
 #'
 #' vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
 #' relationships = "all", visualization_type = "standard")
@@ -168,10 +168,10 @@ render_kegg_graph <- function(g,
 #' values (default: NULL, will use a default palette)
 #' @param palette_limit Optional numeric limit for the color
 #'  palette (default: NULL, will be determined from data)
-#' @param palettes_limits_list Optional list of numeric limits
-#' for multiple palettes if de_results is a list (default: NULL)
 #' @param palettes_list Optional list of color palettes if
 #' de_results is a list (default: NULL)
+#' @param palettes_limits_list Optional list of numeric limits
+#' for multiple palettes if de_results is a list (default: NULL)
 #'
 #' @return An igraph object with differential expression
 #' results mapped to node attributes
@@ -214,8 +214,8 @@ map_results_to_graph <- function(g,
                                  verbose = FALSE,
                                  palette = NULL,
                                  palette_limit = NULL,
-                                 palettes_limits_list = c(NA_real_),
-                                 palettes_list = list(NA_character_)) {
+                                 palettes_list = list(NA_character_),
+                                 palettes_limits_list = c(NA_real_)) {
   if (!inherits(g, "igraph")) {
     stop("Input graph 'g' must be an igraph object.")
   }
