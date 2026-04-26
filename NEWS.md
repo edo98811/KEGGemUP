@@ -7,6 +7,9 @@
 * Better tooltip implementation
 * Highlighting of the nodes now takes care of graying out a bit more of elements that should indeed be not too much into the focus
 * Added `export_kegg_graph()` as a simple function to export the graphs to text files, for maximum compatibility with any framework (possibly even within Cytoscape)
+* Providing an example dataset already precomputed within the package to avoid additional dependency load; as a companion to this, added detailed information on how to create this in the `inst/scripts` folder
+* Finalized a full version of the vignette
+* Completed the configuration of the pkgdown documentation
 
 # KEGGemUP 0.9.0
 
