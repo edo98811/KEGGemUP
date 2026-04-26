@@ -1,4 +1,13 @@
 url: https://edo98811.github.io/KEGGemUP/
 template:
   bootstrap: 5
+  bslib:
+    preset: "bootstrap"
+    font_scale: 1.0
+    base_font:
+      google: "Atkinson Hyperlegible"
+    code_font:
+      google: "IBM Plex Mono"
 
+navbar:
+  type: light
