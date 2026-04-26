@@ -50,13 +50,5 @@ Suggests:
     knitr,
     rmarkdown,
     BiocStyle,
-    testthat (>= 3.0.0),
-    macrophage,
-    org.Hs.eg.db,
-    org.Mm.eg.db,
-    SummarizedExperiment,
-    AnnotationDbi,
-    clusterProfiler,
-    limma,
-    edgeR
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
