@@ -12,8 +12,8 @@ map_results_to_graph(
   verbose = FALSE,
   palette = NULL,
   palette_limit = NULL,
-  palettes_limits_list = c(NA_real_),
-  palettes_list = list(NA_character_)
+  palettes_list = list(NA_character_),
+  palettes_limits_list = c(NA_real_)
 )
 }
 \arguments{
@@ -37,11 +37,11 @@ values (default: NULL, will use a default palette)}
 \item{palette_limit}{Optional numeric limit for the color
 palette (default: NULL, will be determined from data)}
 
-\item{palettes_limits_list}{Optional list of numeric limits
-for multiple palettes if de_results is a list (default: NULL)}
-
 \item{palettes_list}{Optional list of color palettes if
 de_results is a list (default: NULL)}
+
+\item{palettes_limits_list}{Optional list of numeric limits
+for multiple palettes if de_results is a list (default: NULL)}
 }
 \value{
 An igraph object with differential expression

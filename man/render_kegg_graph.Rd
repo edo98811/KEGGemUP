@@ -44,14 +44,14 @@ pathway <- "hsa04110" # Example pathway ID
 graph <- create_kegg_graph(pathway_id = pathway)
 # Example differential expression results
 de_results <- data.frame(
- KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
-log2FoldChange = c(1.5, -2.0, 0.5)
+  KEGG_ids = c("hsa:1234", "hsa:5678", "cpd:C00022"),
+  log2FoldChange = c(1.5, -2.0, 0.5)
 )
 graph <- map_results_to_graph(
-graph,
-de_results,
-feature_column = "KEGG_ids",
-value_column = "log2FoldChange")
+  graph,
+  de_results,
+  feature_column = "KEGG_ids",
+  value_column = "log2FoldChange")
 
 vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
 relationships = "all", visualization_type = "standard")
