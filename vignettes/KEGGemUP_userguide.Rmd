@@ -1,0 +1,377 @@
+---
+title: >
+  The `KEGGemUP` User's Guide
+author:
+  - name: Edoardo Filippi
+    affiliation: 
+    - Institute of Medical Biostatistics, Epidemiology and Informatics (IMBEI), Mainz
+    - Deparment of Nephrology, Mainz University Medical Center
+    email: edoardo.filippi@uni-mainz.de
+  - name: Federico Marini
+    affiliation: 
+    - Institute of Medical Biostatistics, Epidemiology and Informatics (IMBEI), Mainz
+    email: federico.marini@uni-mainz.de
+    orcid: 0000-0003-3252-7758
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('KEGGemUP')`"
+output: 
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    number_sections: yes
+vignette: >
+  %\VignetteIndexEntry{The KEGGemUP User's Guide}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+bibliography: KMU_bibliography.bib
+---
+
+<style type="text/css">
+.smaller {
+  font-size: 10px
+}
+</style>
+
+**Compiled date**: `r Sys.Date()`
+
+**Last edited**: 2026-04-24
+
+**License**: `r packageDescription("KEGGemUP")[["License"]]`
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  error = T,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Pathway-based analysis is a central strategy in biomedical research, enabling the interpretation of datasets stemming from different omics techniques, by linking quantitative high-dimensional profiles of molecular features changes to higher-level biological mechanisms. 
+The Kyoto Encyclopedia of Genes and Genomes (KEGG, [@Kanehisa2000]) is one of the most widely used pathway resources, also thanks to the support offered for a large variety of species, and including different biological entities (genes, proteins, metabolites). 
+However, the integration of KEGG pathways into omics workflows is currently either relying on manual operations, or  limited to generating static visualizations which can be difficult to explore in further detail.
+
+We addressed this problem by leveraging interactive visualization capabilities of R, coupled to a streamlined process to retrieve the pathway information and contextualize any omics data at hand. 
+The `KEGGemUP` R package that can parse the KGML files provided by the KEGG API and builds an igraph representation of the pathway [@igraph2023], on which different data and results can be seamlessly mapped. 
+The resulting pathways can be then rendered and efficiently explorer in interactive widgets that also support further drilldown operations (e.g. by linking to existing databases), with tooltips and bindings compatible within Shiny.
+
+We believe that this can simplify and speed up the iterative process of interpretation of omics data (provided as simple data formats widely adopted within Bioconductor), either for single features or within the frame of KEGG pathways.
+Leveraging a caching mechanism for efficient retrieval of KGML files (with `BiocFileCache`), the `igraph` framework to represent the information-rich extracted pathways, and a powerful HTML-based network visualization system (via `visNetwork`) , `KEGGemUP` delivers a modern, **interactive** way to **create**, **visualize**, and **explore** KEGG pathways from the point of view of integrated omics layers.
+
+
+# Installation
+
+`KEGGemUP` can be installed from Bioconductor with the following code:
+
+```{r installation, eval=FALSE}
+if(!requireNamespace('BiocManager', quietly = TRUE))
+  install.packages('BiocManager')
+
+BiocManager::install("KEGGemUP")
+```
+
+Load the package after installation with
+
+```{r load_package, message=FALSE}
+library("KEGGemUP")
+```
+
+
+## Example dataset
+
+We will demonstrate the features of `KEGGemUP` on a small dataset, extracted from the differential expression analysis workflow, running the limma-voom pipeline on the `r Biocpkg("macrophage")` dataset.
+Specifically, we have compared here the Interferon gamma treated samples vs the naive ones, while accounting for the cell line of origin - we refer the reader to the script in the `inst/scripts` folder to see how that object has been generated.
+
+```{r load_data}
+res_de_macro <- readRDS(
+  system.file("extdata", "limma_res_macrophage.RDS", package = "KEGGemUP")
+)
+
+head(res_de_macro)
+```
+
+As you can see, this is simply a `data.frame` with the table of the top-ranked genes from a linear model fit.
+If using the `r Biocpkg("DESea2")` framework, you can obtain something similar by running `as.data.frame()` on the output of the `results()`` function.
+
+In particular, we will focus on the regulation occurring between these two conditions, and we will use the logFC continuous value as a measure of the effect size.
+
+<!-- alt data: use the one from within pathview to provide a direct comparison? -->
+
+
+# KEGGemUP at a glance
+
+The `KEGGemUP` package allows you to:
+
+* Retrieve and create a KEGG pathway graph, from the KGML files (with `create_kegg_graph()`)
+
+* Map some continuous values onto that graph (e.g. the logFoldChange, with the `map_results_to_graph()`)
+
+* Render that graph interactively (via `render_kegg_graph()`, based on `visNetwork`)
+
+* Focus either on a subset or on a highlighted portion of that graph (thanks to `subset_kegg_graph()` and `highlight_kegg_graph()`)
+
+The remainder of this vignette will cover how to perform these operations to explore omics data in the context of KEGG pathway diagrams.
+
+
+# Building KEGG pathway graphs
+
+KEGG database uses pathway identifiers to refer to each pathway - for example, `hsa00563` is the KEGG pathway ID for "Glycosylphosphatidylinositol (GPI)-anchor biosynthesis" in humans. 
+
+`KEGGemUP` retrieves for you (supported by a caching mechanism, by default) the KGML files, parses them, and builds information-rich `igraph` graph objects.
+
+The identifier must contain the organism prefix, such as "hsa" for human pathways, "mmu" for mouse pathways, etc. - Please refer to the [KEGG website](https://www.kegg.jp/) to access the main components of the database.
+
+```{r create_graph}
+kmu_graph <- create_kegg_graph(pathway_id = "hsa00563")
+
+kmu_graph
+```
+
+While one can directly use the `plot` routine to visualize this graph, most of its attributes are set to behave correctly in the interactive viewer provided by `r BiocStyle::CRANpkg("visNetwork")`.
+Nonetheless, using `igraph` objects as a container makes it easy to convert/reuse by other graph representations.
+
+The optional `kgml_file` parameter provides the option to specify the path to a local KGML file, while `verbose` can print some messages during the execution.
+
+
+# Rendering KEGG pathway graphs
+
+The advantage of having parsed all elements of a KGML file into an `igraph` object directly tailored to be used within `visNetwork` is that we can simply create an interactive view of that pathway with the `render_kegg_graph()` command.
+
+```{r render_graph}
+render_kegg_graph(g = kmu_graph)
+```
+
+This is pretty much a vanilla representation of the KEGG pathway, but it already contains some tooltips, displayed upon hovering the mouse on the nodes, that contain buttons linking to the respective KEGG database entries.
+
+Other parameters such as `scaling_factor`, `relationships` and `visualization_type` define the aspect of the rendered graph.
+In most situations, these can be left as default values, which tends to generate a truthful representation of the KEGG pathway graph.
+
+In the Viewer pane of an IDE such as RStudio, it is possible to interact with the graph with operations such as zoom, pan, select, hover - instead of having a static view, this might become extremely useful to obtain a deeper understanding.
+
+
+# Mapping values onto KEGG pathway graphs
+
+To map continuous values (such as the logFoldChange obtained from differential expression results) to the nodes of a KEGG pathway graph, you can use `map_results_to_graph()`. 
+
+Its main parameter, `g`, is the `igraph` object returned by `create_kegg_graph()`. 
+Notably, there are two ways to specify the values to map onto it, using the `de_results` parameter:
+
+* A single `data.frame` with the differential expression results. 
+  This dataframe must contain at least two columns: one with the KEGG feature IDs (without organism prefix), and another with the values to map to the nodes. 
+  These two column names need to be specified by the parameters `feature_column` and `value_column` (otherwise defaulting to NULL). 
+  
+* A nested list, which can also handle multiple differential expression results tables (e.g., one for RNA-seq and one for metabolomics). 
+  Each element of the list can have a name, and has to be structured itself as a list, containing the following elements:
+  - `de_table`: a data.frame with the differential expression results (as in the single case)
+  - `value_column`: the name of the column in `de_table` containing the values to map to the nodes
+  - `feature_column`: the name of the column in de_table containing the feature IDs (e.g., ENTREZ IDs) corresponding to the KEGG ids in the graph, again without organism prefix)
+
+Some typical values for `value_column` might be "logFC" or "logFoldChange".  
+
+Usually, the KEGG identifiers without organism prefix correspond to the ENTREZ IDs for the genes. 
+For other feature types (e.g., compounds) you will need to make sure that the IDs in your differential expression results table match the KEGG IDs used in the graph.  
+Note: If your data frame does not contain a compatible identifier, it might still be straightforward to add such a column with packages such as AnnotationDbi and the orgDb packages provided by Bioconductor.
+
+In the case of a single result (`res_de_macro`):
+  
+```{r singleDE}
+head(res_de_macro)
+```
+
+... we would use "ENTREZID" as `feature_name` and "logFC" as `value_name`.
+
+Otherwise, one can build the list-based object with this command:
+
+```{r listDE}
+de_results_list <- list(
+  rnaseq_limma = list(
+    de_table = data.frame(res_de_macro),
+    value_column = "logFC",
+    feature_column = "ENTREZID"
+  )
+)
+```
+
+In this case, only one element is specified (named "rnaseq_limma"), but additional entries can be specified afterwards extending the `de_results_list` object.
+
+Applying this step onto the previously generated `kmu_graph`, we would simply need to run the following commands:
+
+```{r graph_mapped, out.width="100%", out.height="800px"}
+kmu_graph_mapped <- map_results_to_graph(g = kmu_graph, 
+                                         de_results = de_results_list)
+kmu_rendered <- render_kegg_graph(g = kmu_graph_mapped, 
+                                  scaling_factor = 1.3)
+kmu_rendered
+```
+
+As you can see, `map_results_to_graph()` utilizes by default a red-to-blue palette for the mapping of the values (`RdBu` from the RColorBrewer package), detecting the range directly from the data.
+This behavior can be controlled via the `palette` and `palette_limit` parameters (or `palettes_list` and  `palettes_limits_list` if using multiple palettes for multiple entries of `de_results`).
+
+For example, using the single `res_de_macro` DE result, one could call:
+
+```{r graph_mapped_altpal, out.width="100%", out.height="800px"}
+kmu_graph_mapped_single <- map_results_to_graph(g = kmu_graph, 
+                                                de_results = res_de_macro,
+                                                feature_column = "ENTREZID",
+                                                value_column = "logFC", 
+                                                palette = "Spectral")
+render_kegg_graph(g = kmu_graph_mapped_single, scaling_factor = 1.3)
+```
+
+... to obtain an equivalent view, using the `Spectral` palette.
+Any palette supported by RColorBrewer can be used, see the output of `RColorBrewer::display.brewer.all()` for a complete reference.
+
+ 
+# Focusing on subsets of a pathway graph
+
+Sometimes one might be interested in focusing on a specific subset of the graph, as pathway graphs can be almost too comprehensive (especially in the case of larger pathways).
+
+`KEGGemUP` provides two approaches to do so, with the `subset_kegg_graph()` and the `highlight_kegg_graph()` functions.
+Their interface is similar, feeding on the `g` graph object, created in the first steps via `create_kegg_graph()`, and on a vector of nodes to keep or highlight.
+Both these functions return a modified `igraph` object, that again can conveniently be rendered by `render_kegg_graph()` - the chunks below illustrate these use cases.
+
+Let's work with the Cell cycle pathway, for human - "hsa04110" in the KEGG database:
+
+```{r subset_graph, out.width="100%", out.height="800px"}
+kmu_cellcycle <- create_kegg_graph(pathway_id = "hsa04110")
+kmu_cellcycle_mapped <- map_results_to_graph(g = kmu_cellcycle, 
+                                             de_results = de_results_list)
+
+# Selecting a subset of the nodes to keep
+KEGGids_to_include <- igraph::V(kmu_cellcycle_mapped)$ids_for_mapping |>
+  tail(35) |> 
+  strsplit(split = ";") |>
+  unlist() |>
+  unique()
+head(KEGGids_to_include)
+length(KEGGids_to_include)
+
+kmu_cellcycle_subset <- subset_kegg_graph(g = kmu_cellcycle_mapped, 
+                                          ids_to_include = KEGGids_to_include)
+render_kegg_graph(kmu_cellcycle_subset)
+```
+
+By keeping the nodes, also the edges that exist and connect them are retained.
+
+As you have seen, the names to pick the node from are coming from the pool included in the `ids_for_mapping` attribute of the graph nodes, and in our example we are simply keeping the last 35 (corresponding to 38 identifiers).
+
+Some intermediate operations might be needed to convert from the more classical gene symbols to the IDs used within KEGG (that often do correspond to ENTREZ IDs).
+
+Another step could be to select a subset of nodes to highlight - or in other words, "grey out" the nodes that are not of interest (and with them, also the edges that are not involving the selected nodes at both ends). 
+Reusing the object created above, you can run the following chunk to create the "highlighted version":
+
+```{r highlight_graph, out.width="100%", out.height="800px"}
+kmu_cellcycle_highlighted <- highlight_kegg_graph(g = kmu_cellcycle_mapped, 
+                                                  ids_to_highlight = KEGGids_to_include)
+render_kegg_graph(kmu_cellcycle_highlighted)
+```
+
+
+# Working further with KEGG graphs
+
+Of course, the graphs created with `KEGGemUP` can also be processed further with alternative packages (if these are compatible with `igraph` objects).
+To ensure interoperability, the `export_kegg_graph()` function provides a compact wrapper to create two tab-separated text files, where all the info on nodes and edges are written.
+
+```{r export_graph}
+file_prefix <- tempfile()
+export_kegg_graph(g, basename = file_prefix)
+```
+
+Alternatively, the `igraph` objects can also be directly sent to external software such as Cytoscape via the RESTful API implemented in `RCy3` - this can also allow some settings of the nodes to be conveniently set in an automated manner. 
+We refer to the `RCy3` package vignettes for further reading.
+
+# Caching information with KEGGemUP
+
+You might have noticed that when creating the KEGG graph, `KEGGemUP` does not ask you where to store the retrieved KGML files, and neither does it work in the current working directory.
+This is because `KEGGemUP` makes extensive use of the functionality provided by `r BiocStyle::Biocpkg("BiocFileCache")` package - and chooses this by default, instead of downloading to a local folder. 
+This ideally avoids the hassle of having to perform repeated queries for files that have been already retrieved in other parallel projects.
+
+The functions `retrieve_kgml()` and `get_kegg_db()` all make use of the `bfc` parameter, together with the `path` specification, to control this aspect.
+The convenient wrapper `retrieve_all_pathways()` retrieves in a single call all pathways for a given organism (to be specified in the `org` parameter with a KEGG organism code, such as "hsa", "mmu", "dme", etc.).
+
+```{r retrieve}
+local_kgml_file <- retrieve_kgml(pathway_id = "hsa04110", path = tempdir())
+local_kgml_file
+
+graph_parsed <- create_kegg_graph(pathway_id = "local_kgml", kgml_file = local_kgml_file)
+graph_parsed
+
+cpd_db <- get_kegg_db(db_name = "compound", path = tempdir())
+head(cpd_db)
+```
+
+The functions `display_cache_KEGGemUP()` and `reset_cache_KEGGemUP()` show and delete, respectively, all entries for KEGGemUP in the standard BiocFileCache location.
+
+```{r cachethings}
+kmu_cached <- display_cache_KEGGemUP()
+head(kmu_cached)
+```
+
+```{r deletecache, eval=FALSE}
+# this will delete all previously retrieved KGML files, use this judiciously
+reset_cache_KEGGemUP()
+```
+
+
+# Related methods & packages
+
+KEGG pathways are used in many bioinformatics contexts and have been around for more than two decades.
+Given their importance in data integration and visualization, it is not surprising that a number of other software packages have been developed to interface to this resource.
+Our aim with `KEGGemUP` was to stress the usefulness of KEGG pathway maps within interactive components of analysis workflows.
+
+We are reporting them in this section for completeness, as many of them can beautifully interoperate with `KEGGemUP`, possibly a few conversion steps away.
+
+* [pathview](https://bioconductor.org/packages/pathview), which is an R/Biocondutor package for pathway-based data integration and visualization - limited to static visualization onto png/pdf plots [@Luo2013].
+* [KEGGgraph](https://bioconductor.org/packages/KEGGgraph), also on Bioconductor, offering a graph approach to KEGG pathways (based on `graph` and `Rgraphviz`) [@Zhang2009].
+* [graphite](https://bioconductor.org/packages/graphite), a Bioconductor package to handle graph interactions from the pathway topological environments [@Sales2012].
+* [ggkegg](https://bioconductor.org/packages/ggkegg), a more recent Bioconductor package bringing the grammar of graphics principles (like for `ggplot2`) to the task of analyzing and visualizing KEGG information [@Sato2023].
+* [KEGGREST](https://bioconductor.org/packages/KEGGREST), providing low-level client-side REST access to the KEGG database.
+* [PinPath](https://github.com/SyNUM-lab/PinPath), a package for visualizing omics data onto pathway diagrams (from KEGG or WikiPathways), and pinpoint where in the pathway the relevant changes occur. PinPath offers the option to save svg vectorized images of the plots created.
+* [Cytoscape](https://cytoscape.org/), a general purpose open source software platform [@Shannon2003], used among others for visualizing complex networks and integrating these with any type of attribute data - for which, as mentioned above, the RCy3 package exists to access and control directly within R.
+
+
+# FAQs {#faqs}
+
+**Does `KEGGemUP` play along nicely with other packages?**
+
+Yes, since it leverages the class from the widely adopted `igraph` package, for which implementations exist in a variety of languages.
+
+**Why is the information obtained from parsing KGML files not 100% coinciding with the png files provided by KEGG?**
+
+Some inconsistencies have been identified while parsing KGML files, and not all elements of the image files are fully included in the KGML format. 
+For this reason, you might notice some lines/graphical elements missing.
+While this is overcome by other packages that provide their representations on top of the original png, they are all static views, that do not play well in an interactive HTML widget.
+
+**I do like KEGG pathways layouts, but can I simply use other layouts?**
+
+Yes, since we are using `igraph` to represent these objects, it is fairly easy to switch to alternative views on the same graphs, overriding the x and y coordinates we have retrieved from the KGML files.
+We opted to keep that view as default as it is the one which matches the "expected" aspect of the KEGG pathway map of interest.
+
+**Is there support to create reports on KEGG enrichment analyses?**
+
+Yes, you can simply loop over the content of a KEGG enrichment table, retrieve their graphs, map the DE values onto them, and render them (or some subsets of interest), all within the same analysis notebook - HTML widgets are seamlessly working in RMarkdown/Quarto documents!
+
+**Can I use the rendered graphs within Shiny and interact with them?**
+
+Yes! Since the rendered graphs are created within `visNetwork`, there are many options to do so, that fully leverage the capability of having shiny bindings that can be used in other elements of the apps.
+If you want to see some examples for this, a very good starting point is [the visNetwork section on Shiny](https://datastorm-open.github.io/visNetwork/shiny.html).
+
+**Can I do customize [this/that] within the `visNetwork` framework?**
+
+Possibly - a number of options are actually exposed to the end user in a convenient manner via parameters, but of course one can achieve the highest level of flexibility and customization interfacing directly to the vis.js Javascript library.
+This, still, might not be desired, as many of the information one wants to access and view are coming from R and Bioconductor-centric workflows. 
+
+
+# Session info {- .smaller}
+
+This vignette was compiled on the following system:
+
+```{r sessioninfo}
+sessionInfo()
+```
+
+# References {-}
+
