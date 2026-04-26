@@ -58,6 +58,5 @@ Suggests:
     AnnotationDbi,
     clusterProfiler,
     limma,
-    edgeR,
-    DT
+    edgeR
 Config/testthat/edition: 3
