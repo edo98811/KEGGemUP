@@ -514,8 +514,7 @@ export_kegg_graph <- function(g,
               sep = "\t", quote = FALSE, row.names = FALSE)
 
   message("Exported graph components in ",
-          paste0(basename, "_nodes.tsv"),
-          " and ", paste0(basename, "_edges.tsv"))
+          basename, "_nodes.tsv and ", basename, "_edges.tsv")
 
   return(invisible(NULL))
 }
