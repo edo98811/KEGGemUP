@@ -26,5 +26,7 @@ the operation without extra unneeded requests to the API
 }
 \examples{
 # Download all pathways for human
-# retrieve_all_pathways("hsa", verbose = TRUE)
+\dontrun{
+  retrieve_all_pathways("hsa", verbose = TRUE)
+}
 }

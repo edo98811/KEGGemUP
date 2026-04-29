@@ -18,5 +18,7 @@ and mapping files stored using BiocFileCache.
 It prompts the user for confirmation before proceeding with the deletion.
 }
 \examples{
-# reset_cache_KEGGemUP()
+\dontrun{
+  reset_cache_KEGGemUP()
+}
 }
