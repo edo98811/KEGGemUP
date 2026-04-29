@@ -43,7 +43,6 @@ bibliography: KMU_bibliography.bib
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  error = T,
   comment = "#>"
 )
 ```
