@@ -98,7 +98,9 @@ retrieve_kgml <- function(pathway_id,
 #'
 #' @examples
 #' # Download all pathways for human
-#' # retrieve_all_pathways("hsa", verbose = TRUE)
+#' \dontrun{
+#'   retrieve_all_pathways("hsa", verbose = TRUE)
+#' }
 retrieve_all_pathways <- function(org,
                                   verbose = FALSE) {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
@@ -294,7 +296,9 @@ display_cache_KEGGemUP <- function() {
 #' @importFrom utils askYesNo
 #'
 #' @examples
-#' # reset_cache_KEGGemUP()
+#' \dontrun{
+#'   reset_cache_KEGGemUP()
+#' }
 reset_cache_KEGGemUP <- function() {
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
