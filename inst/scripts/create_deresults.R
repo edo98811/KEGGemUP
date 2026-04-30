@@ -32,7 +32,7 @@ dge <- dge[-drop, ]
 
 voom_mat <- voom(dge, design, plot = FALSE)
 fit <- lmFit(voom_mat, design)
-fit2 <- contrasts.fit(fit, contrast.matrix)
+fit2 <- contrasts.fit(fit, contrast_matrix)
 fit2 <- eBayes(fit2)  # Empirical Bayes moderation
 
 # Gene annotation ---------------------------------------------------------------
