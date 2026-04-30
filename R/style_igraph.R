@@ -192,9 +192,16 @@ apply_style_map <- function(df,
 #'
 #' @returns An igraph object, without the node originally kept as "TITLE:..."
 #'
-#' @noRd
+#' @export
 #'
 #' @importFrom igraph delete_vertices
+#'
+#' @examples
+#' graph <- create_kegg_graph(pathway_id = "hsa04110")
+#' graph_notitlenode <- cleanup_title_node(graph)
+#' graph_notitlenode
+#'
+#' render_kegg_graph(graph_notitlenode)
 cleanup_title_node <- function(g) {
   title_node <- grep(pattern = "^TITLE:", V(g)$label)
   g <- igraph::delete_vertices(g, title_node)
