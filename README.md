@@ -17,7 +17,7 @@ if(!requireNamespace('BiocManager', quietly = TRUE))
 BiocManager::install("KEGGemUP")
 ```
 
-You can also install the development version of mutscan from GitHub with:
+You can also install the development version of `KEGGemUP` from GitHub with:
 
 ```
 # install.packages("remotes")
