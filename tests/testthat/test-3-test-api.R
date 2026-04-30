@@ -1,3 +1,24 @@
+test_that("retrieval works and talks", {
+  expect_message(
+    create_kegg_graph(pathway_id = "hsa00010", verbose = TRUE)
+  )
+
+  expect_message(
+    retrieve_kgml(pathway_id = "hsa00010", verbose = TRUE, path = tempdir()),
+    "Downloaded & saved"
+  )
+
+  expect_message(
+    kegg_compounds <- get_kegg_db(db_name = "compound",
+                                  verbose = TRUE,
+                                  path = tempdir())
+  )
+})
+
+test_that("cache entries are displayed", {
+  cache_info <- display_cache_KEGGemUP()
+  expect_true(is.list(cache_info))
+})
 
 test_that("retrieve_kgml rejects invalid inputs", {
   expect_error(
@@ -10,6 +31,11 @@ test_that("retrieve_kgml rejects invalid inputs", {
       "hsa00001",
       path = c("a", "b")),
     "single string"
+  )
+
+  expect_error(
+    retrieve_kgml("pippo"),
+    "Invalid KEGG"
   )
 })
 
