@@ -63,4 +63,7 @@ de_entrez_IFNg_vs_naive_genes <- anns$ENTREZID[
     (res_macrophage_IFNg_vs_naive_limma$adj.P.Valj <= 0.05)
 ]
 
-saveRDS(res_macrophage_IFNg_vs_naive_limma, "inst/extdata/limma_res_macrophage.RDS", compress = "xz")
+res_de_macro_IFNg_vs_naive <- res_macrophage_IFNg_vs_naive_limma
+
+save(res_de_macro_IFNg_vs_naive, file = "data/res_de_macro_IFNg_vs_naive.RData", compress = "xz")
+

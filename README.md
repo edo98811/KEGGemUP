@@ -46,15 +46,13 @@ The `KEGGemUP` package allows you to:
 
 ```
 ## load an example dataset, and format the DE results
-res_de_macro <- readRDS(
-  system.file("extdata", "limma_res_macrophage.RDS", package = "KEGGemUP")
-)
+data(res_de_macro_IFNg_vs_naive, package = "KEGGemUP")
 
-head(res_de_macro)
+head(res_de_macro_IFNg_vs_naive)
 
 de_results_list <- list(
   rnaseq_limma = list(
-    de_table = data.frame(res_de_macro),
+    de_table = data.frame(res_de_macro_IFNg_vs_naive),
     value_column = "logFC",
     feature_column = "ENTREZID"
   )

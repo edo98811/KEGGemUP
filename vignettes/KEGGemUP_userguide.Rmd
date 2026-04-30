@@ -85,11 +85,10 @@ We will demonstrate the features of `KEGGemUP` on a small dataset, extracted fro
 Specifically, we have compared here the Interferon gamma treated samples vs the naive ones, while accounting for the cell line of origin - we refer the reader to the script in the `inst/scripts` folder to see how that object has been generated.
 
 ```{r load_data}
-res_de_macro <- readRDS(
-  system.file("extdata", "limma_res_macrophage.RDS", package = "KEGGemUP")
-)
+data(res_de_macro_IFNg_vs_naive, package = "KEGGemUP")
 
-head(res_de_macro)
+## Inspect this briefly
+head(res_de_macro_IFNg_vs_naive)
 ```
 
 As you can see, this is simply a `data.frame` with the table of the top-ranked genes from a linear model fit.
@@ -174,10 +173,10 @@ Usually, the KEGG identifiers without organism prefix correspond to the ENTREZ I
 For other feature types (e.g., compounds) you will need to make sure that the IDs in your differential expression results table match the KEGG IDs used in the graph.  
 Note: If your data frame does not contain a compatible identifier, it might still be straightforward to add such a column with packages such as AnnotationDbi and the orgDb packages provided by Bioconductor.
 
-In the case of a single result (`res_de_macro`):
+In the case of a single result (`res_de_macro_IFNg_vs_naive`):
   
 ```{r singleDE}
-head(res_de_macro)
+head(res_de_macro_IFNg_vs_naive)
 ```
 
 ... we would use "ENTREZID" as `feature_name` and "logFC" as `value_name`.
@@ -187,7 +186,7 @@ Otherwise, one can build the list-based object with this command:
 ```{r listDE}
 de_results_list <- list(
   rnaseq_limma = list(
-    de_table = data.frame(res_de_macro),
+    de_table = data.frame(res_de_macro_IFNg_vs_naive),
     value_column = "logFC",
     feature_column = "ENTREZID"
   )
@@ -209,11 +208,11 @@ kmu_rendered
 As you can see, `map_results_to_graph()` utilizes by default a red-to-blue palette for the mapping of the values (`RdBu` from the RColorBrewer package), detecting the range directly from the data.
 This behavior can be controlled via the `palette` and `palette_limit` parameters (or `palettes_list` and  `palettes_limits_list` if using multiple palettes for multiple entries of `de_results`).
 
-For example, using the single `res_de_macro` DE result, one could call:
+For example, using the single `res_de_macro_IFNg_vs_naive` DE result, one could call:
 
 ```{r graph_mapped_altpal, out.width="100%", out.height="800px"}
 kmu_graph_mapped_single <- map_results_to_graph(g = kmu_graph, 
-                                                de_results = res_de_macro,
+                                                de_results = res_de_macro_IFNg_vs_naive,
                                                 feature_column = "ENTREZID",
                                                 value_column = "logFC", 
                                                 palette = "Spectral")
