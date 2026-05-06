@@ -149,6 +149,13 @@ In most situations, these can be left as default values, which tends to generate
 
 In the Viewer pane of an IDE such as RStudio, it is possible to interact with the graph with operations such as zoom, pan, select, hover - instead of having a static view, this might become extremely useful to obtain a deeper understanding.
 
+Optionally, a pathway graph can also be rendered without the node reporting the title itself as a vertex.
+This can be achieved combining the `cleanup_title_node()` function before rendering.
+
+```{r render_notitle}
+render_kegg_graph(g = cleanup_title_node(kmu_graph))
+```
+
 
 # Mapping values onto KEGG pathway graphs
 
