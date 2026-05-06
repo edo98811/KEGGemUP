@@ -10,6 +10,7 @@
 * Providing an example dataset already precomputed within the package to avoid additional dependency load; as a companion to this, added detailed information on how to create this in the `inst/scripts` folder
 * Finalized a full version of the vignette
 * Completed the configuration of the pkgdown documentation
+* Exporting also the `cleanup_title_node()` function to remove the title node in pathway graphs
 
 # KEGGemUP 0.9.0
 
