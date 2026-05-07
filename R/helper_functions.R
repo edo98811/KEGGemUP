@@ -42,23 +42,20 @@ remove_kegg_prefix <- function(kegg_ids) {
 #'
 #' @noRd
 expand_keggs <- function(kegg_df) {
-  # Initialize empty vectors to store results
-  ids_out <- c()
-  kegg_out <- c()
+  result <- do.call(rbind,
+                    lapply(seq_len(nrow(kegg_df)), function(i) {
+                      split_ids <- unlist(strsplit(kegg_df$KEGG[i], ";"))
+                      split_ids <- sub(".*:", "", split_ids)
 
-  # Loop through each row of the data frame
-  for (i in seq_len(nrow(kegg_df))) {
-    # Split the KEGG string by ';'
-    split_ids <- unlist(strsplit(kegg_df$KEGG[i], ";"))
-    # Remove the prefix before ':' in each KEGG ID
-    split_ids <- sub(".*:", "", split_ids)
-    # Append the row ids and KEGG IDs
-    ids_out <- c(ids_out, rep(kegg_df$name[i], length(split_ids)))
-    kegg_out <- c(kegg_out, split_ids)
-  }
+                      data.frame(
+                        name = rep(kegg_df$name[i], length(split_ids)),
+                        KEGG = split_ids
+                      )
 
-  # Return the expanded data frame
-  return(data.frame(name = ids_out, KEGG = kegg_out))
+                    })
+  )
+
+  return(result)
 }
 
 
