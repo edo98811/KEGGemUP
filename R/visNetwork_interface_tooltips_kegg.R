@@ -13,6 +13,7 @@
 #' @return A visNetwork object representing the graph.
 #'
 #' @importFrom htmlwidgets JS
+#' @importFrom visNetwork visNetwork visPhysics visOptions visInteraction visEvents
 #'
 #' @noRd
 make_vis_graph <- function(vertices_df,
