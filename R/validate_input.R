@@ -54,43 +54,6 @@ is_valid_pathway <- function(pathway_id) {
 }
 
 
-# is_valid_dataframe <- function(obj, name = "object") {
-#   # Non-null
-#   if (is.null(obj)) {
-#     warning(name, " is NULL")
-#     return(FALSE)
-#   }
-
-#   # Single object (length 1 for atomic, for list/data.frame it’s rows > 0)
-#   if (is.atomic(obj) && length(obj) != 1) {
-#     warning(name, " is not a single object, make sure you are not providing MArrayLM but the uptput of topTable, if using limma")
-#     return(FALSE)
-#   }
-
-#   # Must inherit from data.frame
-#   if (!inherits(obj, "data.frame")) {
-#     warning(name, " must be a data.frame, but is of class: ", paste(class(obj), collapse = "/"))
-#     return(FALSE)
-#   }
-
-#   # Non-empty (has rows and columns)
-#   if (nrow(obj) == 0 || ncol(obj) == 0) {
-#     warning(name, " is empty (0 rows or 0 columns)")
-#     return(FALSE)
-#   }
-
-#   # Column names exist
-#   if (is.null(colnames(obj)) || any(colnames(obj) == "")) {
-#     warning(name, " has missing or empty column names")
-#     return(FALSE)
-#   }
-
-#   # Passed all checks
-#   return(TRUE)
-# }
-
-
-
 # DE results validation ---------------------------------------------------
 
 
@@ -204,81 +167,6 @@ standardize_de_results <- function(de_results,
   return(de_results)
 }
 
-# # ' Normalize de_results input into a standard format
-# #' @param de_results NULL, a data.frame, or a named list of de_results entries
-# #' @param value_column Column name for the differential expression values (used if de_results is a data.frame)
-# #' @param feature_column Column name for the feature IDs (used if de_results is a
-# #' data.frame)
-# #' @return A named list of validated de_results entries, or NULL if invalid
-# #' @noRd
-# standardize_de_results <- function(
-#   de_results,
-#   value_column = NULL,
-#   feature_column = NULL
-# ) {
-#   if (is.null(de_results)) {
-#     return(NULL)
-#   }
-
-#   # data.frame into default named list
-#   if (is.list(de_results) && !is.data.frame(de_results)) {
-#     if (is.null(names(de_results)) ||
-#       any(names(de_results) == "")) {
-#       warning(
-#         "de_results must be NULL, a valid data.frame, or a named list. ",
-#         "Ignoring de_results, make sure you are not providing MArrayLM but the uptput of topTable, if using limma"
-#       )
-#       return(NULL)
-#     }
-#   } else if (is_valid_dataframe(de_results, name = "de_results")) {
-#     message(
-#       "de_results provided as a single data.frame. ",
-#       if (is.null(value_column)) {
-#         message("Using default value_column: 'log2FoldChange'")
-#       } else {
-#         message(paste0("Using provided value_column: '", value_column, "'"))
-#       },
-#       if (is.null(feature_column)) {
-#         message(" and default feature_column: 'KEGG_ids'.")
-#       } else {
-#         message(paste0(" and provided feature_column: '", feature_column, "'."))
-#       }
-#     )
-
-#     de_results <- list(
-#       de_input = list(
-#         de_table = de_results,
-#         value_column = if (is.null(value_column)) "log2FoldChange" else value_column,
-#         feature_column = if (is.null(feature_column)) "KEGG_ids" else feature_column
-#       )
-#     )
-#   } else {
-#     warning(
-#       "de_results must be NULL, a valid data.frame, or a named list. ",
-#       "Ignoring de_results."
-#     )
-#     return(NULL)
-#   }
-
-#   # keep only valid entries
-#   keep <- vapply(
-#     names(de_results),
-#     function(name) {
-#       is_valid_de_entry(de_results[[name]], name)
-#     },
-#     logical(1)
-#   )
-
-#   de_results <- de_results[keep]
-
-#   # If nothing valid remains, return NULL
-#   if (length(de_results) == 0) {
-#     return(NULL)
-#   }
-
-#   de_results
-# }
-
 
 
 # checks on df and list objects -------------------------------------------
@@ -338,42 +226,6 @@ dataframe_columns_are_of_type <- function(df,
   return(all_ok)
 }
 
-
-# # Check that a column has no NA or empty strings
-# valid_column <- function(df, col, no_na = TRUE) {
-#   if (!col %in% names(df)) {
-#     warning("Column '", col, "' not found in data frame.")
-#     return(FALSE)
-#   }
-
-#   if (no_na) {
-#     invalid <- is.na(df[[col]]) | df[[col]] == ""
-#     if (any(invalid)) {
-#       return(FALSE)
-#       warning(
-#         "Column '", col, "' contains NA or empty values at rows: ",
-#         paste(which(invalid), collapse = ", ")
-#       )
-#     } else {
-#       return(TRUE)
-#     }
-#   }
-
-#   TRUE
-# }
-
-# # Check that a vector column is numeric
-# is_numeric_col <- function(df, col) {
-#   if (!col %in% names(df)) {
-#     warning("Column '", col, "' not found in data frame.")
-#     return(FALSE)
-#   }
-#   if (!is.numeric(df[[col]])) {
-#     warning("Column '", col, "' is not numeric.")
-#     return(FALSE)
-#   }
-#   TRUE
-# }
 
 
 #' Check that a list has exactly the expected names
