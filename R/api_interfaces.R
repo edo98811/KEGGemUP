@@ -103,6 +103,12 @@ retrieve_kgml <- function(pathway_id,
 #' }
 retrieve_all_pathways <- function(org,
                                   verbose = FALSE) {
+
+  if (!interactive()) {
+    message("This is a non-interactive session; this function will not be run in this context.")
+    return(invisible(NULL))
+  }
+
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
@@ -300,6 +306,12 @@ display_cache_KEGGemUP <- function() {
 #'   reset_cache_KEGGemUP()
 #' }
 reset_cache_KEGGemUP <- function() {
+
+  if (!interactive()) {
+    message("This is a non-interactive session; this function will not be run in this context.")
+    return(invisible(NULL))
+  }
+
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
   bfc_map <- BiocFileCache(cache = file.path(path, "mappings"), ask = FALSE)
