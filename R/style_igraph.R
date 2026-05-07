@@ -139,10 +139,6 @@ scale_dimensions <- function(vertices_df,
     warning("Scaling factor should be positive. Using default value of", default_factor)
     factor <- default_factor
   }
-  if (factor <= 0) {
-    warning("Scaling factor should be positive. Using default value of", default_factor)
-    factor <- default_factor
-  }
 
   # Scale x and y coordinates to make the graph look nicer
   vertices_df$x <- as.numeric(vertices_df$x) * factor
