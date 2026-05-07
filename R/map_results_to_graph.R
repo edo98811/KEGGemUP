@@ -563,8 +563,8 @@ get_palette_colors <- function(palette,
       )
       palette <- default_palette
     }
-    # Get palette colors from RColorBrewer (11 colors, reversed)
 
+    # Get palette colors from RColorBrewer (7 colors, reversed)
     palette_colors <- rev(RColorBrewer::brewer.pal(n = 7, name = palette))
   } else {
     # If palette is already a vector of colors, use it directly
