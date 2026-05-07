@@ -235,8 +235,8 @@ add_colors_to_nodes <- function(vertices_df,
   for (source_index in seq_along(sources)) {
     # Extract source name and corresponding palette/limit
     source_name <- sources[[source_index]]
-    palette_limit <- palettes_limits_list[[source_name]]
-    palette <- palettes_list[[source_name]]
+    current_palette_limit <- palettes_limits_list[[source_name]]
+    current_palette <- palettes_list[[source_name]]
 
     # Get valid nodes
     nodes_to_color <- valid_nodes[
@@ -248,7 +248,7 @@ add_colors_to_nodes <- function(vertices_df,
     # Get paletteRamp for this source
     palette_ramp <- tryCatch(
       {
-        colorRampPalette(palette)
+        colorRampPalette(current_palette)
       },
       error = function(e) {
         warning(
@@ -267,8 +267,8 @@ add_colors_to_nodes <- function(vertices_df,
     range_val <- get_palette_range(
       nodes_to_color$de_value,
       source_name,
-      palette_limit,
-      verbose = TRUE
+      current_palette_limit,
+      verbose = verbose
     )
     if (is.na(range_val)) {
       warning(
