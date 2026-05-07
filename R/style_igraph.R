@@ -190,7 +190,7 @@ apply_style_map <- function(df,
 #'
 #' @export
 #'
-#' @importFrom igraph delete_vertices
+#' @importFrom igraph delete_vertices V
 #'
 #' @examples
 #' graph <- create_kegg_graph(pathway_id = "hsa04110")
@@ -199,7 +199,7 @@ apply_style_map <- function(df,
 #'
 #' render_kegg_graph(graph_notitlenode)
 cleanup_title_node <- function(g) {
-  title_node <- grep(pattern = "^TITLE:", V(g)$label)
+  title_node <- grep(pattern = "^TITLE:", igraph::V(g)$label)
   g <- igraph::delete_vertices(g, title_node)
   return(g)
 }
