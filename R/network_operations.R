@@ -678,6 +678,8 @@ build_kegg_graph <- function(file,
 #' @param verbose Logical indicating whether to print verbose messages.
 #' @param pathway_name Name of the pathway for the graph title.
 #'
+#' @importFrom igraph E delete_edges graph_from_data_frame ecount vcount graph_attr
+#'
 #' @return An igraph object representing the KEGG pathway graph
 #'
 #' @noRd
