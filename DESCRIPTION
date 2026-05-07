@@ -1,5 +1,5 @@
 Package: KEGGemUP
-Title: A package to create, render, and map omics data on graphs from KEGG pathways
+Title: Creating, Rendering, and Mapping Omics Data on KEGG Pathway Graphs
 Version: 0.99.0
 Authors@R: 
     c(
