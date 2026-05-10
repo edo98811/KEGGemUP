@@ -337,6 +337,10 @@ We are reporting them in this section for completeness, as many of them can beau
 * [PinPath](https://github.com/SyNUM-lab/PinPath), a package for visualizing omics data onto pathway diagrams (from KEGG or WikiPathways), and pinpoint where in the pathway the relevant changes occur. PinPath offers the option to save svg vectorized images of the plots created.
 * [Cytoscape](https://cytoscape.org/), a general purpose open source software platform [@Shannon2003], used among others for visualizing complex networks and integrating these with any type of attribute data - for which, as mentioned above, the RCy3 package exists to access and control directly within R.
 
+**Disclaimer**  
+`KEGGemUP` uses KEGG API, and therefore is provided for academic use by academic users belonging to academic institutions.
+See https://www.kegg.jp/kegg/rest/ for more information.
+
 
 # FAQs {#faqs}
 
