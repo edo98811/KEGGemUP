@@ -73,5 +73,8 @@ kmu_rendered
 
 You can see more examples and a detailed usage in the package vignette
 
+## Disclaimer
 
+`KEGGemUP` uses KEGG API, and therefore is provided for academic use by academic users belonging to academic institutions.
+See https://www.kegg.jp/kegg/rest/ for more information.
 
