@@ -87,6 +87,10 @@ retrieve_kgml <- function(pathway_id,
 #' the operation without extra unneeded requests to the API
 #'
 #' @param org KEGG organism code (e.g., 'hsa' for human).
+#' @param wait Numeric value, needs to be strictly positive. Indicates the
+#' amount in seconds to wait in between requests, being polite and respectful
+#' of the limit rates imposed by KEGG. Defaults to 0.5, which is safely a bit
+#' above the rate of 3max/sec.
 #' @param verbose Logical, if TRUE, print additional messages.
 #'
 #' @return The BiocFileCache object is returned invisibly
@@ -102,12 +106,15 @@ retrieve_kgml <- function(pathway_id,
 #'   retrieve_all_pathways("hsa", verbose = TRUE)
 #' }
 retrieve_all_pathways <- function(org,
+                                  wait = 0.5,
                                   verbose = FALSE) {
 
   if (!interactive()) {
     message("This is a non-interactive session; this function will not be run in this context.")
     return(invisible(NULL))
   }
+
+  stopifnot(is.numeric(wait) && wait > 0)
 
   path <- tools::R_user_dir("BiocFileCache", which = "cache")
   bfc_kegg <- BiocFileCache(cache = file.path(path, "kegg_maps"), ask = FALSE)
@@ -138,6 +145,7 @@ retrieve_all_pathways <- function(org,
     pathway_desc <- all_pathways_df$description[i]
     if (verbose) message(i, "/", tot_pathways, " - ", pathway_id, "|", pathway_desc)
     retrieve_kgml(pathway_id, bfc = bfc_kegg, verbose = verbose)
+    Sys.sleep(wait)
   }
 
   message("Done retrieving all pathways for ", org, "!")
