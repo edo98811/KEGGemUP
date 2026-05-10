@@ -4,10 +4,15 @@
 \alias{retrieve_all_pathways}
 \title{Download all pathways}
 \usage{
-retrieve_all_pathways(org, verbose = FALSE)
+retrieve_all_pathways(org, wait = 0.5, verbose = FALSE)
 }
 \arguments{
 \item{org}{KEGG organism code (e.g., 'hsa' for human).}
+
+\item{wait}{Numeric value, needs to be strictly positive. Indicates the
+amount in seconds to wait in between requests, being polite and respectful
+of the limit rates imposed by KEGG. Defaults to 0.5, which is safely a bit
+above the rate of 3max/sec.}
 
 \item{verbose}{Logical, if TRUE, print additional messages.}
 }
