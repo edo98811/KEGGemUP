@@ -5,14 +5,17 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>A package to map you differential expression results on KEGG pathways • KEGGemUP</title>
+<title>Creating, Rendering, and Mapping Omics Data on KEGG Pathway Graphs • KEGGemUP</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/Atkinson_Hyperlegible-0.4.10/font.css" rel="stylesheet">
+<link href="deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A package to map you differential expression results on KEGG pathways">
-<meta name="description" content="TODO Simplify the analysis of multiomics datasets.">
-<meta property="og:description" content="TODO Simplify the analysis of multiomics datasets.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Creating, Rendering, and Mapping Omics Data on KEGG Pathway Graphs">
+<meta name="description" content="KEGGemUP retrieves and renders interactively KEGG pathway graphs. The retrieval makes full use of the caching functionality to avoid unnecessary download processes. The interactivity of the graph is warranted via the visNetwork interface to the vis.js library, fully supporting bindings to be used in Shiny for further operations.">
+<meta property="og:description" content="KEGGemUP retrieves and renders interactively KEGG pathway graphs. The retrieval makes full use of the caching functionality to avoid unnecessary download processes. The interactivity of the graph is warranted via the visNetwork interface to the vis.js library, fully supporting bindings to be used in Shiny for further operations.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="index.html">KEGGemUP</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +38,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/kegg-graph-real-data.html">The `KEGGemUP` package: building KEGG pathway graphs and mapping real data results
+<li><a class="dropdown-item" href="articles/KEGGemUP_userguide.html">The `KEGGemUP` User's Guide
     </a></li>
   </ul>
 </li>
@@ -45,7 +48,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/edo98811/KEGGemUP/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/imbeimainz/KEGGemUP/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -57,65 +60,72 @@
 <div class="section level1">
 <div class="page-header"><h1 id="keggemup">KEGGemUP<a class="anchor" aria-label="anchor" href="#keggemup"></a>
 </h1></div>
-<p>A package to map you differential expression results on KEGG pathways.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>To install the package you need an up to date R version (R &gt;= 4.5.0) and devtools or remotes package installed. Then you can install KEGGemUP from GitHub:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>     </span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"edo98811/KEGGemUP"</span><span class="op">)</span></span></code></pre></div>
+<p><code>KEGGemUP</code> can be installed from Bioconductor with the following code:</p>
+<pre><code><span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">'BiocManager'</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'BiocManager'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"KEGGemUP"</span><span class="op">)</span></span></code></pre>
+<p>You can also install the development version of <code>KEGGemUP</code> from GitHub with:</p>
+<pre><code><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"imbeimainz/KEGGemUP"</span><span class="op">)</span></span></code></pre>
+<p>Load the package after installation with</p>
+<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/imbeimainz/KEGGemUP" class="external-link">"KEGGemUP"</a></span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level2">
-<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+<h2 id="keggemup-at-a-glance">KEGGemUP at a glance<a class="anchor" aria-label="anchor" href="#keggemup-at-a-glance"></a>
 </h2>
-<p>To use the Kegg pathway visualization function you only need a kegg id of the pathway you want to visualize. You can run the function kegg_to_graph to get the igraph representation of the pathway. If you wish to plot it directly to visnetwork then it is enough to add the parameter <code>return_type = "visnetwork"</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
+<p>The <code>KEGGemUP</code> package allows you to:</p>
+<ul>
+<li><p>Retrieve and create a KEGG pathway graph, from the KGML files (with <code><a href="reference/create_kegg_graph.html">create_kegg_graph()</a></code>)</p></li>
+<li><p>Map some continuous values onto that graph (e.g. the logFoldChange, with the <code><a href="reference/map_results_to_graph.html">map_results_to_graph()</a></code>)</p></li>
+<li><p>Render that graph interactively (via <code><a href="reference/render_kegg_graph.html">render_kegg_graph()</a></code>, based on <code>visNetwork</code>)</p></li>
+<li><p>Focus either on a subset or on a highlighted portion of that graph (thanks to <code><a href="reference/subset_kegg_graph.html">subset_kegg_graph()</a></code> and <code><a href="reference/highlight_kegg_graph.html">highlight_kegg_graph()</a></code>)</p></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<pre><code><span><span class="co">## load an example dataset, and format the DE results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">res_de_macro_IFNg_vs_naive</span>, package <span class="op">=</span> <span class="st">"KEGGemUP"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_de_macro_IFNg_vs_naive</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span>, return_type <span class="op">=</span> <span class="st">"visnetwork"</span><span class="op">)</span></span></code></pre></div>
-<p>After that you can use the function <code><a href="reference/map_results_to_graph.html">map_results_to_graph()</a></code> to map your differential expression results to the nodes of the graph. You can provide either a single <code>data.frame</code> or a list of <code>data.frame</code>s containing your differential expression results. Each data frame should have a column for the feature IDs (e.g., ENTREZID) and a column for the values you want to map (e.g., logFC or log2FoldChange).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
-<span></span>
-<span><span class="va">de_results_list</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  trans_limma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    de_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_macrophage_IFNg_vs_naive_limma</span><span class="op">)</span>,</span>
+<span><span class="va">de_results_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  rnaseq_limma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    de_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_de_macro_IFNg_vs_naive</span><span class="op">)</span>,</span>
 <span>    value_column <span class="op">=</span> <span class="st">"logFC"</span>,</span>
 <span>    feature_column <span class="op">=</span> <span class="st">"ENTREZID"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  trans_deseq <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    de_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">res_macrophage_IFNg_vs_naive_dds</span><span class="op">)</span>,</span>
-<span>    value_column <span class="op">=</span> <span class="st">"log2FoldChange"</span>,</span>
-<span>    feature_column <span class="op">=</span> <span class="st">"ENTREZID"</span></span>
-<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_graph.html">map_results_to_graph</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">de_results_list</span><span class="op">)</span></span>
-<span><span class="va">graph</span></span></code></pre></div>
-<p>If using a single data frame you can do it like this:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edo98811/KEGGemUP" class="external-link">KEGGemUP</a></span><span class="op">)</span></span>
+<span><span class="co">## retrieve and create the graph</span></span>
+<span><span class="va">kmu_cellcycle</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/create_kegg_graph.html">create_kegg_graph</a></span><span class="op">(</span>pathway_id <span class="op">=</span> <span class="st">"hsa04110"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pathway</span> <span class="op">&lt;-</span> <span class="st">"hsa04110"</span>  <span class="co"># Example pathway ID</span></span>
+<span><span class="co">## map the DE values to the graph</span></span>
+<span><span class="va">kmu_cellcycle_mapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_graph.html">map_results_to_graph</a></span><span class="op">(</span>g <span class="op">=</span> <span class="va">kmu_cellcycle</span>,</span>
+<span>                                             de_results <span class="op">=</span> <span class="va">de_results_list</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kegg_to_graph.html">kegg_to_graph</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">)</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_results_to_graph.html">map_results_to_graph</a></span><span class="op">(</span><span class="va">graph</span>, <span class="va">res_macrophage_IFNg_vs_naive_limma</span>, feature_column <span class="op">=</span> <span class="st">"ENTREZID"</span>, value_column <span class="op">=</span> <span class="st">"logFC"</span><span class="op">)</span></span>
-<span><span class="va">graph</span></span></code></pre></div>
+<span><span class="co">## render the graph interactively</span></span>
+<span><span class="va">kmu_rendered</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/render_kegg_graph.html">render_kegg_graph</a></span><span class="op">(</span>g <span class="op">=</span> <span class="va">kmu_cellcycle_mapped</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">kmu_rendered</span></span></code></pre>
+<p>You can see more examples and a detailed usage in the package vignette</p>
+</div>
+<div class="section level2">
+<h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
+</h2>
+<p><code>KEGGemUP</code> uses KEGG API, and therefore is provided for academic use by academic users belonging to academic institutions. See <a href="https://www.kegg.jp/kegg/rest/" class="external-link uri">https://www.kegg.jp/kegg/rest/</a> for more information.</p>
 </div>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/edo98811/KEGGemUP/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/edo98811/KEGGemUP/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/imbeimainz/KEGGemUP/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/imbeimainz/KEGGemUP/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -138,15 +148,15 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Edoardo Filippi <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0003-9858-0137" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Federico Marini <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-3252-7758" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Edoardo Filippi <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0003-9858-0137" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Federico Marini <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3252-7758" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/imbeimainz/KEGGemUP/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/imbeimainz/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 

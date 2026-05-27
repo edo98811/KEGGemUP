@@ -1,74 +1,76 @@
 # KEGGemUP
 
-A package to map you differential expression results on KEGG pathways.
-
 ## Installation
 
-To install the package you need an up to date R version (R \>= 4.5.0)
-and devtools or remotes package installed. Then you can install KEGGemUP
-from GitHub:
+`KEGGemUP` can be installed from Bioconductor with the following code:
 
-``` r
-install.packages("remotes")     
-remotes::install_github("edo98811/KEGGemUP")
-```
+    if(!requireNamespace('BiocManager', quietly = TRUE))
+      install.packages('BiocManager')
 
-## Usage
+    BiocManager::install("KEGGemUP")
 
-To use the Kegg pathway visualization function you only need a kegg id
-of the pathway you want to visualize. You can run the function
-kegg_to_graph to get the igraph representation of the pathway. If you
-wish to plot it directly to visnetwork then it is enough to add the
-parameter `return_type = "visnetwork"`.
+You can also install the development version of `KEGGemUP` from GitHub
+with:
 
-``` r
-library(KEGGemUP)
+    # install.packages("remotes")
+    remotes::install_github("imbeimainz/KEGGemUP")
 
-pathway <- "hsa04110"  # Example pathway ID
-graph <- kegg_to_graph(pathway)
+Load the package after installation with
 
-kegg_to_graph(pathway, return_type = "visnetwork")
-```
+    library("KEGGemUP")
 
-After that you can use the function
-[`map_results_to_graph()`](https://edo98811.github.io/KEGGemUP/reference/map_results_to_graph.md)
-to map your differential expression results to the nodes of the graph.
-You can provide either a single `data.frame` or a list of `data.frame`s
-containing your differential expression results. Each data frame should
-have a column for the feature IDs (e.g., ENTREZID) and a column for the
-values you want to map (e.g., logFC or log2FoldChange).
+## KEGGemUP at a glance
 
-``` r
-library(KEGGemUP)
+The `KEGGemUP` package allows you to:
 
-pathway <- "hsa04110"  # Example pathway ID
+- Retrieve and create a KEGG pathway graph, from the KGML files (with
+  [`create_kegg_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/create_kegg_graph.md))
 
-de_results_list <-list(
-  trans_limma = list(
-    de_table = data.frame(res_macrophage_IFNg_vs_naive_limma),
-    value_column = "logFC",
-    feature_column = "ENTREZID"
-  ),
-  trans_deseq = list(
-    de_table = data.frame(res_macrophage_IFNg_vs_naive_dds),
-    value_column = "log2FoldChange",
-    feature_column = "ENTREZID"
+- Map some continuous values onto that graph (e.g. the logFoldChange,
+  with the
+  [`map_results_to_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/map_results_to_graph.md))
+
+- Render that graph interactively (via
+  [`render_kegg_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/render_kegg_graph.md),
+  based on `visNetwork`)
+
+- Focus either on a subset or on a highlighted portion of that graph
+  (thanks to
+  [`subset_kegg_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/subset_kegg_graph.md)
+  and
+  [`highlight_kegg_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/highlight_kegg_graph.md))
+
+## Quick start
+
+    ## load an example dataset, and format the DE results
+    data(res_de_macro_IFNg_vs_naive, package = "KEGGemUP")
+
+    head(res_de_macro_IFNg_vs_naive)
+
+    de_results_list <- list(
+      rnaseq_limma = list(
+        de_table = data.frame(res_de_macro_IFNg_vs_naive),
+        value_column = "logFC",
+        feature_column = "ENTREZID"
+      )
     )
-)
 
-graph <- kegg_to_graph(pathway)
-graph <- map_results_to_graph(graph, de_results_list)
-graph
-```
+    ## retrieve and create the graph
+    kmu_cellcycle <- create_kegg_graph(pathway_id = "hsa04110")
 
-If using a single data frame you can do it like this:
+    ## map the DE values to the graph
+    kmu_cellcycle_mapped <- map_results_to_graph(g = kmu_cellcycle,
+                                                 de_results = de_results_list)
 
-``` r
-library(KEGGemUP)
+    ## render the graph interactively
+    kmu_rendered <- render_kegg_graph(g = kmu_cellcycle_mapped)
 
-pathway <- "hsa04110"  # Example pathway ID
+    kmu_rendered
 
-graph <- kegg_to_graph(pathway)
-graph <- map_results_to_graph(graph, res_macrophage_IFNg_vs_naive_limma, feature_column = "ENTREZID", value_column = "logFC")
-graph
-```
+You can see more examples and a detailed usage in the package vignette
+
+## Disclaimer
+
+`KEGGemUP` uses KEGG API, and therefore is provided for academic use by
+academic users belonging to academic institutions. See
+<https://www.kegg.jp/kegg/rest/> for more information.
