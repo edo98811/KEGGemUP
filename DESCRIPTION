@@ -23,12 +23,11 @@ VignetteBuilder: knitr
 biocViews: 
     Software, Pathways, KEGG, Network, Visualization, DifferentialExpression,
     GraphAndNetwork, Transcriptomics, Proteomics, Metabolomics, SystemsBiology
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
-URL: https://github.com/edo98811/KEGGemUP, https://edo98811.github.io/KEGGemUP/
-BugReports: https://github.com/edo98811/KEGGemUP/issues
+URL: https://github.com/imbeimainz/KEGGemUP
+BugReports: https://github.com/imbeimainz/KEGGemUP/issues
 Depends: 
-    R (>= 4.5.0)
+    R (>= 4.6.0)
 Imports:
     BiocFileCache,
     httr2,
@@ -52,3 +51,4 @@ Suggests:
     BiocStyle,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
