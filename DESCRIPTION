@@ -4,11 +4,11 @@ Version: 0.99.0
 Authors@R: 
     c(
         person(
-            given = "Edoardo", family = "Filippi", role = c("aut", "cre"),
+            given = "Edoardo", family = "Filippi", role = c("aut"),
             email = "edoardo.filippi@uni-mainz.de", comment = c(ORCID = "0009-0003-9858-0137")
         ),
         person(
-            given = "Federico", family = "Marini", role = c("aut"), 
+            given = "Federico", family = "Marini", role = c("aut", "cre"), 
             email = "marinif@uni-mainz.de", comment = c(ORCID = "0000-0003-3252-7758")
         )
     )
