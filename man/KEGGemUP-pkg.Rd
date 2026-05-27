@@ -24,18 +24,18 @@ in fully fledged Shiny apps.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/edo98811/KEGGemUP}
-  \item \url{https://edo98811.github.io/KEGGemUP/}
-  \item Report bugs at \url{https://github.com/edo98811/KEGGemUP/issues}
+  \item \url{https://github.com/imbeimainz/KEGGemUP}
+  \item Report bugs at \url{https://github.com/imbeimainz/KEGGemUP/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Edoardo Filippi \email{edoardo.filippi@uni-mainz.de} (\href{https://orcid.org/0009-0003-9858-0137}{ORCID})
+\strong{Maintainer}: Federico Marini \email{marinif@uni-mainz.de} (\href{https://orcid.org/0000-0003-3252-7758}{ORCID})
 
 Authors:
 \itemize{
   \item Federico Marini \email{marinif@uni-mainz.de} (\href{https://orcid.org/0000-0003-3252-7758}{ORCID})
+  \item Edoardo Filippi \email{edoardo.filippi@uni-mainz.de} (\href{https://orcid.org/0009-0003-9858-0137}{ORCID})
 }
 
 }
