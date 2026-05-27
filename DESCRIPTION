@@ -1,53 +1,54 @@
 Package: KEGGemUP
-Title: A package to map you differential expression results on KEGG pathways
-Version: 0.1.0
+Title: Creating, Rendering, and Mapping Omics Data on KEGG Pathway Graphs
+Version: 0.99.0
 Authors@R: 
     c(
         person(
-            given = "Edoardo", family = "Filippi", role = c("aut", "cre"),
+            given = "Edoardo", family = "Filippi", role = c("aut"),
             email = "edoardo.filippi@uni-mainz.de", comment = c(ORCID = "0009-0003-9858-0137")
         ),
         person(
-            given = "Federico", family = "Marini", role = c("aut"), 
+            given = "Federico", family = "Marini", role = c("aut", "cre"), 
             email = "marinif@uni-mainz.de", comment = c(ORCID = "0000-0003-3252-7758")
         )
     )
-Description: TODO Simplify the analysis of multiomics datasets.
+Description: KEGGemUP retrieves and renders interactively KEGG pathway graphs.
+    The retrieval makes full use of the caching functionality to avoid unnecessary
+    download processes. The interactivity of the graph is warranted via the 
+    visNetwork interface to the vis.js library, fully supporting bindings to be 
+    used in Shiny for further operations.
 License: MIT + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
 biocViews: 
-    Pathways, KEGG, Network, Visualization, DifferentialExpression
-RoxygenNote: 7.3.3
+    Software, Pathways, KEGG, Network, Visualization, DifferentialExpression,
+    GraphAndNetwork, Transcriptomics, Proteomics, Metabolomics, SystemsBiology
 Roxygen: list(markdown = TRUE)
-URL: https://github.com/edo98811/KEGGemUP, https://edo98811.github.io/KEGGemUP/
-BugReports: https://github.com/edo98811/KEGGemUP/issues
+URL: https://github.com/imbeimainz/KEGGemUP
+BugReports: https://github.com/imbeimainz/KEGGemUP/issues
 Depends: 
-    R (>= 4.5.0)
+    R (>= 4.6.0)
 Imports:
     BiocFileCache,
     httr2,
+    ggplot2,
+    rlang,
+    methods,
     igraph,
+    scales,
     KEGGREST,
     visNetwork,
     RColorBrewer,
-    xml2
+    htmlwidgets,
+    xml2,
+    grDevices,
+    stats,
+    tools,
+    utils
 Suggests: 
-    shinytest2,
-    mockery,
-    spelling,
-    testthat (>= 3.0.0),
     knitr,
-    macrophage,
-    org.Hs.eg.db,
-    org.Mm.eg.db,
-    SummarizedExperiment,
-    AnnotationDbi,
-    clusterProfiler,
-    limma,
-    edgeR,
-    purrr,
-    S4Vectors,
+    rmarkdown,
     BiocStyle,
-    DT
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

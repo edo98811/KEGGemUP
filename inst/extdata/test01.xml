@@ -6,6 +6,18 @@
          image="https://www.kegg.jp/test/pathway.png"
          link="https://www.kegg.jp/test/pathway">
 
+    <!-- Gene for reaction R00001 -->
+    <entry id="7" name="tst:R00001_gene" type="gene" reaction="rn:R00001">
+        <graphics name="GENE_R00001" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="150" y="100" width="46" height="17"/>
+    </entry>
+
+    <!-- Gene for reaction R00002 -->
+    <entry id="8" name="tst:R00002_gene" type="gene" reaction="rn:R00002">
+        <graphics name="GENE_R00002" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="300" y="100" width="46" height="17"/>
+    </entry>
+
     <!-- Single gene -->
     <entry id="1" name="tst:1111" type="gene"
         link="https://www.kegg.jp/dbget-bin/www_bget?tst:1111">
@@ -32,6 +44,44 @@
         link="https://www.kegg.jp/dbget-bin/www_bget?tst00002">
         <graphics name="TITLE:Test map" fgcolor="#000000" bgcolor="#FFFFFF"
              type="roundrectangle" x="400" y="100" width="100" height="25"/>
+    </entry>
+
+    <!-- Compound -->
+    <entry id="10" name="cpd:C00001" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00001">
+        <graphics name="COMPOUND1" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="100" y="200" width="30" height="30"/>
+    </entry>
+
+    <!-- Added compounds for reactions -->
+    <entry id="11" name="cpd:C00002" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00002">
+        <graphics name="C00002" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="200" y="200" width="30" height="30"/>
+    </entry>
+
+    <entry id="12" name="cpd:C00003" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00003">
+        <graphics name="C00003" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="300" y="200" width="30" height="30"/>
+    </entry>
+
+    <entry id="13" name="cpd:C00004" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00004">
+        <graphics name="C00004" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="400" y="200" width="30" height="30"/>
+    </entry>
+
+    <entry id="14" name="cpd:C00005" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00005">
+        <graphics name="C00005" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="500" y="200" width="30" height="30"/>
+    </entry>
+
+    <entry id="15" name="cpd:C00006" type="compound"
+        link="https://www.kegg.jp/dbget-bin/www_bget?cpd:C00006">
+        <graphics name="C00006" fgcolor="#000000" bgcolor="#FFFFCC"
+             type="circle" x="600" y="200" width="30" height="30"/>
     </entry>
 
     <!-- Line node -->
@@ -67,26 +117,28 @@
     <relation entry1="4" entry2="5" type="PPrel">
         <subtype name="expression" value="..&gt;"/>
     </relation>
+    
     <!-- Circular relation -->
     <relation entry1="5" entry2="1" type="PPrel">
         <subtype name="feedback" value="--o"/>
     </relation>
 
+    <!-- Reactions -->
     <reaction id="7" name="rn:R00001" type="irreversible">
-      <substrate id="1" name="cpd:C00001"/>
-      <product id="2" name="cpd:C00002"/>
-    </reaction>
-
-    <reaction id="8" name="rn:R00002" type="reversible">
-      <substrate id="2" name="cpd:C00003"/>
-      <substrate id="3" name="cpd:C00004"/>
-      <product id="4" name="cpd:C00005"/>
-      <product id="5" name="cpd:C00006"/>
+      <substrate id="10" name="cpd:C00001"/>
+      <product id="11" name="cpd:C00002"/>
     </reaction>
 
     <reaction id="9" name="rn:R00003" type="irreversible">
-      <substrate id="5" name="cpd:C00007"/>
-      <product id="6" name="cpd:C00008"/>
+      <substrate id="10" name="cpd:C00001"/>
+      <product id="11" name="cpd:C00002"/>
+    </reaction>
+
+    <reaction id="8" name="rn:R00002" type="reversible">
+      <substrate id="12" name="cpd:C00003"/>
+      <substrate id="13" name="cpd:C00004"/>
+      <product id="14" name="cpd:C00005"/>
+      <product id="15" name="cpd:C00006"/>
     </reaction>
 
 </pathway>

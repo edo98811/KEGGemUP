@@ -8,3 +8,7 @@
 ^.github
 ^LICENSE\.md$
 ^\.github$
+^dev$
+^oldstuff$
+TODO\.md
+testdrive\.R

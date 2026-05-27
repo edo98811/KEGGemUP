@@ -1,0 +1,45 @@
+# Constant values --------------------------------------------------------
+
+
+## for style_igraph.R ------------------------------------------------------
+.color_edge_relation_EC <- "#8A2BE2"
+.color_edge_relation_PP <- "#FFD700"
+.color_edge_relation_GE <- "#FF6347"
+.color_edge_relation_PC <- "#20B2AA"
+.color_edge_relation_maplink <- "#FF4500"
+
+.color_edge_substrate_reversible <- "#008000"
+.color_edge_product_reversible <- "#008000"
+.color_edge_substrate_irreversible <- "#FF4500"
+.color_edge_product_irreversible <- "#FF4500"
+
+.color_edge_line <- "black"
+.color_edge_group <- "transparent"
+
+
+
+## for visNetwork_interface_tooltips_kegg.R -----------------------------------------
+
+.color_visnetwork_background <- "#FFFFFF"
+.font_visnetwork_title <- "font-family:IBM Plex Sans, Fira Code, Arial, Tahoma, Geneva, Verdana, sans-serif;font-weight:bold;font-size:20px;text-align:center;"
+
+.font_node_size <- 8
+.color_nodelabel_background <- "white"
+.color_nodeborder_default <- "#AAAAAA"
+.color_nodeborder_groupline <- "transparent"
+.color_nodeborder_highlighted <- "#87b13f"  # bioc green, as an alternative to red
+
+.color_node_faded <- "rgba(200,200,200,0.4)"
+.color_pathwaynode_faded <- "#bbbbbb"
+.color_edge_faded <- "rgba(200,200,200,0.4)"
+.color_edgetext_faded <- "#DDDDDD"
+
+
+
+.style_button_node_name <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
+.style_button_node_reaction <- "color:#fff; background-color:#33b742; border-color:#2e6da4;"
+.color_button_node_pathways <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
+
+.style_button_edge <- "color:#fff; background-color:#337ab7; border-color:#2e6da4;"
+
+

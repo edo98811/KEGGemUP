@@ -1,11 +1,15 @@
-# https://rpubs.com/huanfaChen/261838
+# node and edge default values --------------------------------------------
 
 #' Default KEGG node attributes
+#'
+#' Definition of the default KEGG node attributes
+#' 
 #' @return A list of default KEGG node attributes
+#'
 #' @noRd
-kegg_node_defaults <- function() {
+kegg_vertex_defaults <- function() {
   list(
-    # Core KGML attributes
+    # KGML attributes
     name = NA_character_,
     type = NA_character_,
     link = NA_character_,
@@ -25,6 +29,7 @@ kegg_node_defaults <- function() {
     de_value = NA_real_,
     de_text = NA_character_,
     de_source = NA_character_,
+    de_name = NA_character_,
     ids_for_mapping = "",
 
     # Visualization attributes
@@ -40,12 +45,17 @@ kegg_node_defaults <- function() {
     vertex.color = "white",
     size = 25,
     fixed = TRUE,
-    shape = "vrectangle",
-    text = ""
+    shape = "vrectangle"
   )
 }
 
 
+#' Default KEGG edge attributes
+#'
+#' Definition of the default KEGG edge attributes
+#'
+#' @return A list of default KEGG edge attributes
+#'
 #' @noRd
 kegg_edge_defaults <- function() {
   list(
@@ -64,6 +74,7 @@ kegg_edge_defaults <- function() {
     reaction_from_name = NA_character_,
     reaction_to_name = NA_character_,
     point_index = NA_integer_,
+
     # Style attributes
     directed = TRUE,
     color = "gray",
@@ -73,7 +84,10 @@ kegg_edge_defaults <- function() {
     lty = 1,
     arrow.mode = "to",
     dashes = FALSE,
-    title = NA_character_
+    title = NA_character_,
+    font.face = "arial",
+    borderWidth = 1,
+    borderWidthSelected = 2
   )
 }
 
