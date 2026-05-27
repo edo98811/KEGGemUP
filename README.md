@@ -1,5 +1,5 @@
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/edo98811/KEGGemUP/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/imbeimainz/KEGGemUP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/imbeimainz/KEGGemUP/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
   
@@ -21,7 +21,7 @@ You can also install the development version of `KEGGemUP` from GitHub with:
 
 ```
 # install.packages("remotes")
-remotes::install_github("edo98811/KEGGemUP")
+remotes::install_github("imbeimainz/KEGGemUP")
 ```
 
 Load the package after installation with
