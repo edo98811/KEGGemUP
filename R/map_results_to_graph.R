@@ -657,8 +657,7 @@ get_palette_range <- function(de_value_vector,
 #' @param title Character, the title for the legend.
 #' @param n_element Integer, the number of elements (breaks) to show in the legend.
 #'
-#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void
-#' ggplot_gtable ggplot_build
+#' @importFrom ggplot2 ggplot geom_point aes scale_fill_gradientn theme_void ggplot_gtable ggplot_build
 #' @importFrom rlang .data
 #'
 #' @return A ggplot grob object representing the legend

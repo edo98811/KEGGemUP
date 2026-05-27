@@ -174,10 +174,8 @@ retrieve_all_pathways <- function(org,
 #'
 #' @importFrom KEGGREST keggList
 #' @importFrom utils read.table write.table
-#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd
-#' bfcrpath
-#' @importFrom httr2 request req_perform resp_status resp_body_string
-#' resp_is_error req_retry
+#' @importFrom BiocFileCache BiocFileCache bfcquery bfcpath bfcnew bfcadd bfcrpath
+#' @importFrom httr2 request req_perform resp_status resp_body_string resp_is_error req_retry
 #'
 #' @export
 #'
