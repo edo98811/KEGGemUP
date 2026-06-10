@@ -26,7 +26,13 @@ test_that("workflow", {
                          FUN.VALUE = logical(1))))
 
   vis_graph_01 <- render_kegg_graph(g_test_01_mapped)
+
+  vis_graph_02 <- render_kegg_graph(g_test_01_mapped, graph_title = "my custom title")
+
   expect_s3_class(vis_graph_01, "visNetwork")
+  expect_s3_class(vis_graph_02, "visNetwork")
+
+  expect_error({render_kegg_graph(g_test_01_mapped, graph_title = de_results_list)})
 
   graph_01_subset <- subset_kegg_graph(g_test_01_mapped, ids_to_include = c("C00001", "C00002"))
 

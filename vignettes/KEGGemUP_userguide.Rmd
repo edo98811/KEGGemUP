@@ -245,7 +245,7 @@ kmu_cellcycle <- create_kegg_graph(pathway_id = "hsa04110")
 kmu_cellcycle_mapped <- map_results_to_graph(g = kmu_cellcycle, 
                                              de_results = de_results_list)
 
-# Selecting a subset of the nodes to keep
+## Selecting a subset of the nodes to keep
 KEGGids_to_include <- igraph::V(kmu_cellcycle_mapped)$ids_for_mapping |>
   tail(35) |> 
   strsplit(split = ";") |>
@@ -256,7 +256,9 @@ length(KEGGids_to_include)
 
 kmu_cellcycle_subset <- subset_kegg_graph(g = kmu_cellcycle_mapped, 
                                           ids_to_include = KEGGids_to_include)
-render_kegg_graph(kmu_cellcycle_subset)
+
+## Specifying a custom title with the `graph_title` parameter...
+render_kegg_graph(kmu_cellcycle_subset, graph_title = "The subset of the original graph")
 ```
 
 By keeping the nodes, also the edges that exist and connect them are retained.
