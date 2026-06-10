@@ -38,5 +38,12 @@ Authors:
   \item Edoardo Filippi \email{edoardo.filippi@uni-mainz.de} (\href{https://orcid.org/0009-0003-9858-0137}{ORCID})
 }
 
+Other contributors:
+\itemize{
+  \item Myriam Meineck \email{Myriam.Meineck@unimedizin-mainz.de} (\href{https://orcid.org/0000-0002-3243-2540}{ORCID}) [contributor]
+  \item Paul Classen \email{classenp@uni-mainz.de} (\href{https://orcid.org/0000-0002-9410-0525}{ORCID}) [contributor]
+  \item Julia Weinmann-Menke \email{Julia.Weinmann-Menke@unimedizin-mainz.de} (\href{https://orcid.org/0000-0001-7344-8381}{ORCID}) [funder]
+}
+
 }
 \keyword{internal}

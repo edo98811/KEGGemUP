@@ -1,11 +1,23 @@
 Package: KEGGemUP
 Title: Creating, Rendering, and Mapping Omics Data on KEGG Pathway Graphs
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: 
     c(
         person(
             given = "Edoardo", family = "Filippi", role = c("aut"),
             email = "edoardo.filippi@uni-mainz.de", comment = c(ORCID = "0009-0003-9858-0137")
+        ),
+        person(
+            given = "Myriam", family = "Meineck", role = c("ctb"),
+            email = "Myriam.Meineck@unimedizin-mainz.de", comment = c(ORCID = "0000-0002-3243-2540")
+        ),
+        person(
+            given = "Paul", family = "Classen", role = c("ctb"),
+            email = "classenp@uni-mainz.de", comment = c(ORCID = "0000-0002-9410-0525")
+        ),
+        person(
+            given = "Julia", family = "Weinmann-Menke", role = c("fnd"),
+            email = "Julia.Weinmann-Menke@unimedizin-mainz.de", comment = c(ORCID = "0000-0001-7344-8381")
         ),
         person(
             given = "Federico", family = "Marini", role = c("aut", "cre"), 

@@ -6,6 +6,7 @@
 \usage{
 render_kegg_graph(
   g,
+  graph_title = NULL,
   scaling_factor = 1.5,
   relationships = c("all", "reactions", "relations", "none"),
   visualization_type = c("standard", "positions", "node_name", "node_size")
@@ -14,6 +15,10 @@ render_kegg_graph(
 \arguments{
 \item{g}{An igraph object representing the
 KEGG pathway graph.}
+
+\item{graph_title}{Character string, used as a title for the rendered graph.
+Defaults to NULL, which would fall back to the name specified in the title
+attribute of the graph.}
 
 \item{scaling_factor}{Numeric factor to scale
 node sizes (default: 1.5).}
