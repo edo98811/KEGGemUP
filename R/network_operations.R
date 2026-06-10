@@ -77,6 +77,9 @@ create_kegg_graph <- function(pathway_id,
 #'
 #' @param g An igraph object representing the
 #' KEGG pathway graph.
+#' @param graph_title Character string, used as a title for the rendered graph.
+#' Defaults to NULL, which would fall back to the name specified in the title
+#' attribute of the graph.
 #' @param scaling_factor Numeric factor to scale
 #' node sizes (default: 1.5).
 #' @param relationships Character specifying which
@@ -110,6 +113,7 @@ create_kegg_graph <- function(pathway_id,
 #' vis_graph <- render_kegg_graph(graph, scaling_factor = 1.5,
 #' relationships = "all", visualization_type = "standard")
 render_kegg_graph <- function(g,
+                              graph_title = NULL,
                               scaling_factor = 1.5,
                               relationships = c("all", "reactions", "relations", "none"),
                               visualization_type = c("standard", "positions", "node_name", "node_size")) {
@@ -118,12 +122,22 @@ render_kegg_graph <- function(g,
     stop("Input graph 'g' must be an igraph object.")
   }
 
+  if (!is.null(graph_title)) {
+    stopifnot(is.character(graph_title))
+  }
+
   relationships <- match.arg(relationships)
   visualization_type <- match.arg(visualization_type)
   # Convert igraph to data frames
   vertices_df <- as_data_frame(g, what = "vertices")
   edges_df <- as_data_frame(g, what = "edges")
-  pathway_name <- igraph::graph_attr(g, "title")
+
+  if (!is.null(graph_title)) {
+    pathway_name <- graph_title
+  } else {
+    pathway_name <- igraph::graph_attr(g, "title")
+  }
+
 
   # Style nodes and edges
   vertices_df <- kegg_nodes_to_visNetwork(
