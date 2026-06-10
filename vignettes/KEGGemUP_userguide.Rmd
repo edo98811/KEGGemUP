@@ -286,7 +286,7 @@ export_kegg_graph(g = kmu_cellcycle_highlighted, basename = file_prefix)
 ```
 
 Alternatively, the `igraph` objects can also be directly sent to external software such as Cytoscape via the RESTful API implemented in `RCy3` - this can also allow some settings of the nodes to be conveniently set in an automated manner. 
-We refer to the `RCy3` package vignettes for further reading - possibly, this can be the best place to start: `BiocStyle::Biocpkg("RCy3", vignette = "Cytoscape-and-iGraph.html", label = "02. Cytoscape and igraph")`.
+We refer to the `RCy3` package vignettes for further reading - possibly, this can be the best place to start: `r BiocStyle::Biocpkg("RCy3", vignette = "Cytoscape-and-iGraph.html", label = "02. Cytoscape and igraph")`.
 
 # Caching information with KEGGemUP
 
