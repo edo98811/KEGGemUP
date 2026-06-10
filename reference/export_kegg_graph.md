@@ -31,5 +31,5 @@ NULL, invisibly
 
 g <- create_kegg_graph(pathway_id = "hsa04110")
 export_kegg_graph(g, basename = tempfile())
-#> Exported graph components in /tmp/Rtmp4cNBm3/file1e143d8e5151_nodes.tsv and /tmp/Rtmp4cNBm3/file1e143d8e5151_edges.tsv
+#> Exported graph components in /tmp/RtmpHtNn53/file1d74740b7250_nodes.tsv and /tmp/RtmpHtNn53/file1d74740b7250_edges.tsv
 ```

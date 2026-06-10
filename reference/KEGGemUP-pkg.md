@@ -35,3 +35,14 @@ Authors:
 
 - Edoardo Filippi <edoardo.filippi@uni-mainz.de>
   ([ORCID](https://orcid.org/0009-0003-9858-0137))
+
+Other contributors:
+
+- Myriam Meineck <Myriam.Meineck@unimedizin-mainz.de>
+  ([ORCID](https://orcid.org/0000-0002-3243-2540)) \[contributor\]
+
+- Paul Classen <classenp@uni-mainz.de>
+  ([ORCID](https://orcid.org/0000-0002-9410-0525)) \[contributor\]
+
+- Julia Weinmann-Menke <Julia.Weinmann-Menke@unimedizin-mainz.de>
+  ([ORCID](https://orcid.org/0000-0001-7344-8381)) \[funder\]

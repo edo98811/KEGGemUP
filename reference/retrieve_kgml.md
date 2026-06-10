@@ -46,7 +46,7 @@ directory
 data_dir <- tempdir()
 kgml_path <- retrieve_kgml("hsa04110", path = data_dir, verbose = TRUE)
 #> Downloading KGML from: https://rest.kegg.jp/get/hsa04110/kgml
-#> Downloaded & saved in: /tmp/Rtmp4cNBm3/hsa04110.xml
+#> Downloaded & saved in: /tmp/RtmpHtNn53/hsa04110.xml
 
 cache_dir <- tempdir()
 kgml_path_cached <- retrieve_kgml("hsa04110",

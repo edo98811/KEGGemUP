@@ -41,7 +41,7 @@ graph <- create_kegg_graph(pathway_id = "hsa04110")
 #> 
 graph_notitlenode <- cleanup_title_node(graph)
 graph_notitlenode
-#> IGRAPH 9ab0872 DN-B 133 119 -- 
+#> IGRAPH 7cb1835 DN-B 133 119 -- 
 #> + attr: title (g/c), type (g/c), name (v/c), type (v/c), link (v/c),
 #> | reaction (v/c), reaction_link (v/c), reaction_label (v/c),
 #> | graphics_name (v/c), node_name (v/c), KEGG (v/c), components (v/c),
@@ -58,7 +58,7 @@ graph_notitlenode
 #> | (e/c), width (e/n), value (e/n), label (e/c), lty (e/n), arrow.mode
 #> | (e/c), dashes (e/l), title (e/c), font.face (e/c), borderWidth (e/n),
 #> | borderWidthSelected (e/n), from (e/c), to (e/c)
-#> + edges from 9ab0872 (vertex names):
+#> + edges from 7cb1835 (vertex names):
 
 render_kegg_graph(graph_notitlenode)
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## KEGGemUP 0.99.1
+
+- Finalized some changes upon the Bioconductor package reviewing process
+  - [`render_kegg_graph()`](https://imbeimainz.github.io/KEGGemUP/reference/render_kegg_graph.md)
+    gains a `graph_title` parameter to override the displayed title
+  - fix in the vignette for correct rendering of the link to the RCy3
+    vignette
+  - added information on the `fnd` in the Authors section + formally
+    acknowledged the contributions of the wet-lab collaborators (as
+    `ctb` authors)
+
 ## KEGGemUP 0.99.0
 
 - Ready for the submission to Bioconductor!
