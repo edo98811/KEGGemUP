@@ -318,7 +318,7 @@ head(kmu_cached)
 ```
 
 ```{r deletecache, eval=FALSE}
-# this will delete all previously retrieved KGML files, use this judiciously
+## This will delete all previously retrieved KGML files, use this judiciously
 reset_cache_KEGGemUP()
 ```
 
