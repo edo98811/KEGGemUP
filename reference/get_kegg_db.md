@@ -48,7 +48,7 @@ kegg_compounds <- get_kegg_db(
   path = data_dir, verbose = TRUE
 )
 #> Retrieving KEGG database: compound
-#> Downloaded & saved KEGG database in: /tmp/RtmpuNolVn/kegg_compound.tsv
+#> Downloaded & saved KEGG database in: /tmp/RtmpkwIYXN/kegg_compound.tsv
 
 # Just returning without saving
 kegg_compounds_onthefly <- get_kegg_db(

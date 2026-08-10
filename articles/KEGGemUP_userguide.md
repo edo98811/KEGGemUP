@@ -1,6 +1,6 @@
 # The \`KEGGemUP\` User's Guide
 
-**Compiled date**: 2026-07-14
+**Compiled date**: 2026-08-10
 
 **Last edited**: 2026-04-24
 
@@ -151,7 +151,7 @@ kmu_graph <- create_kegg_graph(pathway_id = "hsa00563")
 #> adding rname 'https://rest.kegg.jp/get/hsa00563/kgml'
 
 kmu_graph
-#> IGRAPH eedddd7 DN-B 147 384 -- 
+#> IGRAPH c0908e4 DN-B 147 384 -- 
 #> + attr: title (g/c), type (g/c), name (v/c), type (v/c), link (v/c),
 #> | reaction (v/c), reaction_link (v/c), reaction_label (v/c),
 #> | graphics_name (v/c), node_name (v/c), KEGG (v/c), components (v/c),
@@ -168,7 +168,7 @@ kmu_graph
 #> | (e/c), width (e/n), value (e/n), label (e/c), lty (e/n), arrow.mode
 #> | (e/c), dashes (e/l), title (e/c), font.face (e/c), borderWidth (e/n),
 #> | borderWidthSelected (e/n), from (e/c), to (e/c)
-#> + edges from eedddd7 (vertex names):
+#> + edges from c0908e4 (vertex names):
 ```
 
 While one can directly use the `plot` routine to visualize this graph,
@@ -431,7 +431,7 @@ files, where all the info on nodes and edges are written.
 
 file_prefix <- tempfile()
 export_kegg_graph(g = kmu_cellcycle_highlighted, basename = file_prefix)
-#> Exported graph components in /tmp/Rtmpclu4Bi/file1f0b12dbdbe0_nodes.tsv and /tmp/Rtmpclu4Bi/file1f0b12dbdbe0_edges.tsv
+#> Exported graph components in /tmp/RtmpRmJytR/file20823d11f0f8_nodes.tsv and /tmp/RtmpRmJytR/file20823d11f0f8_edges.tsv
 ```
 
 Alternatively, the `igraph` objects can also be directly sent to
@@ -469,13 +469,13 @@ specified in the `org` parameter with a KEGG organism code, such as
 
 local_kgml_file <- retrieve_kgml(pathway_id = "hsa04110", path = tempdir())
 local_kgml_file
-#> [1] "/tmp/Rtmpclu4Bi/hsa04110.xml"
+#> [1] "/tmp/RtmpRmJytR/hsa04110.xml"
 
 graph_parsed <- create_kegg_graph(pathway_id = "local_kgml", kgml_file = local_kgml_file)
 #> Warning in value[[3L]](cond): Could not retrieve pathway name for ID:
 #> local_kgml
 graph_parsed
-#> IGRAPH de0b9e2 DN-B 134 119 -- 
+#> IGRAPH 419a8ca DN-B 134 119 -- 
 #> + attr: title (g/c), type (g/c), name (v/c), type (v/c), link (v/c),
 #> | reaction (v/c), reaction_link (v/c), reaction_label (v/c),
 #> | graphics_name (v/c), node_name (v/c), KEGG (v/c), components (v/c),
@@ -492,7 +492,7 @@ graph_parsed
 #> | (e/c), width (e/n), value (e/n), label (e/c), lty (e/n), arrow.mode
 #> | (e/c), dashes (e/l), title (e/c), font.face (e/c), borderWidth (e/n),
 #> | borderWidthSelected (e/n), from (e/c), to (e/c)
-#> + edges from de0b9e2 (vertex names):
+#> + edges from 419a8ca (vertex names):
 
 cpd_db <- get_kegg_db(db_name = "compound", path = tempdir())
 head(cpd_db)
@@ -527,20 +527,20 @@ head(kmu_cached)
 #> # A tibble: 3 × 10
 #>   rid   rname create_time access_time rpath rtype fpath last_modified_time etag 
 #>   <chr> <chr> <chr>       <chr>       <chr> <chr> <chr>              <dbl> <chr>
-#> 1 BFC1  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 2 BFC2  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 3 BFC3  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
+#> 1 BFC1  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 2 BFC2  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 3 BFC3  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
 #> # ℹ 1 more variable: expires <dbl>
 #> 
 #> $mappings
 #> # A tibble: 5 × 10
 #>   rid   rname create_time access_time rpath rtype fpath last_modified_time etag 
 #>   <chr> <chr> <chr>       <chr>       <chr> <chr> <chr>              <dbl> <chr>
-#> 1 BFC1  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 2 BFC2  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 3 BFC3  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 4 BFC4  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
-#> 5 BFC5  http… 2026-07-14… 2026-07-14… /hom… web   http…                 NA NA   
+#> 1 BFC1  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 2 BFC2  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 3 BFC3  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 4 BFC4  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
+#> 5 BFC5  http… 2026-08-10… 2026-08-10… /hom… web   http…                 NA NA   
 #> # ℹ 1 more variable: expires <dbl>
 ```
 
@@ -677,7 +677,7 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] KEGGREST_1.52.2     gtable_0.3.6        xfun_0.60          
-#>  [4] bslib_0.11.0        ggplot2_4.0.3       httr2_1.2.3        
+#>  [4] bslib_0.12.0        ggplot2_4.0.3       httr2_1.3.0        
 #>  [7] visNetwork_2.1.4    htmlwidgets_1.6.4   vctrs_0.7.3        
 #> [10] tools_4.6.1         generics_0.1.4      stats4_4.6.1       
 #> [13] curl_7.1.0          tibble_3.3.1        RSQLite_3.53.3     
@@ -692,15 +692,15 @@ sessionInfo()
 #> [40] dplyr_1.2.1         bookdown_0.47       labeling_0.4.3     
 #> [43] fastmap_1.2.0       grid_4.6.1          cli_3.6.6          
 #> [46] magrittr_2.0.5      utf8_1.2.6          withr_3.0.3        
-#> [49] filelock_1.0.3      scales_1.4.0        rappdirs_0.3.4     
-#> [52] bit64_4.8.2         rmarkdown_2.31      XVector_0.52.0     
-#> [55] httr_1.4.8          igraph_2.3.3        bit_4.6.0          
-#> [58] otel_0.2.0          ragg_1.5.2          png_0.1-9          
-#> [61] memoise_2.0.1       evaluate_1.0.5      knitr_1.51         
-#> [64] IRanges_2.46.0      BiocFileCache_3.2.0 rlang_1.3.0        
-#> [67] glue_1.8.1          DBI_1.3.0           xml2_1.6.0         
-#> [70] BiocManager_1.30.27 BiocGenerics_0.58.1 jsonlite_2.0.0     
-#> [73] R6_2.6.1            systemfonts_1.3.2   fs_2.1.0
+#> [49] filelock_1.0.3      scales_1.4.0        bit64_4.8.2        
+#> [52] rmarkdown_2.31      XVector_0.52.0      httr_1.4.8         
+#> [55] igraph_2.3.3        bit_4.6.0           otel_0.2.0         
+#> [58] ragg_1.5.2          png_0.1-9           memoise_2.0.1      
+#> [61] evaluate_1.0.5      knitr_1.51          IRanges_2.46.0     
+#> [64] BiocFileCache_3.2.0 rlang_1.3.0         glue_1.8.1         
+#> [67] DBI_1.3.0           xml2_1.6.0          BiocManager_1.30.27
+#> [70] BiocGenerics_0.58.1 jsonlite_2.0.0      R6_2.6.1           
+#> [73] systemfonts_1.3.2   fs_2.1.0
 ```
 
 ## References

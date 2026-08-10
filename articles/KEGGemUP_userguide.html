@@ -79,7 +79,7 @@ Marini</h4>
 (IMBEI), Mainz<br><a class="author_email" href="mailto:#"></a><a href="mailto:federico.marini@uni-mainz.de" class="email">federico.marini@uni-mainz.de</a>
       </address>
                   
-            <h4 data-toc-skip class="date">14 July 2026</h4>
+            <h4 data-toc-skip class="date">10 August 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/imbeimainz/KEGGemUP/blob/devel/vignettes/KEGGemUP_userguide.Rmd" class="external-link"><code>vignettes/KEGGemUP_userguide.Rmd</code></a></small>
       <div class="d-none name"><code>KEGGemUP_userguide.Rmd</code></div>
@@ -92,7 +92,7 @@ Marini</h4>
   font-size: 10px
 }
 </style>
-<p><strong>Compiled date</strong>: 2026-07-14</p>
+<p><strong>Compiled date</strong>: 2026-08-10</p>
 <p><strong>Last edited</strong>: 2026-04-24</p>
 <p><strong>License</strong>: MIT + file LICENSE</p>
 <div class="section level2">
@@ -222,7 +222,7 @@ components of the database.</p>
 <span><span class="co">#&gt; adding rname 'https://rest.kegg.jp/get/hsa00563/kgml'</span></span>
 <span></span>
 <span><span class="va">kmu_graph</span></span>
-<span><span class="co">#&gt; IGRAPH eedddd7 DN-B 147 384 -- </span></span>
+<span><span class="co">#&gt; IGRAPH c0908e4 DN-B 147 384 -- </span></span>
 <span><span class="co">#&gt; + attr: title (g/c), type (g/c), name (v/c), type (v/c), link (v/c),</span></span>
 <span><span class="co">#&gt; | reaction (v/c), reaction_link (v/c), reaction_label (v/c),</span></span>
 <span><span class="co">#&gt; | graphics_name (v/c), node_name (v/c), KEGG (v/c), components (v/c),</span></span>
@@ -239,7 +239,7 @@ components of the database.</p>
 <span><span class="co">#&gt; | (e/c), width (e/n), value (e/n), label (e/c), lty (e/n), arrow.mode</span></span>
 <span><span class="co">#&gt; | (e/c), dashes (e/l), title (e/c), font.face (e/c), borderWidth (e/n),</span></span>
 <span><span class="co">#&gt; | borderWidthSelected (e/n), from (e/c), to (e/c)</span></span>
-<span><span class="co">#&gt; + edges from eedddd7 (vertex names):</span></span></code></pre></div>
+<span><span class="co">#&gt; + edges from c0908e4 (vertex names):</span></span></code></pre></div>
 <p>While one can directly use the <code>plot</code> routine to visualize
 this graph, most of its attributes are set to behave correctly in the
 interactive viewer provided by <em><a href="https://CRAN.R-project.org/package=visNetwork" class="external-link">visNetwork</a></em>.
@@ -466,7 +466,7 @@ edges are written.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">file_prefix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/export_kegg_graph.html">export_kegg_graph</a></span><span class="op">(</span>g <span class="op">=</span> <span class="va">kmu_cellcycle_highlighted</span>, basename <span class="op">=</span> <span class="va">file_prefix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Exported graph components in /tmp/Rtmpclu4Bi/file1f0b12dbdbe0_nodes.tsv and /tmp/Rtmpclu4Bi/file1f0b12dbdbe0_edges.tsv</span></span></code></pre></div>
+<span><span class="co">#&gt; Exported graph components in /tmp/RtmpRmJytR/file20823d11f0f8_nodes.tsv and /tmp/RtmpRmJytR/file20823d11f0f8_edges.tsv</span></span></code></pre></div>
 <p>Alternatively, the <code>igraph</code> objects can also be directly
 sent to external software such as Cytoscape via the RESTful API
 implemented in <code>RCy3</code> - this can also allow some settings of
@@ -497,13 +497,13 @@ such as “hsa”, “mmu”, “dme”, etc.).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">local_kgml_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/retrieve_kgml.html">retrieve_kgml</a></span><span class="op">(</span>pathway_id <span class="op">=</span> <span class="st">"hsa04110"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">local_kgml_file</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpclu4Bi/hsa04110.xml"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpRmJytR/hsa04110.xml"</span></span>
 <span></span>
 <span><span class="va">graph_parsed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_kegg_graph.html">create_kegg_graph</a></span><span class="op">(</span>pathway_id <span class="op">=</span> <span class="st">"local_kgml"</span>, kgml_file <span class="op">=</span> <span class="va">local_kgml_file</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in value[[3L]](cond): Could not retrieve pathway name for ID:</span></span>
 <span><span class="co">#&gt; local_kgml</span></span>
 <span><span class="va">graph_parsed</span></span>
-<span><span class="co">#&gt; IGRAPH de0b9e2 DN-B 134 119 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 419a8ca DN-B 134 119 -- </span></span>
 <span><span class="co">#&gt; + attr: title (g/c), type (g/c), name (v/c), type (v/c), link (v/c),</span></span>
 <span><span class="co">#&gt; | reaction (v/c), reaction_link (v/c), reaction_label (v/c),</span></span>
 <span><span class="co">#&gt; | graphics_name (v/c), node_name (v/c), KEGG (v/c), components (v/c),</span></span>
@@ -520,7 +520,7 @@ such as “hsa”, “mmu”, “dme”, etc.).</p>
 <span><span class="co">#&gt; | (e/c), width (e/n), value (e/n), label (e/c), lty (e/n), arrow.mode</span></span>
 <span><span class="co">#&gt; | (e/c), dashes (e/l), title (e/c), font.face (e/c), borderWidth (e/n),</span></span>
 <span><span class="co">#&gt; | borderWidthSelected (e/n), from (e/c), to (e/c)</span></span>
-<span><span class="co">#&gt; + edges from de0b9e2 (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from 419a8ca (vertex names):</span></span>
 <span></span>
 <span><span class="va">cpd_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_kegg_db.html">get_kegg_db</a></span><span class="op">(</span>db_name <span class="op">=</span> <span class="st">"compound"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cpd_db</span><span class="op">)</span></span>
@@ -548,20 +548,20 @@ entries for KEGGemUP in the standard BiocFileCache location.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
 <span><span class="co">#&gt;   rid   rname create_time access_time rpath rtype fpath last_modified_time etag </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> BFC1  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> BFC2  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> BFC3  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> BFC1  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> BFC2  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> BFC3  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: expires &lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $mappings</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 10</span></span></span>
 <span><span class="co">#&gt;   rid   rname create_time access_time rpath rtype fpath last_modified_time etag </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> BFC1  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> BFC2  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> BFC3  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> BFC4  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> BFC5  http… 2026-07-14… 2026-07-14… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> BFC1  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> BFC2  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> BFC3  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> BFC4  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> BFC5  http… 2026-08-10… 2026-08-10… /hom… web   http…                 <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: expires &lt;dbl&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## This will delete all previously retrieved KGML files, use this judiciously</span></span>
@@ -698,7 +698,7 @@ and Bioconductor-centric workflows.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] KEGGREST_1.52.2     gtable_0.3.6        xfun_0.60          </span></span>
-<span><span class="co">#&gt;  [4] bslib_0.11.0        ggplot2_4.0.3       httr2_1.2.3        </span></span>
+<span><span class="co">#&gt;  [4] bslib_0.12.0        ggplot2_4.0.3       httr2_1.3.0        </span></span>
 <span><span class="co">#&gt;  [7] visNetwork_2.1.4    htmlwidgets_1.6.4   vctrs_0.7.3        </span></span>
 <span><span class="co">#&gt; [10] tools_4.6.1         generics_0.1.4      stats4_4.6.1       </span></span>
 <span><span class="co">#&gt; [13] curl_7.1.0          tibble_3.3.1        RSQLite_3.53.3     </span></span>
@@ -713,15 +713,15 @@ and Bioconductor-centric workflows.</p>
 <span><span class="co">#&gt; [40] dplyr_1.2.1         bookdown_0.47       labeling_0.4.3     </span></span>
 <span><span class="co">#&gt; [43] fastmap_1.2.0       grid_4.6.1          cli_3.6.6          </span></span>
 <span><span class="co">#&gt; [46] magrittr_2.0.5      utf8_1.2.6          withr_3.0.3        </span></span>
-<span><span class="co">#&gt; [49] filelock_1.0.3      scales_1.4.0        rappdirs_0.3.4     </span></span>
-<span><span class="co">#&gt; [52] bit64_4.8.2         rmarkdown_2.31      XVector_0.52.0     </span></span>
-<span><span class="co">#&gt; [55] httr_1.4.8          igraph_2.3.3        bit_4.6.0          </span></span>
-<span><span class="co">#&gt; [58] otel_0.2.0          ragg_1.5.2          png_0.1-9          </span></span>
-<span><span class="co">#&gt; [61] memoise_2.0.1       evaluate_1.0.5      knitr_1.51         </span></span>
-<span><span class="co">#&gt; [64] IRanges_2.46.0      BiocFileCache_3.2.0 rlang_1.3.0        </span></span>
-<span><span class="co">#&gt; [67] glue_1.8.1          DBI_1.3.0           xml2_1.6.0         </span></span>
-<span><span class="co">#&gt; [70] BiocManager_1.30.27 BiocGenerics_0.58.1 jsonlite_2.0.0     </span></span>
-<span><span class="co">#&gt; [73] R6_2.6.1            systemfonts_1.3.2   fs_2.1.0</span></span></code></pre></div>
+<span><span class="co">#&gt; [49] filelock_1.0.3      scales_1.4.0        bit64_4.8.2        </span></span>
+<span><span class="co">#&gt; [52] rmarkdown_2.31      XVector_0.52.0      httr_1.4.8         </span></span>
+<span><span class="co">#&gt; [55] igraph_2.3.3        bit_4.6.0           otel_0.2.0         </span></span>
+<span><span class="co">#&gt; [58] ragg_1.5.2          png_0.1-9           memoise_2.0.1      </span></span>
+<span><span class="co">#&gt; [61] evaluate_1.0.5      knitr_1.51          IRanges_2.46.0     </span></span>
+<span><span class="co">#&gt; [64] BiocFileCache_3.2.0 rlang_1.3.0         glue_1.8.1         </span></span>
+<span><span class="co">#&gt; [67] DBI_1.3.0           xml2_1.6.0          BiocManager_1.30.27</span></span>
+<span><span class="co">#&gt; [70] BiocGenerics_0.58.1 jsonlite_2.0.0      R6_2.6.1           </span></span>
+<span><span class="co">#&gt; [73] systemfonts_1.3.2   fs_2.1.0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
